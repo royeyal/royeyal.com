@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Roy Eyal – New Site Coming Soon</title>
+  <title>Roy Eyal – Marketing Web Developer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Roy Eyal – Marketing Web Developer. New portfolio site coming soon."
+    content="Roy Eyal – Marketing Web Developer. Engineering marketing experiences through motion, systems, and modern automation."
   />
 
   <!-- Basic styling -->
@@ -38,6 +38,8 @@
       padding: 24px;
       font-family: var(--font-main);
       background: var(--bg);
+      background-size: 200% 200%; /* enables gradient drift */
+      background-position: 0% 0%;
       color: var(--text-main);
       text-rendering: optimizeLegibility;
     }
@@ -52,12 +54,11 @@
       position: relative;
       overflow: hidden;
       backdrop-filter: blur(20px);
-      animation: cardIn 600ms var(--transition-fast) forwards;
-      opacity: 0;
+      opacity: 0;                /* will be animated in via GSAP */
       transform: translateY(20px);
     }
 
-    /* floating pixel-ish shape, just for fun */
+    /* floating pixel-ish shape */
     .orb {
       position: absolute;
       inset: auto -40px -40px auto;
@@ -68,7 +69,6 @@
       filter: blur(1px);
       border-radius: 32px;
       transform: translate3d(20px, 20px, 0);
-      animation: float 7s ease-in-out infinite alternate;
       pointer-events: none;
     }
 
@@ -198,22 +198,6 @@
       opacity: 0.9;
     }
 
-    @keyframes float {
-      0% {
-        transform: translate3d(10px, 20px, 0) rotate(0deg);
-      }
-      100% {
-        transform: translate3d(-10px, 0, 0) rotate(5deg);
-      }
-    }
-
-    @keyframes cardIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
       * {
         animation-duration: 0.01ms !important;
@@ -228,9 +212,9 @@
     <div class="orb" aria-hidden="true"></div>
 
     <header>
-      <div class="eyebrow">Portfolio refresh in progress</div>
-      <h1>Roy Eyal</h1>
-      <div class="role">Marketing Web Developer &amp; Web Experiences</div>
+      <div class="eyebrow">A decade of building, teaching, and shaping web experiences</div>
+      <h1>Roy Eyal — Marketing Web Developer</h1>
+      <div class="role">Engineering marketing experiences through motion, systems, and modern automation.</div>
       <div class="pill">
         <span>Currently at Lusha</span>
       </div>
@@ -238,12 +222,15 @@
 
     <main>
       <p>
-        I build <span class="highlight">marketing sites, Webflow builds, and
-        GSAP-driven interactions</span> for tech and SaaS companies.
+        My journey spans freelance and studio work, leading into roles at Elementor and Wix,
+        and now marketing engineering at Lusha. I build scalable Webflow architectures,
+        GSAP interaction systems, performance-driven frontend experiences, and
+        <span class="highlight">AI-powered automation pipelines</span> for fast-paced SaaS teams.
       </p>
       <p>
-        A new version of my portfolio is on the way. In the meantime, you can still
-        reach out or check my profiles below.
+        Alongside development, I’ve appeared on Elementor’s YouTube channel — creating videos,
+        walkthroughs, and live sessions that help others understand the craft behind the web.
+        A new, more technical version of my site is on the way. Until then, here are the best ways to connect.
       </p>
 
       <div class="links">
@@ -270,22 +257,94 @@
     </footer>
   </div>
 
+  <!-- Auto-update year -->
   <script>
-    // Update year automatically
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="" crossorigin="anonymous"></script>
+  <!-- GSAP 3.13.0 (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+
   <script>
-    gsap.from(".links a", {
-      opacity: 0,
-      y: 12,
-      stagger: 0.08,
-      duration: 0.5,
-      ease: "power2.out",
-      delay: 0.2
-    });
+    (function() {
+      const prefersReducedMotion = window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (prefersReducedMotion || typeof gsap === "undefined") {
+        // Just fade in the card without fancy motion
+        const wrapper = document.querySelector(".wrapper");
+        if (wrapper) {
+          wrapper.style.opacity = "1";
+          wrapper.style.transform = "none";
+        }
+        return;
+      }
+
+      const wrapper = document.querySelector(".wrapper");
+      const headerItems = document.querySelectorAll(".eyebrow, h1, .role, .pill");
+      const textBlocks = document.querySelectorAll("main p");
+      const links = document.querySelectorAll(".links a");
+      const orb = document.querySelector(".orb");
+
+      // Base timeline
+      const tl = gsap.timeline({
+        defaults: {
+          ease: "power2.out"
+        }
+      });
+
+      // Card in
+      tl.to(wrapper, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6
+      });
+
+      // Stagger header elements
+      tl.from(headerItems, {
+        opacity: 0,
+        y: 20,
+        duration: 0.5,
+        stagger: 0.06
+      }, "-=0.2");
+
+      // Text paragraphs
+      tl.from(textBlocks, {
+        opacity: 0,
+        y: 12,
+        duration: 0.45,
+        stagger: 0.08
+      }, "-=0.2");
+
+      // Links / buttons
+      tl.from(links, {
+        opacity: 0,
+        y: 10,
+        duration: 0.4,
+        stagger: 0.06
+      }, "-=0.15");
+
+      // Subtle orb float
+      if (orb) {
+        gsap.to(orb, {
+          x: -15,
+          y: -10,
+          duration: 7,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut"
+        });
+      }
+
+      // Slow gradient drift on body background
+      gsap.to(document.body, {
+        backgroundPosition: "100% 100%",
+        duration: 26,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+    })();
   </script>
- 
 </body>
 </html>
