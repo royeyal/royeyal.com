@@ -1,0 +1,75 @@
+/* ------------------------------------------------------------------
+   Design tokens — Apple-meets-cyberpunk
+   Magenta = synthwave '80s. Cyan = Tron. Black = the grid.
+   ------------------------------------------------------------------ */
+:root {
+  /* color */
+  --ink: #05060a;
+  --surface: #0b0d15;
+  --surface-raised: #161b2c;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --text: #f2f4fb;
+  --text-muted: #9aa3b8;
+
+  /* ─── Wide-gamut brand colours ─────────────────────────────────
+     OKLCH base — the browser gamut-maps to sRGB on standard
+     screens. P3 overrides below unlock full chroma on wide-gamut
+     displays (Apple, modern Android/Windows). */
+
+  /* #f900b9 */
+  --magenta: oklch(64% 0.29 348deg);
+
+  /* #42effe */
+  --cyan: oklch(88% 0.15 197deg);
+
+  --magenta-dim: rgba(249, 0, 185, 0.35);
+  --cyan-dim: rgba(66, 239, 254, 0.35);
+
+  /* typography */
+  --font-display: 'Archivo Variable', system-ui, sans-serif;
+  --font-body: 'Archivo Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* weight — every element carries heavy, layered shadow */
+  --shadow-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 2px 4px rgba(0, 0, 0, 0.65),
+    0 12px 24px -8px rgba(0, 0, 0, 0.85), 0 48px 110px -20px rgba(0, 0, 0, 1);
+  --shadow-card-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 8px rgba(0, 0, 0, 0.65),
+    0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 64px 140px -20px rgba(0, 0, 0, 1),
+    0 0 64px -8px var(--cyan-dim);
+  --shadow-btn:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 3px 8px rgba(0, 0, 0, 0.7),
+    0 12px 24px -6px rgba(0, 0, 0, 0.8), 0 20px 56px -8px var(--magenta-dim);
+
+  /* subtle card sheen — a touch of raised light from the top-left */
+  --card-gradient: linear-gradient(
+    165deg,
+    var(--surface-raised) 0%,
+    var(--surface) 62%
+  );
+
+  /* layout */
+  --container: 1120px;
+  --gutter: clamp(20px, 4vw, 48px);
+  --section-gap: clamp(96px, 14vh, 180px);
+
+  /* nested-radius recipe: inner-radius = outer-radius − padding.
+     Never reuse the outer radius on a nested box — derive it. */
+  --radius: 16px;
+  --radius-outer: 22px;
+  --radius-small: 10px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --fast: 220ms;
+}
+
+/* P3 — full chroma on wide-gamut displays */
+@media (color-gamut: p3) {
+  :root {
+    --magenta: color(display-p3 0.96 0 0.7);
+    --cyan: color(display-p3 0.3 0.94 1);
+  }
+}

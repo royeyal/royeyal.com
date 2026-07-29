@@ -1,350 +1,357 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Roy Eyal – Marketing Web Developer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="Roy Eyal – Marketing Web Developer. Engineering marketing experiences through motion, systems, and modern automation."
-  />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Roy Eyal — Marketing Web Developer</title>
+    <meta
+      name="description"
+      content="Roy Eyal is a marketing web developer who closes the gap between design and production — Figma-to-code design systems, hand-built marketing sites, and AI workflows. Previously at Elementor and Wix, currently at Lusha."
+    />
+    <meta name="theme-color" content="#05060a" />
+    <!-- TODO: Save your ANSI "R" image as public/favicon.png (512×512) -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+    <header class="hero" id="top">
+      <div class="hero__bg" data-strands aria-hidden="true"></div>
+      <div class="hero__scanlines" aria-hidden="true"></div>
 
-  <!-- Basic styling -->
-  <style>
-    :root {
-      --bg: radial-gradient(circle at top left, #ff6ad5 0%, #5f27cd 35%, #1e1b4b 80%);
-      --card-bg: rgba(9, 9, 20, 0.9);
-      --accent: #4ef1ff;
-      --text-main: #ffffff;
-      --text-muted: #c9c9dd;
-      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Inter", "Segoe UI", sans-serif;
-      --max-width: 640px;
-      --transition-fast: 200ms ease-out;
-      --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.6);
-    }
+      <div class="hero__inner container">
+        <!-- ANSI logo (public/images/royeyal-logo.svg, currentColor) applied
+             as a CSS mask so the cyan→magenta gradient comes from CSS -->
+        <div
+          class="ansi-logo"
+          data-hero="logo"
+          role="img"
+          aria-label="ROY EYAL"
+        ></div>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        <p class="eyebrow" data-hero="eyebrow">Marketing Web Developer</p>
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      font-family: var(--font-main);
-      background: var(--bg);
-      background-size: 200% 200%; /* enables gradient drift */
-      background-position: 0% 0%;
-      color: var(--text-main);
-      text-rendering: optimizeLegibility;
-    }
+        <h1 class="hero__title" data-hero="title">
+          I close the gap between
+          <span class="glow-cyan">design</span> and
+          <span class="glow-magenta">production</span>.
+        </h1>
 
-    .wrapper {
-      width: 100%;
-      max-width: var(--max-width);
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 28px 24px 24px;
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(20px);
-      opacity: 0;                /* will be animated in via GSAP */
-      transform: translateY(20px);
-    }
+        <p class="hero__sub" data-hero="sub">
+          Design systems that speak both Figma and SCSS. Marketing sites
+          hand-built for speed. AI workflows that turn briefs into shipped
+          pages. Currently engineering the marketing web at
+          <a href="https://www.lusha.com" target="_blank" rel="noreferrer"
+            >Lusha</a
+          >.
+        </p>
 
-    /* floating pixel-ish shape */
-    .orb {
-      position: absolute;
-      inset: auto -40px -40px auto;
-      width: 130px;
-      height: 130px;
-      background: radial-gradient(circle at 30% 20%, #ff9ff3, #341f97);
-      opacity: 0.3;
-      filter: blur(1px);
-      border-radius: 32px;
-      transform: translate3d(20px, 20px, 0);
-      pointer-events: none;
-    }
-
-    header {
-      margin-bottom: 20px;
-    }
-
-    .eyebrow {
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    h1 {
-      font-size: clamp(1.9rem, 3vw + 1rem, 2.6rem);
-      line-height: 1.1;
-      margin-bottom: 8px;
-    }
-
-    .role {
-      font-size: 1rem;
-      color: var(--text-muted);
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(153, 246, 255, 0.35);
-      color: var(--accent);
-      margin-top: 10px;
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    main {
-      margin-top: 18px;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
-
-    main p + p {
-      margin-top: 10px;
-    }
-
-    .highlight {
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .btn,
-    .text-link {
-      font-size: 0.9rem;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        background var(--transition-fast),
-        color var(--transition-fast),
-        border-color var(--transition-fast);
-    }
-
-    .btn {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 255, 0.7);
-      background: linear-gradient(135deg, #4c1d95, #0f172a);
-      color: #f9fafb;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.8);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn span.arrow {
-      font-size: 1rem;
-      transform: translateX(0);
-      transition: transform var(--transition-fast);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
-    }
-
-    .btn:hover span.arrow {
-      transform: translateX(3px);
-    }
-
-    .text-link {
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      background: transparent;
-    }
-
-    .text-link:hover {
-      border-color: rgba(148, 163, 255, 0.6);
-      color: var(--accent);
-      background: rgba(15, 23, 42, 0.8);
-      transform: translateY(-1px);
-    }
-
-    footer {
-      margin-top: 18px;
-      font-size: 0.75rem;
-      color: #71717a;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    footer span {
-      opacity: 0.9;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="wrapper">
-    <div class="orb" aria-hidden="true"></div>
-
-    <header>
-      <div class="eyebrow">A decade of building, teaching, and shaping web experiences</div>
-      <h1>Roy Eyal — Marketing Web Developer</h1>
-      <div class="role">Engineering marketing experiences through motion, systems, and modern automation.</div>
-      <div class="pill">
-        <span>Currently at Lusha</span>
+        <div class="hero__actions" data-hero="actions">
+          <a class="btn btn--primary" href="mailto:hello@royeyal.com">
+            Get in touch <span class="btn__arrow" aria-hidden="true">→</span>
+          </a>
+          <a
+            class="btn btn--ghost"
+            href="https://www.linkedin.com/in/royeyalcom/"
+            target="_blank"
+            rel="noreferrer"
+            >LinkedIn</a
+          >
+          <a
+            class="btn btn--ghost"
+            href="https://github.com/royeyal"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub</a
+          >
+        </div>
       </div>
+
+      <p class="hero__hint" data-hero="hint" aria-hidden="true">
+        scroll to continue<span class="cursor">▌</span>
+      </p>
     </header>
 
     <main>
-      <p>
-        My journey spans freelance and studio work, leading into roles at Elementor and Wix,
-        and now marketing engineering at Lusha. I build scalable Webflow architectures,
-        GSAP interaction systems, performance-driven frontend experiences, and
-        <span class="highlight">AI-powered automation pipelines</span> for fast-paced SaaS teams.
-      </p>
-      <p>
-        Alongside development, I’ve appeared on Elementor’s YouTube channel — creating videos,
-        walkthroughs, and live sessions that help others understand the craft behind the web.
-        A new, more technical version of my site is on the way. Until then, here are the best ways to connect.
-      </p>
+      <!-- ============================================================
+           ABOUT
+           ============================================================ -->
+      <section class="about section" id="about" data-reveal-section>
+        <div class="container">
+          <p class="eyebrow" data-reveal>About</p>
+          <div class="about__grid">
+            <div class="about__copy">
+              <h2 class="section__title" data-reveal>
+                One person.<br />Four disciplines.
+              </h2>
+              <div class="about__text" data-reveal>
+                <p>
+                  I'm Roy — a marketing web developer. It's a deliberately
+                  hybrid title: I write production code (PHP, SCSS, JavaScript —
+                  no page builders), I think in Figma variables and design
+                  tokens, and I ship for marketing teams that measure
+                  everything. My work lives where those worlds meet.
+                </p>
+                <p>
+                  Over the last decade I've helped build and rebrand the
+                  marketing sites of Elementor, Wix, and now Lusha — alongside
+                  freelance Webflow builds for SaaS companies. Lately I engineer
+                  AI workflows: Claude Code skills that take a landing page from
+                  keyword to production HTML in minutes, and a
+                  Figma-to-WordPress pipeline powered by a shared design token
+                  system.
+                </p>
+                <p>
+                  I've also spent time on the other side of the screen — hosting
+                  10+ webinars, meetups and YouTube live shows for Elementor's
+                  community, and writing CSS guides that became go-to references
+                  at Wix.
+                </p>
+              </div>
+              <ul class="chips" data-reveal>
+                <li class="chip">HTML · PHP · SCSS · JS</li>
+                <li class="chip">Webflow Expert</li>
+                <li class="chip">Figma → Code Tokens</li>
+                <li class="chip">GSAP Motion</li>
+                <li class="chip">CI/CD · GitHub</li>
+                <li class="chip">AI Workflow Automation</li>
+                <li class="chip">UX/UI</li>
+                <li class="chip">GTM · A/B Testing</li>
+              </ul>
+            </div>
 
-      <div class="links">
-        <a class="btn" href="mailto:hello@royeyal.com">
-          <span>Contact me</span>
-          <span class="arrow">↗</span>
-        </a>
+            <figure class="about__portrait" data-reveal>
+              <!-- TODO: Save your Elementor headshot as
+                   public/images/roy-eyal.jpg (it is not committed yet) -->
+              <img
+                src="/images/roy-eyal.jpg"
+                onerror="
+                  this.onerror = null;
+                  this.src = '/images/headshot-placeholder.svg';
+                "
+                alt="Roy Eyal — professional headshot"
+                width="480"
+                height="560"
+              />
+              <figcaption class="mono">roy_eyal.jpg — 480×560</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
 
-        <a class="text-link" href="https://www.linkedin.com/in/royeyalcom" target="_blank" rel="noreferrer">
-          LinkedIn
-        </a>
-        <a class="text-link" href="https://github.com/royeyal" target="_blank" rel="noreferrer">
-          GitHub
-        </a>
-        <a class="text-link" href="https://royeyal.studio" target="_blank" rel="noreferrer">
-          Old Webflow portfolio
-        </a>
-      </div>
+      <!-- ============================================================
+           PROFESSIONAL WORK
+           ============================================================ -->
+      <section class="work section" id="work" data-reveal-section>
+        <div class="container">
+          <p class="eyebrow" data-reveal>Experience</p>
+          <h2 class="section__title" data-reveal>
+            A decade of shipping<br />the marketing web.
+          </h2>
+
+          <ol class="work__list">
+            <li class="work-card" data-reveal>
+              <header class="work-card__head">
+                <div class="work-card__logo" aria-hidden="true">
+                  <!-- TODO: Paste Lusha's SVG logo here (inline <svg>,
+                       fill="currentColor") -->
+                  <span class="mono">svg</span>
+                </div>
+                <h3 class="work-card__company">Lusha</h3>
+                <p class="work-card__role">Marketing Web Developer</p>
+                <p class="work-card__years mono">2023 — Now</p>
+              </header>
+              <ul class="work-card__points">
+                <li>
+                  Hand-coded, high-performing marketing pages in HTML, PHP, SCSS
+                  and JavaScript — no page builders.
+                </li>
+                <li>
+                  Engineered a suite of Claude Code skills that automated the
+                  performance-marketing pipeline — keyword to production HTML
+                  landing page in minutes, not hours.
+                </li>
+                <li>
+                  Built a token-based design system linking Figma variables to
+                  SCSS, with mirrored components across design and code — plus a
+                  skill that converts a full Figma page into an editable
+                  WordPress page (ACF Pro).
+                </li>
+                <li>
+                  Created a reusable Webflow component toolkit that lets PMMs
+                  and designers self-serve on-brand landing pages, and maintain
+                  the WordPress codebase through GitHub CI/CD.
+                </li>
+              </ul>
+              <ul class="chips chips--small">
+                <li class="chip">PHP</li>
+                <li class="chip">SCSS</li>
+                <li class="chip">Claude Code</li>
+                <li class="chip">Webflow</li>
+                <li class="chip">CI/CD</li>
+              </ul>
+            </li>
+
+            <li class="work-card" data-reveal>
+              <header class="work-card__head">
+                <div class="work-card__logo" aria-hidden="true">
+                  <!-- TODO: Paste Wix's SVG logo here (inline <svg>,
+                       fill="currentColor") -->
+                  <span class="mono">svg</span>
+                </div>
+                <h3 class="work-card__company">Wix</h3>
+                <p class="work-card__role">Technical Designer</p>
+                <p class="work-card__years mono">2022 — 2023</p>
+              </header>
+              <ul class="work-card__points">
+                <li>
+                  Played a key role in the Wix Studio rebrand, developing
+                  optimized, SEO-friendly landing pages with CSS3, modern
+                  JavaScript and Velo.
+                </li>
+                <li>
+                  Authored CSS guides for Wix's developer community that became
+                  go-to references for accessible, well-structured styling.
+                </li>
+              </ul>
+              <ul class="chips chips--small">
+                <li class="chip">CSS3</li>
+                <li class="chip">ES6+</li>
+                <li class="chip">Velo</li>
+                <li class="chip">Accessibility</li>
+              </ul>
+            </li>
+
+            <li class="work-card" data-reveal>
+              <header class="work-card__head">
+                <div class="work-card__logo" aria-hidden="true">
+                  <!-- TODO: Paste Elementor's SVG logo here (inline <svg>,
+                       fill="currentColor") -->
+                  <span class="mono">svg</span>
+                </div>
+                <h3 class="work-card__company">Elementor</h3>
+                <p class="work-card__role">
+                  WordPress Developer &amp; Elementor Expert
+                </p>
+                <p class="work-card__years mono">2020 — 2022</p>
+              </header>
+              <ul class="work-card__points">
+                <li>
+                  Spearheaded the rebranding of Elementor — SEO-optimized,
+                  high-conversion landing pages in CSS3, PHP and JavaScript.
+                </li>
+                <li>
+                  Co-architected the Elementor design system: scalable technical
+                  frameworks for brand consistency across platforms.
+                </li>
+                <li>
+                  Hosted 10+ webinars, in-person meetups and YouTube live shows,
+                  lifting community engagement metrics and company KPIs.
+                </li>
+                <li>
+                  Ran A/B tests through Google Tag Manager and published
+                  well-received blog content and “Site of the Month” features.
+                </li>
+              </ul>
+              <ul class="chips chips--small">
+                <li class="chip">WordPress</li>
+                <li class="chip">Design Systems</li>
+                <li class="chip">Community</li>
+                <li class="chip">GTM</li>
+              </ul>
+            </li>
+          </ol>
+
+          <p class="work__earlier mono" data-reveal>
+            ▪ before that: freelance Webflow &amp; WordPress developer for SaaS
+            — GSAP animation, GitHub-based deploys, clean version control.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           FREELANCE WORK
+           ============================================================ -->
+      <section class="freelance section" id="freelance" data-reveal-section>
+        <div class="container">
+          <p class="eyebrow" data-reveal>Selected Freelance Work</p>
+          <h2 class="section__title" data-reveal>
+            Built solo,<br />start to ship.
+          </h2>
+          <p class="section__lede" data-reveal>
+            A selection of sites I designed and developed as a freelance web
+            developer — all in Webflow, except one in Elementor.
+          </p>
+
+          <!-- TODO: Replace these placeholder cards with your real selected
+               projects (name, link, screenshot, one-line result). -->
+          <ul class="project-grid">
+            <li class="project-card" data-reveal>
+              <div class="project-card__media" aria-hidden="true">
+                <span class="mono">screenshot_01.png</span>
+              </div>
+              <h3 class="project-card__name">Project Name</h3>
+              <p class="project-card__meta mono">Webflow · SaaS</p>
+            </li>
+            <li class="project-card" data-reveal>
+              <div class="project-card__media" aria-hidden="true">
+                <span class="mono">screenshot_02.png</span>
+              </div>
+              <h3 class="project-card__name">Project Name</h3>
+              <p class="project-card__meta mono">Webflow · SaaS</p>
+            </li>
+            <li class="project-card" data-reveal>
+              <div class="project-card__media" aria-hidden="true">
+                <span class="mono">screenshot_03.png</span>
+              </div>
+              <h3 class="project-card__name">Project Name</h3>
+              <p class="project-card__meta mono">Webflow · Product</p>
+            </li>
+            <li class="project-card" data-reveal>
+              <div class="project-card__media" aria-hidden="true">
+                <span class="mono">screenshot_04.png</span>
+              </div>
+              <h3 class="project-card__name">Project Name</h3>
+              <p class="project-card__meta mono">Elementor</p>
+            </li>
+          </ul>
+        </div>
+      </section>
     </main>
 
-    <footer>
-      <span>© <span id="year"></span> Roy Eyal</span>
-      <span>New site coming soon.</span>
+    <!-- ============================================================
+         BIG FOOTER
+         ============================================================ -->
+    <footer class="footer" id="contact">
+      <div class="container">
+        <p class="eyebrow" data-reveal>Say hello</p>
+        <a class="footer__mail" href="mailto:hello@royeyal.com" data-reveal
+          >hello@royeyal.com</a
+        >
+        <nav class="footer__links" data-reveal aria-label="Social links">
+          <a
+            href="https://www.linkedin.com/in/royeyalcom/"
+            target="_blank"
+            rel="noreferrer"
+            >LinkedIn</a
+          >
+          <a href="https://github.com/royeyal" target="_blank" rel="noreferrer"
+            >GitHub</a
+          >
+        </nav>
+      </div>
+
+      <div class="footer__giant" aria-hidden="true">
+        <span data-giant>ROY&nbsp;EYAL</span>
+      </div>
+
+      <div class="footer__meta container">
+        <p class="mono">roy@royeyal.com:~$ exit<span class="cursor">▌</span></p>
+        <p class="mono">© <span data-year>2026</span> Roy Eyal</p>
+      </div>
     </footer>
-  </div>
-
-  <!-- Auto-update year -->
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-
-  <!-- GSAP 3.13.0 (CDN) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
-
-  <script>
-    (function() {
-      const prefersReducedMotion = window.matchMedia &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      if (prefersReducedMotion || typeof gsap === "undefined") {
-        // Just fade in the card without fancy motion
-        const wrapper = document.querySelector(".wrapper");
-        if (wrapper) {
-          wrapper.style.opacity = "1";
-          wrapper.style.transform = "none";
-        }
-        return;
-      }
-
-      const wrapper = document.querySelector(".wrapper");
-      const headerItems = document.querySelectorAll(".eyebrow, h1, .role, .pill");
-      const textBlocks = document.querySelectorAll("main p");
-      const links = document.querySelectorAll(".links a");
-      const orb = document.querySelector(".orb");
-
-      // Base timeline
-      const tl = gsap.timeline({
-        defaults: {
-          ease: "power2.out"
-        }
-      });
-
-      // Card in
-      tl.to(wrapper, {
-        opacity: 1,
-        y: 0,
-        duration: 0.6
-      });
-
-      // Stagger header elements
-      tl.from(headerItems, {
-        opacity: 0,
-        y: 20,
-        duration: 0.5,
-        stagger: 0.06
-      }, "-=0.2");
-
-      // Text paragraphs
-      tl.from(textBlocks, {
-        opacity: 0,
-        y: 12,
-        duration: 0.45,
-        stagger: 0.08
-      }, "-=0.2");
-
-      // Links / buttons
-      tl.from(links, {
-        opacity: 0,
-        y: 10,
-        duration: 0.4,
-        stagger: 0.06
-      }, "-=0.15");
-
-      // Subtle orb float
-      if (orb) {
-        gsap.to(orb, {
-          x: -15,
-          y: -10,
-          duration: 7,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut"
-        });
-      }
-
-      // Slow gradient drift on body background
-      gsap.to(document.body, {
-        backgroundPosition: "100% 100%",
-        duration: 26,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-      });
-    })();
-  </script>
-</body>
+  </body>
 </html>

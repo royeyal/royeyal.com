@@ -1,0 +1,27 @@
+{
+  "name": "royeyal.com",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Roy Eyal — Marketing Web Developer. Personal CV site.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "gsap": "^3.13.0",
+    "ogl": "^1.0.11"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "vite": "^7.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}
