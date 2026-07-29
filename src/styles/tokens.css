@@ -27,9 +27,10 @@
   --magenta-dim: rgba(249, 0, 185, 0.35);
   --cyan-dim: rgba(66, 239, 254, 0.35);
 
-  /* typography */
+  /* typography — display becomes Neue Machina once purchased
+     (see fonts.css for the switch instructions) */
   --font-display: 'Archivo Variable', system-ui, sans-serif;
-  --font-body: 'Archivo Variable', system-ui, sans-serif;
+  --font-body: 'Switzer Variable', system-ui, sans-serif;
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
 
   /* type scale */

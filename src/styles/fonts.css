@@ -1,8 +1,9 @@
 /* ------------------------------------------------------------------
    Self-hosted fonts
-   Departure Mono has a single weight (400) — don't ask for bold, the
-   browser would fake it and ruin the pixel grid.
    ------------------------------------------------------------------ */
+
+/* Departure Mono has a single weight (400) — don't ask for bold, the
+   browser would fake it and ruin the pixel grid. */
 @font-face {
   font-family: 'Departure Mono';
   src: url('../assets/fonts/DepartureMono-Regular.woff2') format('woff2');
@@ -10,3 +11,30 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* Switzer (Fontshare) — variable weight axis, body text */
+@font-face {
+  font-family: 'Switzer Variable';
+  src: url('../assets/fonts/Switzer-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Neue Machina Ultrabold (Pangram Pangram) — headings.
+   When the purchased woff2 arrives:
+   1. Drop it at src/assets/fonts/NeueMachina-Ultrabold.woff2
+   2. Uncomment this block
+   3. In tokens.css set:
+        --font-display: 'Neue Machina', 'Archivo Variable', sans-serif;
+   4. Remove the font-variation-settings 'wdth' lines from headings
+      (that axis is Archivo-only) and change their font-weight to 800.
+
+@font-face {
+  font-family: 'Neue Machina';
+  src: url('../assets/fonts/NeueMachina-Ultrabold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+*/
