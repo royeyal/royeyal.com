@@ -214,7 +214,7 @@
 }
 
 .work-card:hover {
-  border-color: var(--cyan-dim);
+  border-color: color-mix(in oklab, var(--cyan) 75%, transparent);
   box-shadow: var(--shadow-card-hover);
   transform: translateY(-3px);
 }
@@ -298,6 +298,12 @@
   box-shadow: 0 0 10px var(--cyan-dim);
 }
 
+/* highlighted lead-in title on each bullet */
+.work-card__points strong {
+  color: var(--text);
+  font-weight: 680;
+}
+
 .work__earlier {
   margin-top: 2.5rem;
 }
@@ -337,7 +343,7 @@
 }
 
 .project-card:hover {
-  border-color: var(--magenta-dim);
+  border-color: color-mix(in oklab, var(--magenta) 75%, transparent);
   transform: translateY(-4px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.09),
@@ -360,6 +366,12 @@
       transparent 0 14px,
       rgba(255, 255, 255, 0.02) 14px 28px
     );
+}
+
+.project-card__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .project-card__name {

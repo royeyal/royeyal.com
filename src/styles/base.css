@@ -143,7 +143,8 @@ a {
   letter-spacing: 0.04em;
   padding: 7px 14px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  /* tight, even radius reads terminal-chip, not pill */
+  border-radius: 6px;
   background: var(--surface);
   color: var(--text-muted);
   box-shadow:
@@ -180,7 +181,8 @@ a {
   text-transform: uppercase;
   text-decoration: none;
   padding: 14px 26px;
-  border-radius: 999px;
+  /* squared-off cyberpunk corners instead of a pill */
+  border-radius: 10px;
   transition:
     transform var(--fast) var(--ease-out),
     box-shadow var(--fast) var(--ease-out),
