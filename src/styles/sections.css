@@ -166,6 +166,8 @@
 
 .about__portrait img {
   width: 100%;
+  height: auto;
+  display: block;
   border-radius: var(--radius);
   border: 1px solid var(--line-strong);
   box-shadow:
