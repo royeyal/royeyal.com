@@ -21,39 +21,40 @@ export function initAnimations() {
 
   mm.add('(prefers-reduced-motion: no-preference)', () => {
     // --- Hero intro -------------------------------------------------
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    // expo.out = long deceleration tail; elements arrive with mass
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
     tl.from('[data-hero="logo"]', {
       opacity: 0,
-      y: 24,
+      y: 32,
       filter: 'blur(8px)',
-      duration: 0.9,
+      duration: 1.2,
     })
       .from(
         '[data-hero="eyebrow"]',
-        { opacity: 0, x: -16, duration: 0.5 },
-        '-=0.45'
+        { opacity: 0, x: -20, duration: 0.7 },
+        '-=0.7'
       )
       .from(
         '[data-hero="title"]',
-        { opacity: 0, y: 32, duration: 0.8 },
-        '-=0.3'
+        { opacity: 0, y: 40, duration: 1.1 },
+        '-=0.5'
       )
-      .from('[data-hero="sub"]', { opacity: 0, y: 20, duration: 0.6 }, '-=0.45')
+      .from('[data-hero="sub"]', { opacity: 0, y: 24, duration: 0.9 }, '-=0.75')
       .from(
         '[data-hero="actions"] .btn',
-        { opacity: 0, y: 16, duration: 0.5, stagger: 0.08 },
-        '-=0.35'
+        { opacity: 0, y: 20, duration: 0.7, stagger: 0.09 },
+        '-=0.6'
       )
-      .from('[data-hero="hint"]', { opacity: 0, duration: 0.8 }, '-=0.1');
+      .from('[data-hero="hint"]', { opacity: 0, duration: 1 }, '-=0.3');
 
     // --- Scroll reveals --------------------------------------------
     gsap.utils.toArray('[data-reveal]').forEach((el) => {
       gsap.from(el, {
         opacity: 0,
-        y: 36,
-        duration: 0.8,
-        ease: 'power3.out',
+        y: 44,
+        duration: 1.1,
+        ease: 'expo.out',
         scrollTrigger: {
           trigger: el,
           start: 'top 85%',

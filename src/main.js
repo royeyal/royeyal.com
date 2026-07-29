@@ -7,10 +7,7 @@
  * copies of GSAP.
  */
 import '@fontsource-variable/archivo';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
-import '@fontsource/jetbrains-mono/700.css';
-import './main.css';
+import './main.css'; /* includes Departure Mono @font-face */
 
 import { initStrands } from './js/strands.js';
 import { initAnimations } from './js/animations.js';
