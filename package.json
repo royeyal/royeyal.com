@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "deploy": "export $(grep -v '^#' .env | xargs) && npm run build && wrangler deploy"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.2.8",
@@ -18,10 +19,12 @@
   },
   "devDependencies": {
     "prettier": "^3.6.2",
-    "vite": "^8.1.5"
+    "vite": "^8.1.5",
+    "wrangler": "^4.118.0"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "workerd@1.20260730.1": true
   }
 }

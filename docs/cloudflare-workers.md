@@ -1,42 +1,45 @@
 # Cloudflare Workers — deployment reference
 
-Two scenarios for this repo. Neither is set up yet; this doc is the
-checklist for when we do.
+Two scenarios for this repo. Scenario A is scaffolded; Scenario B is
+for later, if the design moves to Webflow.
 
 ---
 
-## Scenario A — host royeyal.com on Cloudflare (this site, now)
+## Scenario A — host royeyal.com on Cloudflare (scaffolded)
 
 Vite already cache-busts (hashed asset names are written into
 `index.html` on every build), so **no stable-URL worker logic is
 needed** — just static hosting with a Workers Assets binding.
 
-### Files to add
+### Files (already in the repo)
 
-`wrangler.toml`:
+[`wrangler.jsonc`](../wrangler.jsonc) — JSONC is the current
+recommended format (TOML still works, but newer Wrangler features are
+JSON-only, and JSON has no equivalent to TOML's "keys after a
+`[section]` silently nest" footgun):
 
-```toml
-name = "royeyal-com"
-main = "worker/index.js"
-compatibility_date = "2026-07-30"
-
-# ⚠️ account_id MUST be top-level, BEFORE any [section] header.
-# Placed after [build] or [assets] it silently becomes a nested key,
-# Wrangler ignores it, and non-interactive deploys fail with no
-# useful error.
-account_id = "<YOUR_ACCOUNT_ID>"
-
-workers_dev = true # until the royeyal.com route/domain is attached
-
-[assets]
-directory = "./dist"
-binding = "ASSETS"
-run_worker_first = false # static site: let assets serve directly
+```jsonc
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "royeyal-com",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-07-30",
+  "account_id": "<YOUR_ACCOUNT_ID>",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": false,
+  },
+  "observability": { "enabled": true },
+}
 ```
 
-`worker/index.js` (minimal passthrough — only needed if we want
-custom headers/redirects later; with `run_worker_first = false` and
-no special routes, Workers Assets can even run without it):
+[`worker/index.js`](../worker/index.js) — minimal passthrough (only
+needed if we want custom headers/redirects later; with
+`run_worker_first: false` Workers Assets could technically run
+without a worker at all, but keeping one gives us a place to add
+logic without a config migration):
 
 ```js
 export default {
@@ -46,27 +49,47 @@ export default {
 };
 ```
 
+### Fill in before deploying
+
+`wrangler.jsonc` still has a placeholder:
+
+```
+"account_id": "<YOUR_ACCOUNT_ID>"
+```
+
+Get the real value from the Cloudflare dashboard (top-right account
+dropdown) or `npx wrangler whoami`.
+
 ### Secrets
 
-`.env` (gitignored — NEVER commit):
+`.env` (gitignored — already created, NEVER commit):
 
 ```
 CLOUDFLARE_API_TOKEN=<token with Workers Scripts:Edit permission>
 ```
 
-### package.json script
+### package.json script (already added)
 
 ```json
 "deploy": "export $(grep -v '^#' .env | xargs) && npm run build && wrangler deploy"
 ```
 
 Always build before deploy — never ship a stale `dist/`.
-No `.env`? Fallback: `wrangler login` once, then `npm run deploy`.
+No `.env` value set? Fallback: `wrangler login` once, then
+`npm run deploy` (the empty `.env` line is simply ignored).
+
+Sanity-check any config change with a dry run before a real deploy:
+
+```bash
+npx wrangler deploy --dry-run
+```
 
 ### Domain
 
 Cloudflare dashboard → the Worker → Settings → Domains & Routes →
-add `royeyal.com` (the zone must already be on this account).
+add `royeyal.com`. The zone is already on this account (royeyal.com
+is registered via Cloudflare Registrar), so this is a same-account
+dashboard action — no external DNS/nameserver changes needed.
 
 ---
 
@@ -107,8 +130,11 @@ use Webflow's global instead — never ship two copies.
 
 ## Gotcha recap (both scenarios)
 
-1. `account_id` above every `[section]` in `wrangler.toml`.
-2. Build before every deploy (the worker may import the manifest).
-3. `run_worker_first = true` whenever the worker must intercept
-   paths that also exist as files in `dist/`.
-4. `.env` stays gitignored; the API token never enters the repo.
+1. Set the real `account_id` in `wrangler.jsonc` before deploying —
+   dry-run doesn't catch a missing/placeholder value.
+2. Build before every deploy (Scenario B's worker imports the
+   manifest, so a stale `dist/` means a stale — or broken — deploy).
+3. `run_worker_first: true` whenever the worker must intercept paths
+   that also exist as files in `dist/` (required for Scenario B).
+4. `.env` and `.wrangler/` stay gitignored; the API token never
+   enters the repo.
