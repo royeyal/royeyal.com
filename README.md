@@ -6,13 +6,26 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
 
 ## Stack
 
-- **Vite** — dev server + build (`npm run dev`, `npm run build`)
+- **Vite 8** — dev server + build (`npm run dev`, `npm run build`)
 - **GSAP** (npm) — hero intro, scroll reveals, footer scrub
 - **ogl** (npm) — WebGL "Strands" hero background, a vanilla port of
   [reactbits.dev/animations/strands](https://reactbits.dev/animations/strands)
   (no React needed)
-- **Fontsource** — self-hosted Archivo Variable + JetBrains Mono (no font CDN)
+- Self-hosted fonts, no font CDN: **Archivo Variable** (Fontsource,
+  headings — swaps to Neue Machina once purchased, see
+  `docs/font-options.md`), **Switzer Variable** (body), **Departure Mono**
+  (terminal accents) — see `src/styles/fonts.css`
 - **Prettier** — `npm run format`
+
+## Commands
+
+| Command                | What it does                                                                                                                                                                                                                                                                |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`          | Start the Vite dev server (hot reload) at localhost:5173                                                                                                                                                                                                                    |
+| `npm run build`        | Production build to `dist/` (hashed filenames, copies `public/` verbatim — this is what puts `favicon.png` etc. into `dist/`)                                                                                                                                               |
+| `npm run preview`      | Serve the built `dist/` over HTTP so you can sanity-check the real production output before deploying. Opening `dist/index.html` directly (`file://`) will **not** work — ES modules are blocked under `file://`, so this is the only way to view a finished build locally. |
+| `npm run format`       | Format the whole repo with Prettier                                                                                                                                                                                                                                         |
+| `npm run format:check` | Check formatting without writing                                                                                                                                                                                                                                            |
 
 ## Structure
 
@@ -23,8 +36,11 @@ src/main.css          imports the style layers
 src/styles/           tokens / base / sections / footer
 src/js/strands.js     WebGL hero background (ogl)
 src/js/animations.js  GSAP motion
-public/images/        static assets
+src/styles/fonts.css  self-hosted @font-face declarations
+public/               static assets, copied verbatim into dist/ on build
 docs/copy-options.md  alternate hero/positioning copy
+docs/font-options.md  font research and pairing recommendations
+docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
 ```
 
 ## ⚠️ Webflow migration notes
@@ -39,15 +55,14 @@ docs/copy-options.md  alternate hero/positioning copy
 
 - [x] **ANSI logo** — `public/images/royeyal-logo.svg` (currentColor),
       applied in the hero as a CSS mask so the gradient comes from CSS.
-- [ ] **Headshot** — save the Elementor headshot as
-      `public/images/roy-eyal.jpg` (the `<img>` already points there and
-      falls back to the placeholder SVG until the file exists).
-- [ ] **Favicon** — save the ANSI "R" image as `public/favicon.png`
-      (512×512); the `<link>` tags are already wired.
+- [x] **Headshot** — `public/images/roy-eyal.webp` is live.
+- [x] **Favicon** — `public/favicon.png` is live.
+- [x] **Freelance projects** — Minimus, The Identity Underground,
+      Silverfort, SatYield are live and linked.
+- [x] **Email** — `hello@royeyal.com` confirmed and used throughout.
 - [ ] **Company logos** — paste inline SVG logos (fill="currentColor") into
       the `.work-card__logo` slots for Lusha, Wix, and Elementor.
-- [ ] **Freelance projects** — replace the four placeholder cards in the
-      Freelance section with real projects (name, link, screenshot).
-- [ ] **Email** — links use `hello@royeyal.com`; confirm that's the address
-      you want public.
+- [ ] **Neue Machina** — once purchased, drop the Ultrabold woff2 into
+      `src/assets/fonts/` and follow the switch steps commented in
+      `src/styles/fonts.css`.
 - [ ] Decide on navigation (currently none, by design).
