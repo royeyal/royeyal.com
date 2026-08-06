@@ -60,8 +60,9 @@ docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
 - [x] **Freelance projects** — Minimus, The Identity Underground,
       Silverfort, SatYield are live and linked.
 - [x] **Email** — `hello@royeyal.com` confirmed and used throughout.
-- [ ] **Company logos** — paste inline SVG logos (fill="currentColor") into
-      the `.work-card__logo` slots for Lusha, Wix, and Elementor.
+- [x] **Company logos** — Lusha, Wix, and Elementor inline SVGs
+      (currentColor) are live in the `.work-card__logo` slots; canonical
+      copies at `public/images/{lusha,wix,elementor}.svg`.
 - [ ] **Neue Machina** — once purchased, drop the Ultrabold woff2 into
       `src/assets/fonts/` and follow the switch steps commented in
       `src/styles/fonts.css`.
