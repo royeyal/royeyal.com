@@ -386,7 +386,12 @@
 .project-grid {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.75rem), 1fr));
+  /* 28rem floor resolves to exactly two columns: at 1024px of content
+     three 448px tracks would need 1392px, two fit at ~500px each, and
+     below ~28rem it collapses to one on its own — no media query.
+     Two columns render a 1727px capture at ~28% instead of 17%, which
+     is the difference between a legible headline and mush. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 28rem), 1fr));
   gap: 1.5rem;
 }
 
@@ -415,19 +420,47 @@
 }
 
 .project-card__media {
-  aspect-ratio: 16 / 10;
+  /* true capture ratio (1000x595) — 16/10 would crop ~5% */
+  aspect-ratio: 1000 / 595;
   border-radius: calc(var(--radius-outer) - var(--card-pad));
-  border: var(--border-w) dashed var(--line-strong);
-  display: grid;
-  place-items: center;
+  border: var(--border-w) solid var(--line);
+  overflow: hidden;
   margin-bottom: 1.125rem;
-  background:
-    linear-gradient(135deg, rgba(66, 239, 254, 0.06), rgba(249, 0, 185, 0.06)),
-    repeating-linear-gradient(
-      45deg,
-      transparent 0 0.875rem,
-      rgba(255, 255, 255, 0.02) 0.875rem 1.75rem
-    );
+  background: var(--surface);
+}
+
+/*
+ * Dimmed at rest via OPACITY rather than a brightness filter, because
+ * the four captures are not uniformly bright: Minimus and Silverfort
+ * are light pages, but SatYield is near-black with cyan and Identity
+ * Underground's hero is a dark gradient. Lowering opacity blends each
+ * shot toward the dark card beneath it, so the light ones calm down
+ * while the dark ones barely move — brightness() would have crushed
+ * SatYield into mud. Slight desaturation stops the borrowed brand
+ * colours competing with the magenta/cyan accents.
+ *
+ * Comes up fast and fades slowly, same asymmetry as the timeline
+ * markers, so the page keeps one motion vocabulary.
+ */
+.project-card__shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  transition:
+    opacity var(--bulb-off) var(--ease-bulb-off),
+    filter var(--bulb-off) var(--ease-bulb-off);
+}
+
+.project-card:hover .project-card__shot,
+.project-card:has(.project-card__link:focus-visible) .project-card__shot {
+  opacity: 1;
+  filter: saturate(1);
+  transition:
+    opacity var(--bulb-on) var(--ease-bulb-on),
+    filter var(--bulb-on) var(--ease-bulb-on);
 }
 
 .project-card__link {
