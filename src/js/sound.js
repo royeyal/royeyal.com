@@ -38,9 +38,15 @@ const STORAGE_KEY = 'royeyal:sound';
 // `npm run dev` rather than by ear in production.
 const USED_SOUNDS = ['droplet', 'ready', 'tick', 'press', 'whisper', 'page'];
 
+/*
+ * sessionStorage, deliberately NOT localStorage: every fresh visit must
+ * start silent. Within a tab the choice survives reloads and in-page
+ * navigation, but closing the tab resets to off — so a visitor can never
+ * arrive to unexpected audio because of a choice made days earlier.
+ */
 function readPref(key) {
   try {
-    return localStorage.getItem(key) === 'on';
+    return sessionStorage.getItem(key) === 'on';
   } catch {
     return false; // storage blocked (private mode, sandboxed context)
   }
@@ -48,9 +54,19 @@ function readPref(key) {
 
 function writePref(key, on) {
   try {
-    localStorage.setItem(key, on ? 'on' : 'off');
+    sessionStorage.setItem(key, on ? 'on' : 'off');
   } catch {
-    /* session-only; in-memory state still drives the UI */
+    /* in-memory state still drives the UI for this page view */
+  }
+}
+
+// One-time cleanup: an earlier build persisted this in localStorage, so
+// anyone who enabled sound back then would still be opted in forever.
+function clearLegacyPref(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* nothing to clean up if storage is blocked */
   }
 }
 
@@ -65,6 +81,7 @@ export function initSound(toggle, options = {}) {
 
   const state = toggle.querySelector('[data-sound-state]');
 
+  clearLegacyPref(storageKey);
   let enabled = readPref(storageKey);
   let api = null; // resolved cuelume module namespace
   let loading = null; // in-flight import promise (singleton)
@@ -190,6 +207,71 @@ export function initSound(toggle, options = {}) {
   document.addEventListener('keydown', onKeydown);
   document.addEventListener('focusin', onFocusin);
 
+  /* ---- state-change cues -----------------------------------------
+   * cuelume's bind() only covers pointer and click events. The timeline
+   * steps light up from scroll position, not from a pointer, so their
+   * cue comes from watching the data-status attribute that the Osmo
+   * script writes. Declared in the markup as data-sound-on/off so the
+   * mapping stays with the element and ports to Webflow like the
+   * data-cuelume-* attributes do.
+   */
+  const stateNodes = document.querySelectorAll(
+    '[data-sound-on], [data-sound-off]'
+  );
+
+  // ScrollTrigger sets statuses during init and on every refresh; if the
+  // page loads deep-linked mid-timeline that would fire a burst. Stay
+  // disarmed until things have settled.
+  let armed = false;
+  let armTimer = 0;
+  let lastCue = 0;
+
+  const observer = stateNodes.length
+    ? new MutationObserver((records) => {
+        if (!armed || !enabled || !api) return;
+        const now = performance.now();
+        for (const record of records) {
+          const el = record.target;
+          const was = record.oldValue;
+          const is = el.getAttribute('data-status');
+          if (was === is) continue;
+
+          const name =
+            is === 'active' && was !== 'active'
+              ? el.dataset.soundOn
+              : was === 'active' && is !== 'active'
+                ? el.dataset.soundOff
+                : null;
+          if (!name) continue;
+
+          // A fast scroll can cross several steps in one frame; keep them
+          // from stacking into a chord.
+          if (now - lastCue < 70) continue;
+          lastCue = now;
+          if (import.meta.env.DEV) {
+            // cuelume's play() is a no-op until the document has real
+            // user activation, so this is the only way to confirm cues
+            // fire without a human at the keyboard.
+            window.__soundCues = (window.__soundCues || []).concat(name);
+          }
+          safe(() => api.play(name));
+        }
+      })
+    : null;
+
+  if (observer) {
+    stateNodes.forEach((node) =>
+      observer.observe(node, {
+        attributes: true,
+        attributeFilter: ['data-status'],
+        attributeOldValue: true,
+      })
+    );
+    armTimer = setTimeout(() => {
+      armed = true;
+    }, 700);
+  }
+
   // Clicking a _blank link backgrounds the tab; don't play into it.
   function onVisibility() {
     if (!api) return;
@@ -211,6 +293,8 @@ export function initSound(toggle, options = {}) {
     document.removeEventListener('keydown', onKeydown);
     document.removeEventListener('focusin', onFocusin);
     document.removeEventListener('visibilitychange', onVisibility);
+    clearTimeout(armTimer);
+    observer?.disconnect();
     // cuelume 0.2.2 exposes no unbind(); muting is the best we can do.
     if (api) safe(() => api.setEnabled(false));
   };
