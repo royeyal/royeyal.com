@@ -141,7 +141,23 @@ export function initSound(toggle, options = {}) {
     return loading;
   }
 
-  function apply({ announce = false } = {}) {
+  /* ---- Safari's gesture window -----------------------------------
+   * Safari will only create or resume an AudioContext inside the
+   * SYNCHRONOUS run of a user-gesture handler. Chrome tracks "sticky
+   * activation" that survives an await, so it does not care. cuelume
+   * creates its context lazily on the first play(), which means that if
+   * that first play() lands in a promise continuation after the dynamic
+   * import, Safari refuses to resume and the page is mute forever —
+   * every later cue then finds a permanently suspended context.
+   *
+   * So the enable path must reach play() with no promise in between.
+   * We warm the module on any earlier interaction, and if it is already
+   * resolved when the click arrives we do the work inline.
+   */
+  let needsUnlock = false;
+
+  function onClick() {
+    enabled = !enabled;
     render();
 
     if (!enabled) {
@@ -149,28 +165,45 @@ export function initSound(toggle, options = {}) {
       return;
     }
 
+    if (api) {
+      // Inline — still inside the gesture, so Safari resumes.
+      safe(() => api.setEnabled(true));
+      safe(() => api.play('toggle'));
+      return;
+    }
+
+    // Module not warm yet. Unavoidably async, so Safari will not resume
+    // here; flag it and retry inline on the next real gesture.
     load().then((mod) => {
-      // The user may have toggled off again while the chunk loaded.
       if (!mod || !enabled) return;
       safe(() => mod.setEnabled(true));
-      if (announce) safe(() => mod.play('toggle'));
+      safe(() => mod.play('toggle'));
+      needsUnlock = true;
     });
   }
 
-  function onClick() {
-    enabled = !enabled;
-    // Confirm only off->on. Muting is confirmed by silence.
-    apply({ announce: enabled });
+  // Warm on any earlier interaction so the toggle click finds the module
+  // resolved. ~9 kB, off the critical path, still never fetched for a
+  // visitor who does not interact at all.
+  function preload() {
+    load();
   }
 
-  // Warm the chunk on hover/focus so the click lands on a resolved module.
-  function preload() {
-    if (!enabled) load();
+  // Retries the unlock inside a genuine gesture after an async enable.
+  function onUnlockGesture() {
+    if (!needsUnlock || !enabled || !api) return;
+    needsUnlock = false;
+    safe(() => api.play('toggle'));
   }
 
   toggle.addEventListener('click', onClick);
   toggle.addEventListener('pointerenter', preload, { once: true });
   toggle.addEventListener('focusin', preload, { once: true });
+  document.addEventListener('pointerdown', preload, {
+    once: true,
+    capture: true,
+  });
+  document.addEventListener('pointerdown', onUnlockGesture, true);
 
   /* ---- keyboard bridge -------------------------------------------
    * cuelume binds pointerdown/pointerenter, and NEITHER fires when a
@@ -267,6 +300,7 @@ export function initSound(toggle, options = {}) {
   return function destroy() {
     toggle.removeEventListener('click', onClick);
     document.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('pointerdown', onUnlockGesture, true);
     document.removeEventListener('visibilitychange', onVisibility);
     clearTimeout(armTimer);
     observer?.disconnect();
