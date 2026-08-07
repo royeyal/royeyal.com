@@ -1,0 +1,142 @@
+/* ------------------------------------------------------------------
+   Step timeline (Osmo Supply resource, restyled to our tokens)
+
+   Structure and state hooks are Osmo's; only the visual language is
+   ours — squared markers instead of circles to match the chip/button
+   radii, Departure Mono numerals, and a cyan -> magenta progress fill.
+   ------------------------------------------------------------------ */
+.step-timeline {
+  width: 100%;
+  margin-top: 3rem;
+}
+
+.step-timeline__wrapper {
+  position: relative;
+}
+
+.step-timeline__list {
+  display: flex;
+  flex-flow: column;
+  gap: 3rem;
+}
+
+.step-timeline__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  position: relative;
+}
+
+/* the faint rail — the script sets top/height to span marker centres */
+.step-timeline__line {
+  pointer-events: none;
+  position: absolute;
+  left: 1.375rem;
+  top: 0;
+  bottom: 0;
+  width: var(--border-w-thick);
+  background-color: var(--line);
+}
+
+/* progress fill — scaled from the top by the script */
+.step-timeline__fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 0;
+  background: linear-gradient(180deg, var(--cyan), var(--magenta));
+  box-shadow: 0 0 1rem var(--cyan-dim);
+}
+
+.step-timeline__marker {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  position: relative;
+  border: var(--border-w) solid var(--line-strong);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  box-shadow: var(--shadow-chip);
+  transition:
+    background-color var(--fast) var(--ease-out),
+    border-color var(--fast) var(--ease-out),
+    color var(--fast) var(--ease-out),
+    box-shadow var(--slow) var(--ease-out);
+}
+
+/* every step the fill has passed */
+[data-step-timeline-item][data-status='active'] [data-step-timeline-marker] {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: #fff;
+}
+
+/* the single leading step */
+[data-step-timeline-item][data-current] [data-step-timeline-marker] {
+  box-shadow:
+    var(--shadow-chip),
+    0 0 0 0.5rem var(--magenta-dim),
+    0 0 2rem -0.25rem var(--magenta);
+}
+
+.step-timeline__content {
+  display: flex;
+  flex-flow: column;
+  gap: 0.5rem;
+  max-width: 46ch;
+  padding-top: 0.35rem;
+  transition: opacity var(--fast) var(--ease-out);
+}
+
+/* Osmo's three-stage legibility ramp: ahead / passed / current */
+[data-step-timeline-item] .step-timeline__content {
+  opacity: 0.25;
+}
+
+[data-step-timeline-item][data-status='active'] .step-timeline__content {
+  opacity: 0.5;
+}
+
+[data-step-timeline-item][data-current] .step-timeline__content {
+  opacity: 1;
+}
+
+.step-timeline__content-h {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--weight-display);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.step-timeline__p {
+  color: var(--text-muted);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+@media (max-width: 40rem) {
+  .step-timeline__list {
+    gap: 2.25rem;
+  }
+
+  .step-timeline__item {
+    gap: 1rem;
+  }
+
+  .step-timeline__line {
+    left: 1.125rem;
+  }
+
+  .step-timeline__marker {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}

@@ -6,14 +6,12 @@
  * GSAP global that Webflow / a CDN <script> provides — do not ship two
  * copies of GSAP.
  */
-import '@fontsource-variable/tektur';
-// Archivo kept during the Tektur trial as the --font-display fallback.
-// If Tektur stays, drop this import and the dependency (~68 KB saved).
-import '@fontsource-variable/archivo';
-import './main.css'; /* includes Departure Mono @font-face */
+import './main.css'; /* includes all @font-face declarations */
 
 import { initStrands } from './js/strands.js';
 import { initAnimations } from './js/animations.js';
+import { initStepTimeline } from './js/timeline.js';
+import { initSound } from './js/sound.js';
 
 document.querySelector('[data-year]').textContent = new Date().getFullYear();
 
@@ -33,3 +31,5 @@ initStrands(document.querySelector('[data-strands]'), {
 });
 
 initAnimations();
+initStepTimeline();
+initSound(document.querySelector('[data-sound-toggle]'));

@@ -1,8 +1,13 @@
 # Font options — elevating the Apple-meets-cyberpunk direction
 
-Currently live: **Archivo Variable** (display + body, using the width axis
-for headings) and **JetBrains Mono** (terminal accents). Both free,
-self-hosted via Fontsource. Solid, but here's what would elevate it.
+Currently live (all free, all self-hosted from `src/assets/fonts/`, latin
+subset only): **Tektur** (display/headings, variable wght 400–900),
+**Switzer Variable** (body), **Departure Mono** (terminal accents).
+
+Tektur's squared, techno letterforms echo the ANSI logo's pixel grid;
+Switzer stays quiet underneath; Departure Mono carries the terminal
+texture. The research below is what led there, and what could still
+elevate it further.
 
 ## Display / headings
 

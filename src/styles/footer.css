@@ -21,7 +21,6 @@
   font-family: var(--font-display);
   font-size: var(--font-size-mail);
   font-weight: var(--weight-display);
-  font-variation-settings: 'wdth' var(--display-wdth);
   letter-spacing: -0.02em;
   text-decoration: none;
   border-bottom: var(--border-w-thick) solid var(--magenta);
@@ -73,8 +72,7 @@
   text-align: center;
   font-family: var(--font-display);
   font-size: var(--font-size-giant);
-  font-weight: var(--weight-display);
-  font-variation-settings: 'wdth' var(--display-wdth);
+  font-weight: var(--weight-display-max);
   letter-spacing: -0.02em;
   color: transparent;
   -webkit-text-stroke: 0.09375rem rgba(255, 255, 255, 0.22);
@@ -88,6 +86,46 @@
   background-clip: text;
   transform: translateY(0.12em);
   filter: drop-shadow(0 -0.75rem 3.75rem rgba(249, 0, 185, 0.18));
+}
+
+/* Sound toggle — a terminal switch sitting between the two meta lines.
+   Invisible chrome until hovered; magenta and lit when on. */
+.sound-toggle {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  background: none;
+  border: var(--border-w) solid transparent;
+  border-radius: var(--radius-chip);
+  padding: 0.125rem 0.4375rem;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition:
+    color var(--fast) var(--ease-out),
+    border-color var(--fast) var(--ease-out),
+    text-shadow var(--fast) var(--ease-out);
+}
+
+.sound-toggle:hover {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+}
+
+.sound-toggle[aria-pressed='true'] {
+  color: var(--magenta);
+  text-shadow: 0 0 1rem var(--magenta-dim);
+}
+
+.sound-toggle[aria-pressed='true']:hover {
+  border-color: var(--magenta-dim);
+}
+
+.sound-toggle[disabled] {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .footer__meta {

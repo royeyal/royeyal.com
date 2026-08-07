@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
-    target: 'es2018',
+    // es2020 for dynamic import() — the lazy cuelume load in src/js/sound.js
+    target: 'es2020',
     outDir: 'dist',
   },
 });

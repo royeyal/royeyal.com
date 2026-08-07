@@ -1,0 +1,217 @@
+/*
+ * Interaction sounds — cuelume, opt-in, default OFF.
+ *
+ * The *bindings* live in the markup as data-cuelume-* attributes (see
+ * index.html). This module owns only load / enable / persist / volume.
+ * Intended assignment — keep in sync with index.html:
+ *
+ *   contact   .btn--primary, .footer__mail        hover droplet  press ready
+ *   outbound  .btn--ghost, .footer__links a,
+ *             .hero__sub a                        hover tick     press press
+ *   project   .project-card__link                 hover whisper  press page
+ *
+ * No data-cuelume-release anywhere: every target opens a new tab or the
+ * mail client, so a pointerup sound would fire into a backgrounding tab.
+ *
+ * WCAG 1.4.2 (Audio Control) is satisfied by construction — nothing plays
+ * without an explicit opt-in gesture, every clip is far under 3s, and the
+ * stop control is permanently visible in the footer. Deliberately NOT
+ * gated on prefers-reduced-motion: there is no sound analogue of that
+ * query, and a user who clicks a control labelled "[ sound: off ]" to turn
+ * it on has given an unambiguous instruction. Don't "fix" this.
+ *
+ * cuelume handles more than its README documents (verified in
+ * node_modules/cuelume/dist/interactions/bind.js): bind() is idempotent,
+ * hover is throttled to 150ms globally AND restricted to fine-pointer
+ * mice, and unknown sound names fall back safely. So no custom throttle
+ * is needed here.
+ *
+ * NOTE (Webflow migration): cuelume is bundled from npm here. In Webflow,
+ * load it from a pinned ESM CDN URL and keep the data-cuelume-* attributes
+ * on elements via the custom-attributes panel.
+ */
+
+const VOLUME = 0.35;
+const STORAGE_KEY = 'royeyal:sound';
+
+// Dev-only guard: cuelume is pre-1.0, so catch a renamed sound at
+// `npm run dev` rather than by ear in production.
+const USED_SOUNDS = ['droplet', 'ready', 'tick', 'press', 'whisper', 'page'];
+
+function readPref(key) {
+  try {
+    return localStorage.getItem(key) === 'on';
+  } catch {
+    return false; // storage blocked (private mode, sandboxed context)
+  }
+}
+
+function writePref(key, on) {
+  try {
+    localStorage.setItem(key, on ? 'on' : 'off');
+  } catch {
+    /* session-only; in-memory state still drives the UI */
+  }
+}
+
+export function initSound(toggle, options = {}) {
+  if (!toggle) return null;
+
+  const {
+    volume = VOLUME,
+    storageKey = STORAGE_KEY,
+    root = document,
+  } = options;
+
+  const state = toggle.querySelector('[data-sound-state]');
+
+  let enabled = readPref(storageKey);
+  let api = null; // resolved cuelume module namespace
+  let loading = null; // in-flight import promise (singleton)
+  let broken = false; // import or API validation failed
+
+  // The button is inert without JS, so it ships hidden and we reveal it.
+  toggle.hidden = false;
+
+  // Never let a pre-1.0 library throw out of an event handler.
+  function safe(fn) {
+    try {
+      fn();
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[sound]', err);
+    }
+  }
+
+  function render() {
+    toggle.setAttribute('aria-pressed', String(enabled));
+    if (state) state.textContent = enabled ? 'on' : 'off';
+  }
+
+  function markUnavailable() {
+    enabled = false;
+    writePref(storageKey, false);
+    toggle.disabled = true;
+    toggle.setAttribute('aria-pressed', 'false');
+    toggle.setAttribute('aria-label', 'Sound effects unavailable');
+    if (state) state.textContent = 'n/a';
+  }
+
+  function load() {
+    if (api || broken) return Promise.resolve(api);
+    if (loading) return loading;
+
+    loading = import('cuelume')
+      .then((mod) => {
+        if (
+          typeof mod.bind !== 'function' ||
+          typeof mod.setEnabled !== 'function' ||
+          typeof mod.setVolume !== 'function' ||
+          typeof mod.play !== 'function'
+        ) {
+          throw new Error('cuelume: unexpected API shape');
+        }
+        if (import.meta.env.DEV && Array.isArray(mod.sounds)) {
+          const missing = USED_SOUNDS.filter((n) => !mod.sounds.includes(n));
+          if (missing.length) {
+            console.warn('[sound] unknown cuelume sounds:', missing);
+          }
+        }
+        api = mod;
+        api.setVolume(volume);
+        api.bind(root); // idempotent — guarded by a WeakSet upstream
+        return api;
+      })
+      .catch((err) => {
+        broken = true;
+        if (import.meta.env.DEV) console.warn('[sound] unavailable', err);
+        markUnavailable();
+        return null;
+      });
+
+    return loading;
+  }
+
+  function apply({ announce = false } = {}) {
+    render();
+    writePref(storageKey, enabled);
+
+    if (!enabled) {
+      if (api) safe(() => api.setEnabled(false));
+      return;
+    }
+
+    load().then((mod) => {
+      // The user may have toggled off again while the chunk loaded.
+      if (!mod || !enabled) return;
+      safe(() => mod.setEnabled(true));
+      if (announce) safe(() => mod.play('toggle'));
+    });
+  }
+
+  function onClick() {
+    enabled = !enabled;
+    // Confirm only off->on. Muting is confirmed by silence.
+    apply({ announce: enabled });
+  }
+
+  // Warm the chunk on hover/focus so the click lands on a resolved module.
+  function preload() {
+    if (!enabled) load();
+  }
+
+  toggle.addEventListener('click', onClick);
+  toggle.addEventListener('pointerenter', preload, { once: true });
+  toggle.addEventListener('focusin', preload, { once: true });
+
+  /* ---- keyboard bridge -------------------------------------------
+   * cuelume binds pointerdown/pointerenter, and NEITHER fires when a
+   * link or button is activated from the keyboard — browsers dispatch
+   * only a click. Without this, sound would be a mouse-only feature.
+   */
+  function onKeydown(event) {
+    if (!enabled || !api || event.repeat) return;
+    const el = event.target.closest?.('[data-cuelume-press]');
+    if (!el || el === toggle) return;
+    // Space activates buttons but only scrolls when a link is focused.
+    const isLink = el.tagName === 'A';
+    if (event.key !== 'Enter' && !(event.key === ' ' && !isLink)) return;
+    safe(() => api.play(el.dataset.cuelumePress || 'press'));
+  }
+
+  function onFocusin(event) {
+    if (!enabled || !api) return;
+    const el = event.target.closest?.('[data-cuelume-hover]');
+    // :focus-visible is the browser's own "was this keyboard?" heuristic —
+    // it stops a mouse click emitting both a hover and a focus sound.
+    if (!el || el === toggle || !el.matches(':focus-visible')) return;
+    safe(() => api.play(el.dataset.cuelumeHover || 'chime'));
+  }
+
+  document.addEventListener('keydown', onKeydown);
+  document.addEventListener('focusin', onFocusin);
+
+  // Clicking a _blank link backgrounds the tab; don't play into it.
+  function onVisibility() {
+    if (!api) return;
+    safe(() => api.setEnabled(enabled && !document.hidden));
+  }
+  document.addEventListener('visibilitychange', onVisibility);
+
+  render();
+  if (enabled) {
+    // Returning opt-in: honour the stored choice without blocking paint.
+    // The AudioContext stays suspended until this visit's first gesture;
+    // cuelume resumes it, so the first hover/click is the unlock.
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1200));
+    idle(() => apply());
+  }
+
+  return function destroy() {
+    toggle.removeEventListener('click', onClick);
+    document.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('focusin', onFocusin);
+    document.removeEventListener('visibilitychange', onVisibility);
+    // cuelume 0.2.2 exposes no unbind(); muting is the best we can do.
+    if (api) safe(() => api.setEnabled(false));
+  };
+}

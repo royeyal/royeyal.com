@@ -96,7 +96,6 @@
   font-family: var(--font-display);
   font-size: var(--font-size-h1);
   font-weight: var(--weight-display);
-  font-variation-settings: 'wdth' var(--display-wdth);
   line-height: 1;
   letter-spacing: -0.025em;
   text-wrap: balance;
@@ -302,7 +301,6 @@
   font-family: var(--font-display);
   font-size: var(--font-size-company);
   font-weight: var(--weight-display);
-  font-variation-settings: 'wdth' var(--display-wdth);
   letter-spacing: -0.015em;
 }
 
@@ -456,7 +454,6 @@
   font-family: var(--font-display);
   font-size: var(--font-size-h3);
   font-weight: var(--weight-display);
-  font-variation-settings: 'wdth' var(--display-wdth);
   margin-bottom: 0.25rem;
   padding-inline: 0.375rem;
 }

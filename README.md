@@ -11,11 +11,17 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
 - **ogl** (npm) — WebGL "Strands" hero background, a vanilla port of
   [reactbits.dev/animations/strands](https://reactbits.dev/animations/strands)
   (no React needed)
-- Self-hosted fonts, no font CDN: **Archivo Variable** (Fontsource,
-  headings — swaps to Neue Machina once purchased, see
-  `docs/font-options.md`), **Switzer Variable** (body), **Departure Mono**
-  (terminal accents) — see `src/styles/fonts.css`
+- **cuelume** (npm) — opt-in interaction sounds, synthesised via Web Audio
+  (no audio files). Default OFF behind a footer toggle; loaded lazily so
+  it costs nothing unless enabled
+- Self-hosted fonts, no font CDN, **latin subset only** (this site is US
+  English) — all three live in `src/assets/fonts/` and are declared in
+  `src/styles/fonts.css`:
+  - **Tektur** — display/headings, variable weight 400–900
+  - **Switzer Variable** — body
+  - **Departure Mono** — terminal accents (single weight, never fake-bold it)
 - **Prettier** — `npm run format`
+- **Wrangler** — deploys to Cloudflare Workers (see Deploy below)
 
 ## Commands
 
@@ -26,28 +32,63 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
 | `npm run preview`      | Serve the built `dist/` over HTTP so you can sanity-check the real production output before deploying. Opening `dist/index.html` directly (`file://`) will **not** work — ES modules are blocked under `file://`, so this is the only way to view a finished build locally. |
 | `npm run format`       | Format the whole repo with Prettier                                                                                                                                                                                                                                         |
 | `npm run format:check` | Check formatting without writing                                                                                                                                                                                                                                            |
+| `npm run deploy`       | Build fresh, then `wrangler deploy` to Cloudflare. Sources `CLOUDFLARE_API_TOKEN` from the gitignored `.env`. Never deploys a stale `dist/`.                                                                                                                                |
 
 ## Structure
 
 ```
-index.html            page markup (all sections)
-src/main.js           entry — fonts, css, strands, animations
-src/main.css          imports the style layers
-src/styles/           tokens / base / sections / footer
-src/js/strands.js     WebGL hero background (ogl)
-src/js/animations.js  GSAP motion
-src/styles/fonts.css  self-hosted @font-face declarations
-public/               static assets, copied verbatim into dist/ on build
-docs/copy-options.md  alternate hero/positioning copy
-docs/font-options.md  font research and pairing recommendations
+index.html             page markup (all sections)
+vite.config.js         build config (target es2020 — dynamic import)
+src/main.js            entry — css, strands, animations, timeline, sound
+src/main.css           imports the style layers
+src/styles/            fonts / tokens / base / sections / timeline / footer
+src/styles/fonts.css   self-hosted @font-face declarations
+src/assets/fonts/      the three woff2 files themselves
+src/js/strands.js      WebGL hero background (ogl)
+src/js/animations.js   GSAP hero intro + scroll reveals
+src/js/timeline.js     GSAP scroll-highlighted "four disciplines" timeline
+src/js/sound.js        cuelume interaction sounds (opt-in)
+public/                static assets, copied verbatim into dist/ on build
+worker/index.js        Cloudflare Worker — serves dist/ via assets binding
+wrangler.jsonc         Worker config (account_id still a placeholder)
+docs/copy-options.md   alternate hero/positioning copy
+docs/font-options.md   font research and pairing recommendations
 docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
 ```
 
+## Deploy
+
+Hosted on Cloudflare Workers using a static assets binding — Vite already
+writes hashed filenames into `index.html`, so no stable-URL worker logic
+is needed. Full reference, including the Webflow-pivot variant and the two
+silent-failure gotchas, is in `docs/cloudflare-workers.md`.
+
+Before the first deploy, two placeholders need real values:
+
+1. `account_id` in `wrangler.jsonc` (still `<YOUR_ACCOUNT_ID>`) — from the
+   Cloudflare dashboard or `npx wrangler whoami`
+2. `CLOUDFLARE_API_TOKEN` in `.env` (gitignored), needs `Workers
+Scripts:Edit`
+
+Then `npm run deploy`. Validate config changes with
+`npx wrangler deploy --dry-run` first. The domain is registered with
+Cloudflare Registrar, so attaching `royeyal.com` is a same-account
+dashboard action — no external DNS changes.
+
 ## ⚠️ Webflow migration notes
 
-- **Remove bundled GSAP**: `src/main.js` and `src/js/animations.js` import
-  GSAP from npm. In Webflow, delete those imports and use the global `gsap`
-  / `ScrollTrigger` from Webflow's CDN script — never ship two copies.
+- **Remove bundled GSAP**: `src/main.js`, `src/js/animations.js` and
+  `src/js/timeline.js` import GSAP from npm. In Webflow, delete those
+  imports and use the global `gsap` / `ScrollTrigger` from Webflow's CDN
+  script — never ship two copies.
+- **cuelume is ESM-only**, so the CDN form is a pinned module URL:
+  `<script type="module">import { bind } from 'https://esm.sh/cuelume@0.2.2'`.
+  Same bundled-now/CDN-later situation as GSAP.
+- Everything driven by `data-*` attributes ports cleanly — Webflow's
+  custom-attributes panel takes them verbatim. That covers
+  `data-cuelume-*`, `data-step-timeline-*`, `data-reveal`, `data-hero`,
+  `data-brand`. Class-name-based selectors would **not** survive, since
+  Webflow generates its own.
 - The Strands background ports to Webflow as an embed `<div data-strands>` +
   the built JS; ogl stays bundled (Webflow doesn't provide it).
 
@@ -63,7 +104,12 @@ docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
 - [x] **Company logos** — Lusha, Wix, and Elementor inline SVGs
       (currentColor) are live in the `.work-card__logo` slots; canonical
       copies at `public/images/{lusha,wix,elementor}.svg`.
-- [ ] **Neue Machina** — once purchased, drop the Ultrabold woff2 into
-      `src/assets/fonts/` and follow the switch steps commented in
-      `src/styles/fonts.css`.
+- [x] **Display font** — Tektur is live (self-hosted, latin-only).
+- [ ] **Neue Machina** — optional upgrade. Once purchased, drop the
+      Ultrabold woff2 into `src/assets/fonts/` and follow the switch steps
+      commented at the bottom of `src/styles/fonts.css`. Note it is a
+      single static weight, so `--weight-display` / `--weight-display-max`
+      both need to become `800`.
+- [ ] **Cloudflare** — fill in `account_id` and `CLOUDFLARE_API_TOKEN`,
+      then `npm run deploy` (see Deploy above).
 - [ ] Decide on navigation (currently none, by design).

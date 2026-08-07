@@ -9,7 +9,6 @@
       content="Roy Eyal is a marketing web developer who closes the gap between design and production — Figma-to-code design systems, hand-built marketing sites, and AI workflows. Previously at Elementor and Wix, currently at Lusha."
     />
     <meta name="theme-color" content="#05060a" />
-    <!-- TODO: Save your ANSI "R" image as public/favicon.png (512×512) -->
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
     <script type="module" src="/src/main.js"></script>
@@ -44,17 +43,29 @@
           Design systems that speak both Figma and SCSS. Marketing sites
           hand-built for speed. AI workflows that turn briefs into shipped
           pages. Currently engineering the marketing web at
-          <a href="https://www.lusha.com" target="_blank" rel="noreferrer"
+          <a
+            href="https://www.lusha.com"
+            target="_blank"
+            rel="noreferrer"
+            data-cuelume-hover="tick"
+            data-cuelume-press="press"
             >Lusha</a
           >.
         </p>
 
         <div class="hero__actions" data-hero="actions">
-          <a class="btn btn--primary" href="mailto:hello@royeyal.com">
+          <a
+            class="btn btn--primary"
+            href="mailto:hello@royeyal.com"
+            data-cuelume-hover="droplet"
+            data-cuelume-press="ready"
+          >
             Get in touch <span class="btn__arrow" aria-hidden="true">→</span>
           </a>
           <a
             class="btn btn--ghost"
+            data-cuelume-hover="tick"
+            data-cuelume-press="press"
             href="https://www.linkedin.com/in/royeyalcom/"
             target="_blank"
             rel="noreferrer"
@@ -62,6 +73,8 @@
           >
           <a
             class="btn btn--ghost"
+            data-cuelume-hover="tick"
+            data-cuelume-press="press"
             href="https://github.com/royeyal"
             target="_blank"
             rel="noreferrer"
@@ -90,26 +103,102 @@
               <div class="about__text" data-reveal>
                 <p>
                   I'm Roy — a marketing web developer. It's a deliberately
-                  hybrid title: I write production code (PHP, SCSS, JavaScript —
-                  no page builders), I think in Figma variables and design
-                  tokens, and I ship for marketing teams that measure
-                  everything. My work lives where those worlds meet.
+                  hybrid title, and it covers four things most teams hire four
+                  people for. Over the last decade I've used all four to build
+                  and rebrand the marketing sites of Elementor, Wix, and now
+                  Lusha.
                 </p>
-                <p>
-                  Over the last decade I've helped build and rebrand the
-                  marketing sites of Elementor, Wix, and now Lusha — alongside
-                  freelance Webflow builds for SaaS companies. Lately I engineer
-                  AI workflows: Claude Code skills that take a landing page from
-                  keyword to production HTML in minutes, and a
-                  Figma-to-WordPress pipeline powered by a shared design token
-                  system.
-                </p>
-                <p>
-                  I've also spent time on the other side of the screen — hosting
-                  10+ webinars, meetups and YouTube live shows for Elementor's
-                  community, and writing CSS guides that became go-to references
-                  at Wix.
-                </p>
+              </div>
+
+              <!-- Step timeline (Osmo Supply). Deliberately NO data-reveal on
+                   these items: the GSAP reveal in animations.js writes inline
+                   opacity, which would fight the timeline's own state-driven
+                   opacity ramp. -->
+              <div
+                data-step-timeline-init
+                data-step-timeline-activation="0.5"
+                class="step-timeline"
+              >
+                <div class="step-timeline__wrapper">
+                  <div data-step-timeline-line class="step-timeline__line">
+                    <div
+                      data-step-timeline-fill
+                      class="step-timeline__fill"
+                    ></div>
+                  </div>
+                  <div class="step-timeline__collection">
+                    <ol class="step-timeline__list">
+                      <li data-step-timeline-item class="step-timeline__item">
+                        <div
+                          data-step-timeline-marker
+                          class="step-timeline__marker"
+                          aria-hidden="true"
+                        >
+                          <span>01</span>
+                        </div>
+                        <div class="step-timeline__content">
+                          <h3 class="step-timeline__content-h">Design</h3>
+                          <p class="step-timeline__p">
+                            Figma variables, design tokens and UX/UI calls. I
+                            think in components before I write a line of CSS, so
+                            what gets designed is what can actually ship.
+                          </p>
+                        </div>
+                      </li>
+                      <li data-step-timeline-item class="step-timeline__item">
+                        <div
+                          data-step-timeline-marker
+                          class="step-timeline__marker"
+                          aria-hidden="true"
+                        >
+                          <span>02</span>
+                        </div>
+                        <div class="step-timeline__content">
+                          <h3 class="step-timeline__content-h">Code</h3>
+                          <p class="step-timeline__p">
+                            HTML, PHP, SCSS and JavaScript written by hand — no
+                            page builders. Reusable UI that survives contact
+                            with a real team and a real release schedule.
+                          </p>
+                        </div>
+                      </li>
+                      <li data-step-timeline-item class="step-timeline__item">
+                        <div
+                          data-step-timeline-marker
+                          class="step-timeline__marker"
+                          aria-hidden="true"
+                        >
+                          <span>03</span>
+                        </div>
+                        <div class="step-timeline__content">
+                          <h3 class="step-timeline__content-h">Marketing</h3>
+                          <p class="step-timeline__p">
+                            Pages built to convert, then measured — Google Tag
+                            Manager, A/B tests, and the SEO groundwork. I ship
+                            for teams that count everything.
+                          </p>
+                        </div>
+                      </li>
+                      <li data-step-timeline-item class="step-timeline__item">
+                        <div
+                          data-step-timeline-marker
+                          class="step-timeline__marker"
+                          aria-hidden="true"
+                        >
+                          <span>04</span>
+                        </div>
+                        <div class="step-timeline__content">
+                          <h3 class="step-timeline__content-h">Automation</h3>
+                          <p class="step-timeline__p">
+                            Claude Code skills and CI/CD pipelines that take a
+                            page from keyword to production in minutes, and
+                            convert a Figma page into editable WordPress.
+                          </p>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
               </div>
               <ul class="chips" data-reveal>
                 <li class="chip">HTML · PHP · SCSS · JS</li>
@@ -348,6 +437,8 @@
             <li class="project-card" data-reveal>
               <a
                 class="project-card__link"
+                data-cuelume-hover="whisper"
+                data-cuelume-press="page"
                 href="https://www.minimus.io/"
                 target="_blank"
                 rel="noreferrer"
@@ -362,6 +453,8 @@
             <li class="project-card" data-reveal>
               <a
                 class="project-card__link"
+                data-cuelume-hover="whisper"
+                data-cuelume-press="page"
                 href="https://www.theidentityunderground.com/"
                 target="_blank"
                 rel="noreferrer"
@@ -376,6 +469,8 @@
             <li class="project-card" data-reveal>
               <a
                 class="project-card__link"
+                data-cuelume-hover="whisper"
+                data-cuelume-press="page"
                 href="https://www.silverfort.com/"
                 target="_blank"
                 rel="noreferrer"
@@ -390,6 +485,8 @@
             <li class="project-card" data-reveal>
               <a
                 class="project-card__link"
+                data-cuelume-hover="whisper"
+                data-cuelume-press="page"
                 href="https://www.satyield.com/"
                 target="_blank"
                 rel="noreferrer"
@@ -412,7 +509,12 @@
     <footer class="footer" id="contact">
       <div class="container">
         <p class="eyebrow" data-reveal>Say hello</p>
-        <a class="footer__mail" href="mailto:hello@royeyal.com" data-reveal
+        <a
+          class="footer__mail"
+          href="mailto:hello@royeyal.com"
+          data-reveal
+          data-cuelume-hover="droplet"
+          data-cuelume-press="ready"
           >hello@royeyal.com</a
         >
         <nav class="footer__links" data-reveal aria-label="Social links">
@@ -420,9 +522,16 @@
             href="https://www.linkedin.com/in/royeyalcom/"
             target="_blank"
             rel="noreferrer"
+            data-cuelume-hover="tick"
+            data-cuelume-press="press"
             >LinkedIn</a
           >
-          <a href="https://github.com/royeyal" target="_blank" rel="noreferrer"
+          <a
+            href="https://github.com/royeyal"
+            target="_blank"
+            rel="noreferrer"
+            data-cuelume-hover="tick"
+            data-cuelume-press="press"
             >GitHub</a
           >
         </nav>
@@ -436,6 +545,24 @@
         <p class="mono">
           hello@royeyal.com:~$ exit<span class="cursor">▌</span>
         </p>
+
+        <!-- Ships hidden; initSound reveals it, so a failed bundle leaves
+             no dead control. aria-label carries the stable name and
+             aria-pressed carries state, so the visible "[ sound: off ]"
+             text is aria-hidden to avoid a double announcement. -->
+        <button
+          type="button"
+          class="sound-toggle"
+          data-sound-toggle
+          aria-pressed="false"
+          aria-label="Sound effects"
+          hidden
+        >
+          <span aria-hidden="true"
+            >[ sound: <span data-sound-state>off</span> ]</span
+          >
+        </button>
+
         <p class="mono">© <span data-year>2026</span> Roy Eyal</p>
       </div>
     </footer>
