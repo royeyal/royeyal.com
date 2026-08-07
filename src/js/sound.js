@@ -2,7 +2,8 @@
  * Interaction sounds — cuelume, opt-in, default OFF.
  *
  * The *bindings* live in the markup as data-cuelume-* attributes (see
- * index.html). This module owns only load / enable / persist / volume.
+ * index.html). This module owns only load / enable / volume. The state
+ * is never persisted — every page load starts off.
  * Intended assignment — keep in sync with index.html:
  *
  *   contact   .btn--primary, .footer__mail        hover droplet  press ready
@@ -39,32 +40,18 @@ const STORAGE_KEY = 'royeyal:sound';
 const USED_SOUNDS = ['droplet', 'ready', 'tick', 'press', 'whisper', 'page'];
 
 /*
- * sessionStorage, deliberately NOT localStorage: every fresh visit must
- * start silent. Within a tab the choice survives reloads and in-page
- * navigation, but closing the tab resets to off — so a visitor can never
- * arrive to unexpected audio because of a choice made days earlier.
+ * The preference is deliberately NOT persisted. Every page load starts
+ * silent, full stop — no storage to read, so there is no state that can
+ * survive and surprise someone later. On a single-page site the cost is
+ * one click if you reload; the benefit is that "off by default" is a
+ * property of the code rather than a promise about stored values.
  */
-function readPref(key) {
-  try {
-    return sessionStorage.getItem(key) === 'on';
-  } catch {
-    return false; // storage blocked (private mode, sandboxed context)
-  }
-}
 
-function writePref(key, on) {
-  try {
-    sessionStorage.setItem(key, on ? 'on' : 'off');
-  } catch {
-    /* in-memory state still drives the UI for this page view */
-  }
-}
-
-// One-time cleanup: an earlier build persisted this in localStorage, so
-// anyone who enabled sound back then would still be opted in forever.
-function clearLegacyPref(key) {
+// Clear keys written by earlier builds, which did persist the choice.
+function clearStoredPrefs(key) {
   try {
     localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
   } catch {
     /* nothing to clean up if storage is blocked */
   }
@@ -81,8 +68,9 @@ export function initSound(toggle, options = {}) {
 
   const state = toggle.querySelector('[data-sound-state]');
 
-  clearLegacyPref(storageKey);
-  let enabled = readPref(storageKey);
+  clearStoredPrefs(storageKey);
+  // Always starts off. Never read from storage.
+  let enabled = false;
   let api = null; // resolved cuelume module namespace
   let loading = null; // in-flight import promise (singleton)
   let broken = false; // import or API validation failed
@@ -106,7 +94,6 @@ export function initSound(toggle, options = {}) {
 
   function markUnavailable() {
     enabled = false;
-    writePref(storageKey, false);
     toggle.disabled = true;
     toggle.setAttribute('aria-pressed', 'false');
     toggle.setAttribute('aria-label', 'Sound effects unavailable');
@@ -150,7 +137,6 @@ export function initSound(toggle, options = {}) {
 
   function apply({ announce = false } = {}) {
     render();
-    writePref(storageKey, enabled);
 
     if (!enabled) {
       if (api) safe(() => api.setEnabled(false));
@@ -279,14 +265,8 @@ export function initSound(toggle, options = {}) {
   }
   document.addEventListener('visibilitychange', onVisibility);
 
+  // Always renders the off state; nothing is loaded until a real click.
   render();
-  if (enabled) {
-    // Returning opt-in: honour the stored choice without blocking paint.
-    // The AudioContext stays suspended until this visit's first gesture;
-    // cuelume resumes it, so the first hover/click is the unlock.
-    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1200));
-    idle(() => apply());
-  }
 
   return function destroy() {
     toggle.removeEventListener('click', onClick);
