@@ -6,6 +6,9 @@
  * GSAP global that Webflow / a CDN <script> provides — do not ship two
  * copies of GSAP.
  */
+import '@fontsource-variable/tektur';
+// Archivo kept during the Tektur trial as the --font-display fallback.
+// If Tektur stays, drop this import and the dependency (~68 KB saved).
 import '@fontsource-variable/archivo';
 import './main.css'; /* includes Departure Mono @font-face */
 

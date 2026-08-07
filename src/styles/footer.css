@@ -20,8 +20,8 @@
   display: inline-block;
   font-family: var(--font-display);
   font-size: var(--font-size-mail);
-  font-weight: 750;
-  font-variation-settings: 'wdth' 114;
+  font-weight: var(--weight-display);
+  font-variation-settings: 'wdth' var(--display-wdth);
   letter-spacing: -0.02em;
   text-decoration: none;
   border-bottom: var(--border-w-thick) solid var(--magenta);
@@ -73,8 +73,8 @@
   text-align: center;
   font-family: var(--font-display);
   font-size: var(--font-size-giant);
-  font-weight: 850;
-  font-variation-settings: 'wdth' 125;
+  font-weight: var(--weight-display);
+  font-variation-settings: 'wdth' var(--display-wdth);
   letter-spacing: -0.02em;
   color: transparent;
   -webkit-text-stroke: 0.09375rem rgba(255, 255, 255, 0.22);

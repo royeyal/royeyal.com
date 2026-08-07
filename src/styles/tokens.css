@@ -29,7 +29,15 @@
 
   /* typography — display becomes Neue Machina once purchased
      (see fonts.css for the switch instructions) */
-  --font-display: 'Archivo Variable', system-ui, sans-serif;
+  /* Trialling Tektur (Google, variable wght 400-900 / wdth 75-100).
+     To revert to Archivo: swap the two lines below and restore
+     --display-wdth to 118. Tektur's width axis maxes at 100, so the
+     old Archivo 'wdth' 112-125 values would silently clamp — headings
+     now read the --display-wdth token instead of hard-coded values. */
+  --font-display: 'Tektur Variable', 'Archivo Variable', system-ui, sans-serif;
+  /* --font-display: 'Archivo Variable', system-ui, sans-serif; */
+  --weight-display: 666;
+  --display-wdth: 100;
   --font-body: 'Switzer Variable', system-ui, sans-serif;
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
 
