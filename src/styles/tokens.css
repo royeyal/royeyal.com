@@ -106,6 +106,18 @@
   --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
   --fast: 280ms;
   --slow: 550ms;
+
+  /* Lightbulb easing — deliberately asymmetric, because a filament is.
+     ON  surges to full and settles (bloom overshoots slightly).
+     OFF drops steeply then trails off as the filament cools, and takes
+     roughly 3x as long. Applied by declaring the transition on the
+     TARGET state: the rule on the base state governs turning off, the
+     rule on the active state governs turning on. */
+  --ease-bulb-on: cubic-bezier(0.2, 0.95, 0.3, 1);
+  --ease-bulb-bloom: cubic-bezier(0.18, 1.5, 0.45, 1);
+  --ease-bulb-off: cubic-bezier(0.25, 0.75, 0.35, 1);
+  --bulb-on: 260ms;
+  --bulb-off: 780ms;
 }
 
 /* P3 — full chroma on wide-gamut displays */

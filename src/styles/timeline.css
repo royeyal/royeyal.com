@@ -64,22 +64,36 @@
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   box-shadow: var(--shadow-chip);
+  /* base = unlit. This transition governs turning OFF: a steep initial
+     drop and a long cooling tail. */
   transition:
-    background-color var(--fast) var(--ease-out),
-    border-color var(--fast) var(--ease-out),
-    color var(--fast) var(--ease-out),
-    box-shadow var(--slow) var(--ease-out);
+    background-color var(--bulb-off) var(--ease-bulb-off),
+    border-color var(--bulb-off) var(--ease-bulb-off),
+    color var(--bulb-off) var(--ease-bulb-off),
+    box-shadow var(--bulb-off) var(--ease-bulb-off),
+    transform var(--bulb-off) var(--ease-bulb-off);
 }
 
-/* every step the fill has passed */
+/* every step the fill has passed — lit.
+   This transition governs turning ON: a fast surge, with the glow and
+   scale allowed to overshoot slightly so the filament visibly blooms
+   before settling. Colours use the non-overshooting curve to avoid
+   interpolating out of gamut. */
 [data-step-timeline-item][data-status='active'] [data-step-timeline-marker] {
   background: var(--magenta);
   border-color: var(--magenta);
   color: #fff;
+  transition:
+    background-color var(--bulb-on) var(--ease-bulb-on),
+    border-color var(--bulb-on) var(--ease-bulb-on),
+    color var(--bulb-on) var(--ease-bulb-on),
+    box-shadow var(--bulb-on) var(--ease-bulb-bloom),
+    transform var(--bulb-on) var(--ease-bulb-bloom);
 }
 
-/* the single leading step */
+/* the single leading step — brightest, and physically swells a touch */
 [data-step-timeline-item][data-current] [data-step-timeline-marker] {
+  transform: scale(1.06);
   box-shadow:
     var(--shadow-chip),
     0 0 0 0.5rem var(--magenta-dim),
@@ -92,16 +106,19 @@
   gap: 0.5rem;
   max-width: 46ch;
   padding-top: 0.35rem;
-  transition: opacity var(--fast) var(--ease-out);
 }
 
-/* Osmo's three-stage legibility ramp: ahead / passed / current */
+/* Osmo's three-stage legibility ramp: ahead / passed / current.
+   Same bulb asymmetry as the markers — text comes up quickly and dims
+   away slowly, so scrolling back never feels like a light switch. */
 [data-step-timeline-item] .step-timeline__content {
   opacity: 0.25;
+  transition: opacity var(--bulb-off) var(--ease-bulb-off);
 }
 
 [data-step-timeline-item][data-status='active'] .step-timeline__content {
   opacity: 0.5;
+  transition: opacity var(--bulb-on) var(--ease-bulb-on);
 }
 
 [data-step-timeline-item][data-current] .step-timeline__content {
