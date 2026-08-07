@@ -202,22 +202,64 @@
   margin-top: 3rem;
 }
 
+/*
+ * Card hover is a lightbulb, same as the timeline markers: the frame
+ * surges on in ~260ms and cools over ~780ms. It previously used
+ * --ease-out, which is expo-out and reaches 95% of its value in the
+ * first fifth of the duration — so the frame snapped while the image
+ * faded, two motion languages in one hover.
+ *
+ * --accent drives both the border and the two-layer glow in
+ * --shadow-card-lit, so experience stays cyan and freelance magenta
+ * off one shared recipe.
+ */
+/*
+ * The lit hover shadow, shared by both card types. Declared here rather
+ * than in tokens.css because a custom property's var() is substituted
+ * at the element where the property is DECLARED — on :root, --accent
+ * does not exist, so the recipe would compute to guaranteed-invalid and
+ * inherit down as nothing. Declared alongside --accent, one recipe
+ * serves both the cyan and the magenta card.
+ *
+ * Structure: the existing elevation stack and lit top lip, plus a
+ * TWO-LAYER glow — a tight bright core at 70% and a wide diffuse halo
+ * at 30%, which is how light actually falls off; a single blur reads
+ * flat. Both glow layers have ZERO spread, so the light extends past
+ * the border instead of being pulled back inside it the way the old
+ * negative-spread glow was.
+ */
+.work-card,
+.project-card {
+  --shadow-card-lit:
+    inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.12),
+    0 0.25rem 0.5rem rgba(0, 0, 0, 0.65),
+    0 1.25rem 2.5rem -0.625rem rgba(0, 0, 0, 0.9),
+    0 4rem 8.75rem -1.25rem rgba(0, 0, 0, 1),
+    0 0 2.5rem 0 color-mix(in oklab, var(--accent) 30%, transparent),
+    0 0 0.75rem 0 color-mix(in oklab, var(--accent) 70%, transparent);
+}
+
 .work-card {
+  --accent: var(--cyan);
   border: var(--border-w) solid var(--line);
   border-radius: var(--radius);
   background: var(--card-gradient);
   padding: clamp(1.5rem, 4vw, 2.75rem);
   box-shadow: var(--shadow-card);
   transition:
-    border-color var(--fast) var(--ease-out),
-    box-shadow var(--slow) var(--ease-out),
-    transform var(--fast) var(--ease-out);
+    border-color var(--bulb-off) var(--ease-bulb-off),
+    box-shadow var(--bulb-off) var(--ease-bulb-off),
+    transform var(--bulb-off) var(--ease-bulb-off);
 }
 
 .work-card:hover {
-  border-color: color-mix(in oklab, var(--cyan) 75%, transparent);
-  box-shadow: var(--shadow-card-hover);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-card-lit);
   transform: translateY(-0.1875rem);
+  transition:
+    border-color var(--bulb-on) var(--ease-bulb-on),
+    box-shadow var(--bulb-on) var(--ease-bulb-on),
+    transform var(--bulb-on) var(--ease-bulb-bloom);
 }
 
 .work-card__head {
@@ -398,25 +440,27 @@
 .project-card {
   /* nested-radius recipe: media radius = outer radius − padding */
   --card-pad: 0.75rem;
+  --accent: var(--magenta);
   border: var(--border-w) solid var(--line);
   border-radius: var(--radius-outer);
   background: var(--card-gradient);
   padding: var(--card-pad) var(--card-pad) 1.375rem;
   box-shadow: var(--shadow-card);
   transition:
-    border-color var(--fast) var(--ease-out),
-    box-shadow var(--slow) var(--ease-out),
-    transform var(--fast) var(--ease-out);
+    border-color var(--bulb-off) var(--ease-bulb-off),
+    box-shadow var(--bulb-off) var(--ease-bulb-off),
+    transform var(--bulb-off) var(--ease-bulb-off);
 }
 
-.project-card:hover {
-  border-color: color-mix(in oklab, var(--magenta) 75%, transparent);
+.project-card:hover,
+.project-card:has(.project-card__link:focus-visible) {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-card-lit);
   transform: translateY(-0.25rem);
-  box-shadow:
-    inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.09),
-    0 0.125rem 0.25rem rgba(0, 0, 0, 0.5),
-    0 2rem 5rem -1.5rem rgba(0, 0, 0, 0.95),
-    0 0 2.5rem -0.5rem var(--magenta-dim);
+  transition:
+    border-color var(--bulb-on) var(--ease-bulb-on),
+    box-shadow var(--bulb-on) var(--ease-bulb-on),
+    transform var(--bulb-on) var(--ease-bulb-bloom);
 }
 
 .project-card__media {
@@ -449,18 +493,26 @@
   object-fit: cover;
   opacity: 0.72;
   filter: saturate(0.85);
+  transform: scale(1);
   transition:
     opacity var(--bulb-off) var(--ease-bulb-off),
-    filter var(--bulb-off) var(--ease-bulb-off);
+    filter var(--bulb-off) var(--ease-bulb-off),
+    transform var(--bulb-off) var(--ease-bulb-off);
 }
 
+/* Light comes up fast; the camera move is slow and deliberate, which is
+   why the zoom gets its own longer duration rather than --bulb-on. The
+   4% scale is comfortably inside the resolution headroom (a 1000px
+   capture in a 474px slot), so nothing goes soft. */
 .project-card:hover .project-card__shot,
 .project-card:has(.project-card__link:focus-visible) .project-card__shot {
   opacity: 1;
   filter: saturate(1);
+  transform: scale(1.04);
   transition:
     opacity var(--bulb-on) var(--ease-bulb-on),
-    filter var(--bulb-on) var(--ease-bulb-on);
+    filter var(--bulb-on) var(--ease-bulb-on),
+    transform var(--zoom-in) var(--ease-bulb-on);
 }
 
 .project-card__link {
@@ -472,16 +524,9 @@
     border-color var(--fast) var(--ease-out);
 }
 
-/* keyboard focus on the link lights the card up like a hover */
-.project-card:has(.project-card__link:focus-visible) {
-  border-color: color-mix(in oklab, var(--magenta) 75%, transparent);
-  transform: translateY(-0.25rem);
-  box-shadow:
-    inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.09),
-    0 0.125rem 0.25rem rgba(0, 0, 0, 0.5),
-    0 2rem 5rem -1.5rem rgba(0, 0, 0, 0.95),
-    0 0 2.5rem -0.5rem var(--magenta-dim);
-}
+/* Keyboard focus lights the card exactly like a hover — the selector is
+   folded into the .project-card:hover rule above so the two states can
+   never drift apart. */
 
 .project-card__name {
   font-family: var(--font-display);

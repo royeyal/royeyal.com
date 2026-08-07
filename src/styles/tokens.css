@@ -63,11 +63,13 @@
     0 0.125rem 0.25rem rgba(0, 0, 0, 0.65),
     0 0.75rem 1.5rem -0.5rem rgba(0, 0, 0, 0.85),
     0 3rem 6.875rem -1.25rem rgba(0, 0, 0, 1);
-  --shadow-card-hover:
-    inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.12),
-    0 0.25rem 0.5rem rgba(0, 0, 0, 0.65),
-    0 1.25rem 2.5rem -0.625rem rgba(0, 0, 0, 0.9),
-    0 4rem 8.75rem -1.25rem rgba(0, 0, 0, 1), 0 0 4rem -0.5rem var(--cyan-dim);
+  /* NOTE: the lit-card hover shadow (--shadow-card-lit) is deliberately
+     NOT here. It references --accent, which only exists on the cards,
+     and a custom property's var() is substituted where the property is
+     DECLARED — so on :root it would resolve against a non-existent
+     --accent, compute to guaranteed-invalid, and inherit down as
+     nothing. It lives on the card selectors in sections.css instead. */
+
   --shadow-btn:
     inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.3),
     0 0.1875rem 0.5rem rgba(0, 0, 0, 0.7),
@@ -118,6 +120,10 @@
   --ease-bulb-off: cubic-bezier(0.25, 0.75, 0.35, 1);
   --bulb-on: 260ms;
   --bulb-off: 780ms;
+
+  /* Slow cinematic drift on project screenshots — long enough to read as
+     a camera move rather than a UI effect. */
+  --zoom-in: 900ms;
 }
 
 /* P3 — full chroma on wide-gamut displays */
