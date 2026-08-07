@@ -4,28 +4,34 @@
  * The *bindings* live in the markup as data-cuelume-* attributes (see
  * index.html). This module owns only load / enable / volume. The state
  * is never persisted — every page load starts off.
- * Intended assignment — keep in sync with index.html:
  *
- *   contact   .btn--primary, .footer__mail        hover droplet  press ready
- *   outbound  .btn--ghost, .footer__links a,
- *             .hero__sub a                        hover tick     press press
- *   project   .project-card__link                 hover whisper  press page
+ * Two kinds of cue, both answering a deliberate act. Keep in sync with
+ * index.html:
  *
- * No data-cuelume-release anywhere: every target opens a new tab or the
+ *   click   data-cuelume-press on the 11 links   press / ready / page
+ *   scroll  data-sound-on / -off on the steps    toggle / error
+ *
+ * No hover cues, by choice. cuelume throttles pointerenter with a single
+ * module-level timestamp shared across every element, so moving between
+ * two links inside 150ms silently drops the second sound — which reads
+ * as lag rather than restraint. Bluetooth output latency compounds it.
+ * Sound now only ever answers a click or a step lighting up.
+ *
+ * No data-cuelume-release either: every target opens a new tab or the
  * mail client, so a pointerup sound would fire into a backgrounding tab.
  *
  * WCAG 1.4.2 (Audio Control) is satisfied by construction — nothing plays
  * without an explicit opt-in gesture, every clip is far under 3s, and the
- * stop control is permanently visible in the footer. Deliberately NOT
+ * stop control is always visible on screen. Deliberately NOT
  * gated on prefers-reduced-motion: there is no sound analogue of that
  * query, and a user who clicks a control labelled "[ sound: off ]" to turn
  * it on has given an unambiguous instruction. Don't "fix" this.
  *
  * cuelume handles more than its README documents (verified in
- * node_modules/cuelume/dist/interactions/bind.js): bind() is idempotent,
- * hover is throttled to 150ms globally AND restricted to fine-pointer
- * mice, and unknown sound names fall back safely. So no custom throttle
- * is needed here.
+ * node_modules/cuelume/dist/interactions/bind.js): bind() is idempotent
+ * and unknown sound names fall back safely rather than throwing. Note
+ * play() is also a hard no-op until navigator.userActivation reports
+ * real interaction, so audio genuinely cannot fire on load.
  *
  * NOTE (Webflow migration): cuelume is bundled from npm here. In Webflow,
  * load it from a pinned ESM CDN URL and keep the data-cuelume-* attributes
@@ -37,7 +43,7 @@ const STORAGE_KEY = 'royeyal:sound';
 
 // Dev-only guard: cuelume is pre-1.0, so catch a renamed sound at
 // `npm run dev` rather than by ear in production.
-const USED_SOUNDS = ['droplet', 'ready', 'tick', 'press', 'whisper', 'page'];
+const USED_SOUNDS = ['press', 'ready', 'page', 'toggle', 'error'];
 
 /*
  * The preference is deliberately NOT persisted. Every page load starts
@@ -181,17 +187,7 @@ export function initSound(toggle, options = {}) {
     safe(() => api.play(el.dataset.cuelumePress || 'press'));
   }
 
-  function onFocusin(event) {
-    if (!enabled || !api) return;
-    const el = event.target.closest?.('[data-cuelume-hover]');
-    // :focus-visible is the browser's own "was this keyboard?" heuristic —
-    // it stops a mouse click emitting both a hover and a focus sound.
-    if (!el || el === toggle || !el.matches(':focus-visible')) return;
-    safe(() => api.play(el.dataset.cuelumeHover || 'chime'));
-  }
-
   document.addEventListener('keydown', onKeydown);
-  document.addEventListener('focusin', onFocusin);
 
   /* ---- state-change cues -----------------------------------------
    * cuelume's bind() only covers pointer and click events. The timeline
@@ -271,7 +267,6 @@ export function initSound(toggle, options = {}) {
   return function destroy() {
     toggle.removeEventListener('click', onClick);
     document.removeEventListener('keydown', onKeydown);
-    document.removeEventListener('focusin', onFocusin);
     document.removeEventListener('visibilitychange', onVisibility);
     clearTimeout(armTimer);
     observer?.disconnect();
