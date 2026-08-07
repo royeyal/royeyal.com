@@ -546,25 +546,30 @@
           hello@royeyal.com:~$ exit<span class="cursor">▌</span>
         </p>
 
-        <!-- Ships hidden; initSound reveals it, so a failed bundle leaves
-             no dead control. aria-label carries the stable name and
-             aria-pressed carries state, so the visible "[ sound: off ]"
-             text is aria-hidden to avoid a double announcement. -->
-        <button
-          type="button"
-          class="sound-toggle"
-          data-sound-toggle
-          aria-pressed="false"
-          aria-label="Sound effects"
-          hidden
-        >
-          <span aria-hidden="true"
-            >[ sound: <span data-sound-state>off</span> ]</span
-          >
-        </button>
-
         <p class="mono">© <span data-year>2026</span> Roy Eyal</p>
       </div>
     </footer>
+
+    <!-- Global sound toggle. Fixed for now so it is discoverable from the
+         first screen — in the footer nobody found it until the page was
+         already over. When the nav bar exists, move this into it and drop
+         the --fixed modifier; the component itself is unchanged.
+
+         Ships hidden; initSound reveals it, so a failed bundle leaves no
+         dead control. aria-label carries the stable name and aria-pressed
+         carries the state, so the visible "[ sound: off ]" text is
+         aria-hidden to avoid a double announcement. -->
+    <button
+      type="button"
+      class="sound-toggle sound-toggle--fixed"
+      data-sound-toggle
+      aria-pressed="false"
+      aria-label="Sound effects"
+      hidden
+    >
+      <span aria-hidden="true"
+        >[ sound: <span data-sound-state>off</span> ]</span
+      >
+    </button>
   </body>
 </html>

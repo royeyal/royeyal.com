@@ -88,46 +88,6 @@
   filter: drop-shadow(0 -0.75rem 3.75rem rgba(249, 0, 185, 0.18));
 }
 
-/* Sound toggle — a terminal switch sitting between the two meta lines.
-   Invisible chrome until hovered; magenta and lit when on. */
-.sound-toggle {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-  background: none;
-  border: var(--border-w) solid transparent;
-  border-radius: var(--radius-chip);
-  padding: 0.125rem 0.4375rem;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  transition:
-    color var(--fast) var(--ease-out),
-    border-color var(--fast) var(--ease-out),
-    text-shadow var(--fast) var(--ease-out);
-}
-
-.sound-toggle:hover {
-  color: var(--cyan);
-  border-color: var(--cyan-dim);
-}
-
-.sound-toggle[aria-pressed='true'] {
-  color: var(--magenta);
-  text-shadow: 0 0 1rem var(--magenta-dim);
-}
-
-.sound-toggle[aria-pressed='true']:hover {
-  border-color: var(--magenta-dim);
-}
-
-.sound-toggle[disabled] {
-  opacity: 0.5;
-  cursor: default;
-}
-
 .footer__meta {
   display: flex;
   justify-content: space-between;
