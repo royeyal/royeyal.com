@@ -315,6 +315,15 @@
   --logo-color: oklch(66% 0.24 4deg);
 }
 
+/* Roy's own mark is the site's own accent — no borrowed brand hue to
+   normalise. Safe to reference --magenta here (unlike --accent in the
+   --shadow-card-lit note above) because --magenta IS declared on :root,
+   so it substitutes at this declaration site and the P3 override in
+   tokens.css flows through automatically. */
+.work-card__logo[data-brand='royeyal'] {
+  --logo-color: var(--magenta);
+}
+
 @media (color-gamut: p3) {
   .work-card__logo[data-brand='lusha'] {
     --logo-color: color(display-p3 0.62 0.49 1);
@@ -333,6 +342,15 @@
   width: 65%;
   height: auto;
   fill: currentColor;
+}
+
+/* The R is portrait (68.9 x 94.7) where the other three marks are square
+   or near-square, so the shared `width: 65%` would run it to ~89% of the
+   tile height. Size it by height instead, to land at the same ~33px
+   optical size as the rest. */
+.work-card__logo[data-brand='royeyal'] svg {
+  width: auto;
+  height: 70%;
 }
 
 .work-card__logo .mono {
@@ -384,10 +402,6 @@
 .work-card__points strong {
   color: var(--text);
   font-weight: 680;
-}
-
-.work__earlier {
-  margin-top: 2.5rem;
 }
 
 @media (max-width: 40rem) {

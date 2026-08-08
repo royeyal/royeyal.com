@@ -210,6 +210,18 @@ a {
   transition: transform var(--fast) var(--ease-snap);
 }
 
+/* Platform marks on the LinkedIn / GitHub links, in both the hero and
+   the footer. Sized in em so it tracks whatever label it sits beside;
+   1.15em balances the uppercase cap height, where 1em reads undersized.
+   `flex: none` keeps it from squashing when .btn goes full-width under
+   40rem, and currentColor picks up the existing hovers for free. */
+.social-icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  fill: currentColor;
+}
+
 .btn--primary:hover .btn__arrow {
   transform: translateX(0.25rem);
 }
