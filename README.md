@@ -12,7 +12,10 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
   [reactbits.dev/animations/strands](https://reactbits.dev/animations/strands)
   (no React needed)
 - **cuelume** (npm) — opt-in interaction sounds, synthesised via Web Audio
-  (no audio files). Default OFF behind a footer toggle; loaded lazily so
+  (no audio files). Default OFF, never persisted — every page load starts
+  silent. The toggle is a body-level fixed control at the bottom-right,
+  not in the footer (nobody found it there); when a nav bar exists, move
+  it in and drop the `.sound-toggle--fixed` modifier. Loaded lazily, so
   it costs nothing unless enabled
 - Self-hosted fonts, no font CDN, **latin subset only** (this site is US
   English) — all three live in `src/assets/fonts/` and are declared in
@@ -85,10 +88,24 @@ dashboard action — no external DNS changes.
   `<script type="module">import { bind } from 'https://esm.sh/cuelume@0.2.2'`.
   Same bundled-now/CDN-later situation as GSAP.
 - Everything driven by `data-*` attributes ports cleanly — Webflow's
-  custom-attributes panel takes them verbatim. That covers
-  `data-cuelume-*`, `data-step-timeline-*`, `data-reveal`, `data-hero`,
-  `data-brand`. Class-name-based selectors would **not** survive, since
-  Webflow generates its own.
+  custom-attributes panel takes them verbatim. **All of them have to come
+  across**: each is a JS hook with no class-name fallback, and one of the
+  files below reads it by name.
+  - `src/main.js` — `data-strands`, `data-sound-toggle`, `data-year`
+  - `src/js/animations.js` — `data-hero`, `data-reveal`, `data-giant`
+  - `src/js/timeline.js` — `data-step-timeline-*`
+  - cuelume itself — `data-cuelume-press`
+  - `src/js/sound.js` — `data-sound-state`, and `data-sound-on` /
+    `data-sound-off` on the timeline steps. Easiest to miss and the only
+    ones that fail **silently**: they drive the per-step scroll cues
+    through a MutationObserver watching `data-status`, so if they get
+    dropped the page still works perfectly, just mute on scroll.
+  - `src/styles/sections.css` — `data-brand`, the only CSS-only one
+    (picks the logo tile colour)
+
+  Class-name-based selectors would **not** survive, since Webflow
+  generates its own.
+
 - The Strands background ports to Webflow as an embed `<div data-strands>` +
   the built JS; ogl stays bundled (Webflow doesn't provide it).
 
@@ -101,9 +118,13 @@ dashboard action — no external DNS changes.
 - [x] **Freelance projects** — Minimus, The Identity Underground,
       Silverfort, SatYield are live and linked.
 - [x] **Email** — `hello@royeyal.com` confirmed and used throughout.
-- [x] **Company logos** — Lusha, Wix, and Elementor inline SVGs
-      (currentColor) are live in the `.work-card__logo` slots; canonical
-      copies at `public/images/{lusha,wix,elementor}.svg`.
+- [x] **Company logos** — Lusha, Wix, Elementor and Roy's own R monogram
+      are inline SVGs (currentColor) in the four `.work-card__logo` slots.
+      Canonical copies of the first three are at
+      `public/images/{lusha,wix,elementor}.svg`. The R has **no separate
+      file** — it is the 20 subpaths of the letter R cut out of
+      `public/images/royeyal-logo.svg`, the same ANSI wordmark the hero
+      masks, so the two can never drift apart.
 - [x] **Display font** — Tektur is live (self-hosted, latin-only).
 - [ ] **Neue Machina** — optional upgrade. Once purchased, drop the
       Ultrabold woff2 into `src/assets/fonts/` and follow the switch steps
