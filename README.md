@@ -59,6 +59,8 @@ docs/font-options.md   font research and pairing recommendations
 docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
 docs/google-workspace-domain-change.md
                        moving Workspace from royeyal.studio to royeyal.com
+docs/webflow-studio-wind-down.md
+                       retiring the .studio site, keeping the Workspace plan
 ```
 
 > ⚠️ The site advertises `hello@royeyal.com`, but the mailbox still lives
