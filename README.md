@@ -57,7 +57,13 @@ wrangler.jsonc         Worker config (account_id still a placeholder)
 docs/copy-options.md   alternate hero/positioning copy
 docs/font-options.md   font research and pairing recommendations
 docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
+docs/google-workspace-domain-change.md
+                       moving Workspace from royeyal.studio to royeyal.com
 ```
+
+> ⚠️ The site advertises `hello@royeyal.com`, but the mailbox still lives
+> at `royeyal.studio`. **Don't go live until that's resolved** — see
+> `docs/google-workspace-domain-change.md`.
 
 ## Deploy
 
