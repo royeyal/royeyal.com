@@ -53,7 +53,7 @@ src/js/timeline.js     GSAP scroll-highlighted "four disciplines" timeline
 src/js/sound.js        cuelume interaction sounds (opt-in)
 public/                static assets, copied verbatim into dist/ on build
 worker/index.js        Cloudflare Worker — serves dist/ via assets binding
-wrangler.jsonc         Worker config — account_id, apex custom domain route
+wrangler.jsonc         Worker config — account_id, assets binding
 docs/copy-options.md   alternate hero/positioning copy
 docs/font-options.md   font research and pairing recommendations
 docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
@@ -87,10 +87,10 @@ check token scopes; the real deploy is the test for those).
 appears in every dashboard URL. `CLOUDFLARE_API_TOKEN` lives in the
 gitignored `.env`.
 
-The apex is attached as a Workers **custom domain** declared in
-`wrangler.jsonc` `routes`, so deploying creates and maintains the DNS
-record itself. `workers_dev` is **off** — a live `*.workers.dev` URL
-would be a second indexable copy of the whole site.
+The apex is attached as a Workers **custom domain**, which created its
+own DNS record. It is not declared in `wrangler.jsonc` — see the note
+there and the token-scope table below. `workers_dev` is **off**: a live
+`*.workers.dev` URL would be a second indexable copy of the whole site.
 
 ### Token scopes
 
