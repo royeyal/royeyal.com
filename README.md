@@ -63,11 +63,12 @@ docs/webflow-studio-wind-down.md
                        retiring the .studio site, keeping the Workspace plan
 ```
 
-> ⚠️ The site advertises `hello@royeyal.com`. That domain currently has
-> **Cloudflare Email Routing** MX records, so mail may be forwarding
-> already — but it can't _send_ as that address. Check what the contact
-> link actually does before sharing the URL:
-> `docs/google-workspace-domain-change.md`.
+> ⚠️ The site advertises `hello@royeyal.com`, which is not yet a real
+> mailbox — `royeyal.com` still has **Cloudflare Email Routing** MX
+> records, so at best mail forwards somewhere and cannot be replied to
+> from that address. `royeyal.com` is being promoted to the Workspace
+> primary domain to fix it: `docs/google-workspace-domain-change.md`.
+> Worth finishing before the URL goes on a CV.
 
 ## Deploy
 
@@ -165,6 +166,7 @@ Add `Zone → DNS → Edit` to the token if you'd rather script it.
 - [ ] **www redirect** — `www.royeyal.com` does not resolve. Needs a
       proxied placeholder DNS record plus a Redirect Rule to the apex;
       the API token lacks the scopes, so it's a dashboard action.
-- [ ] **hello@royeyal.com sending** — see
-      `docs/google-workspace-domain-change.md` (short route).
+- [ ] **hello@royeyal.com** — becoming the Workspace primary domain, so
+      the address on the site can both send and receive. Step-by-step in
+      `docs/google-workspace-domain-change.md`.
 - [ ] Decide on navigation (currently none, by design).
