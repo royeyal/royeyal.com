@@ -94,19 +94,24 @@ would be a second indexable copy of the whole site.
 
 ### Token scopes
 
-The current token can deploy and manage the custom domain, but **not**
-touch DNS records or Redirect Rules:
+Probed against the live API, not inferred:
 
-| Scope                    | State     |
-| ------------------------ | --------- |
-| Workers Scripts:Edit     | ✅        |
-| Workers Routes:Edit      | ✅        |
-| Zone:Read                | ✅        |
-| DNS:Edit                 | ❌ denied |
-| Redirect/Transform Rules | ❌ denied |
+| Scope                          | State | Consequence                                                               |
+| ------------------------------ | ----- | ------------------------------------------------------------------------- |
+| Account → Workers Scripts:Edit | ✅    | deploys, and **custom domains** — those use `/accounts/…/workers/domains` |
+| Zone → Zone:Read               | ✅    |                                                                           |
+| Zone → Workers Routes:Edit     | ❌    | `routes` can't be declared in `wrangler.jsonc` — see the note there       |
+| Zone → DNS:Edit                | ❌    | DNS records are a dashboard action                                        |
+| Zone → Transform/Config Rules  | ❌    | Redirect Rules are a dashboard action                                     |
 
-Anything touching DNS or redirects is therefore a dashboard action.
-Add `Zone → DNS → Edit` to the token if you'd rather script it.
+The custom-domain vs. routes split is the non-obvious one: attaching
+`royeyal.com` worked, so it's tempting to conclude Workers Routes is
+granted. It isn't — those are different endpoints, and declaring
+`routes` makes `wrangler deploy` exit non-zero _after_ a successful
+upload.
+
+Granting `Workers Routes:Edit`, `DNS:Edit` and `Transform Rules:Edit`
+would make the whole setup scriptable from the repo.
 
 ## ⚠️ Webflow migration notes
 
@@ -164,8 +169,10 @@ Add `Zone → DNS → Edit` to the token if you'd rather script it.
 - [x] **Cloudflare** — deployed and live at royeyal.com, apex attached
       as a Workers custom domain.
 - [ ] **www redirect** — `www.royeyal.com` does not resolve. Needs a
-      proxied placeholder DNS record plus a Redirect Rule to the apex;
-      the API token lacks the scopes, so it's a dashboard action.
+      proxied placeholder DNS record plus a Redirect Rule 301ing to the
+      apex; the API token lacks DNS and Rules scopes, so it's a dashboard
+      action. The apex is canonical (`<link rel="canonical">` in
+      `index.html` says so too).
 - [ ] **hello@royeyal.com** — becoming the Workspace primary domain, so
       the address on the site can both send and receive. Step-by-step in
       `docs/google-workspace-domain-change.md`.

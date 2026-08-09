@@ -10,12 +10,19 @@
   // is the secret, and that stays gitignored.
   "account_id": "c84d1e6f99329d834a7cb284c20292dd",
 
+  // NOTE: royeyal.com IS attached as a custom domain — it was created by
+  // an earlier deploy and persists in Cloudflare (account-level Worker
+  // domain). It is deliberately NOT declared here: wrangler reconciles a
+  // `routes` key against GET /zones/:id/workers/routes, which this API
+  // token cannot read, so declaring it makes every deploy exit non-zero
+  // even though the upload succeeds. Restore the line below if the token
+  // ever gains Zone -> Workers Routes -> Edit:
+  //   "routes": [{ "pattern": "royeyal.com", "custom_domain": true }],
+  //
   // Apex is canonical — it matches hello@royeyal.com and the footer's
-  // terminal prompt. www is handled by a Cloudflare Redirect Rule rather
-  // than a second custom domain, because with run_worker_first: false the
-  // asset server answers before the worker ever runs, so the worker could
-  // not redirect it. Attaching this creates the apex DNS record itself.
-  "routes": [{ "pattern": "royeyal.com", "custom_domain": true }],
+  // terminal prompt. www is a Cloudflare Redirect Rule, not a second
+  // custom domain: with run_worker_first false the asset server answers
+  // before the worker runs, so the worker could never redirect it.
 
   // Off: royeyal.com is confirmed serving, and a live *.workers.dev URL
   // would be a second indexable copy of the whole site. Flip to true
