@@ -5,8 +5,10 @@
   "main": "worker/index.js",
   "compatibility_date": "2026-07-30",
 
-  // Cloudflare dashboard -> top-right account dropdown, or `wrangler whoami`
-  "account_id": "<YOUR_ACCOUNT_ID>",
+  // Cloudflare dashboard -> top-right account dropdown, or `wrangler whoami`.
+  // Not a secret — it appears in every dashboard URL. The API token in .env
+  // is the secret, and that stays gitignored.
+  "account_id": "c84d1e6f99329d834a7cb284c20292dd",
 
   // No custom domain route attached yet -> keep the *.workers.dev URL live
   "workers_dev": true,
