@@ -63,8 +63,10 @@ docs/webflow-studio-wind-down.md
                        retiring the .studio site, keeping the Workspace plan
 ```
 
-> ⚠️ The site advertises `hello@royeyal.com`, but the mailbox still lives
-> at `royeyal.studio`. **Don't go live until that's resolved** — see
+> ⚠️ The site advertises `hello@royeyal.com`. That domain currently has
+> **Cloudflare Email Routing** MX records, so mail may be forwarding
+> already — but it can't _send_ as that address. Check what the contact
+> link actually does before sharing the URL:
 > `docs/google-workspace-domain-change.md`.
 
 ## Deploy
