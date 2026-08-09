@@ -10,8 +10,17 @@
   // is the secret, and that stays gitignored.
   "account_id": "c84d1e6f99329d834a7cb284c20292dd",
 
-  // No custom domain route attached yet -> keep the *.workers.dev URL live
-  "workers_dev": true,
+  // Apex is canonical — it matches hello@royeyal.com and the footer's
+  // terminal prompt. www is handled by a Cloudflare Redirect Rule rather
+  // than a second custom domain, because with run_worker_first: false the
+  // asset server answers before the worker ever runs, so the worker could
+  // not redirect it. Attaching this creates the apex DNS record itself.
+  "routes": [{ "pattern": "royeyal.com", "custom_domain": true }],
+
+  // Off: royeyal.com is confirmed serving, and a live *.workers.dev URL
+  // would be a second indexable copy of the whole site. Flip to true
+  // temporarily if you ever need a URL while the custom domain is broken.
+  "workers_dev": false,
 
   // Static hosting for dist/. Vite already writes hashed filenames into
   // index.html on every build, so no stable-URL worker logic is needed —

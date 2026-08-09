@@ -76,17 +76,36 @@ writes hashed filenames into `index.html`, so no stable-URL worker logic
 is needed. Full reference, including the Webflow-pivot variant and the two
 silent-failure gotchas, is in `docs/cloudflare-workers.md`.
 
-Before the first deploy, two placeholders need real values:
+**Live at [royeyal.com](https://royeyal.com)** since 2026-08-09.
 
-1. `account_id` in `wrangler.jsonc` (still `<YOUR_ACCOUNT_ID>`) — from the
-   Cloudflare dashboard or `npx wrangler whoami`
-2. `CLOUDFLARE_API_TOKEN` in `.env` (gitignored), needs `Workers
-Scripts:Edit`
+`npm run deploy` builds fresh and ships. Validate config changes with
+`npx wrangler deploy --dry-run` first (local only — it does **not**
+check token scopes; the real deploy is the test for those).
 
-Then `npm run deploy`. Validate config changes with
-`npx wrangler deploy --dry-run` first. The domain is registered with
-Cloudflare Registrar, so attaching `royeyal.com` is a same-account
-dashboard action — no external DNS changes.
+`account_id` is committed in `wrangler.jsonc` — it is not a secret, it
+appears in every dashboard URL. `CLOUDFLARE_API_TOKEN` lives in the
+gitignored `.env`.
+
+The apex is attached as a Workers **custom domain** declared in
+`wrangler.jsonc` `routes`, so deploying creates and maintains the DNS
+record itself. `workers_dev` is **off** — a live `*.workers.dev` URL
+would be a second indexable copy of the whole site.
+
+### Token scopes
+
+The current token can deploy and manage the custom domain, but **not**
+touch DNS records or Redirect Rules:
+
+| Scope                    | State     |
+| ------------------------ | --------- |
+| Workers Scripts:Edit     | ✅        |
+| Workers Routes:Edit      | ✅        |
+| Zone:Read                | ✅        |
+| DNS:Edit                 | ❌ denied |
+| Redirect/Transform Rules | ❌ denied |
+
+Anything touching DNS or redirects is therefore a dashboard action.
+Add `Zone → DNS → Edit` to the token if you'd rather script it.
 
 ## ⚠️ Webflow migration notes
 
@@ -141,6 +160,11 @@ dashboard action — no external DNS changes.
       commented at the bottom of `src/styles/fonts.css`. Note it is a
       single static weight, so `--weight-display` / `--weight-display-max`
       both need to become `800`.
-- [ ] **Cloudflare** — fill in `account_id` and `CLOUDFLARE_API_TOKEN`,
-      then `npm run deploy` (see Deploy above).
+- [x] **Cloudflare** — deployed and live at royeyal.com, apex attached
+      as a Workers custom domain.
+- [ ] **www redirect** — `www.royeyal.com` does not resolve. Needs a
+      proxied placeholder DNS record plus a Redirect Rule to the apex;
+      the API token lacks the scopes, so it's a dashboard action.
+- [ ] **hello@royeyal.com sending** — see
+      `docs/google-workspace-domain-change.md` (short route).
 - [ ] Decide on navigation (currently none, by design).
