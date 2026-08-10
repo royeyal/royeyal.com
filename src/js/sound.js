@@ -10,6 +10,7 @@
  *
  *   click   data-cuelume-press on the 19 targets press / ready / page
  *   scroll  data-sound-on / -off on the steps    toggle / error
+ *   menu    data-sound-on / -off on the nav      arrival / scan
  *
  * No hover cues, by choice. cuelume throttles pointerenter with a single
  * module-level timestamp shared across every element, so moving between
@@ -43,7 +44,15 @@ const STORAGE_KEY = 'royeyal:sound';
 
 // Dev-only guard: cuelume is pre-1.0, so catch a renamed sound at
 // `npm run dev` rather than by ear in production.
-const USED_SOUNDS = ['press', 'ready', 'page', 'toggle', 'error'];
+const USED_SOUNDS = [
+  'press',
+  'ready',
+  'page',
+  'toggle',
+  'error',
+  'arrival',
+  'scan',
+];
 
 /*
  * The preference is deliberately NOT persisted. Every page load starts
@@ -230,8 +239,11 @@ export function initSound(toggle, options = {}) {
    * mapping stays with the element and ports to Webflow like the
    * data-cuelume-* attributes do.
    */
+  /* The nav carries data-sound-on/off too, but it signals through
+     data-bottom-nav-open rather than data-status, so it gets its own
+     observer below and is excluded here. */
   const stateNodes = document.querySelectorAll(
-    '[data-sound-on], [data-sound-off]'
+    '[data-sound-on]:not([data-bottom-nav-init]), [data-sound-off]:not([data-bottom-nav-init])'
   );
 
   // ScrollTrigger sets statuses during init and on every refresh; if the
@@ -287,6 +299,38 @@ export function initSound(toggle, options = {}) {
     }, 700);
   }
 
+  /* ---- bottom nav open / close -----------------------------------
+   * Same declarative idea as the timeline steps, different attribute:
+   * the vendored Osmo script writes data-bottom-nav-open, so watching
+   * that keeps the cue out of nav.js entirely.
+   *
+   * No arming delay is needed here, unlike the timeline: the attribute
+   * only ever changes from a real click on the toggle, so there is no
+   * init/refresh burst to suppress.
+   */
+  const navNode = document.querySelector('[data-bottom-nav-init]');
+  const navObserver =
+    navNode && (navNode.dataset.soundOn || navNode.dataset.soundOff)
+      ? new MutationObserver((records) => {
+          if (!enabled || !api) return;
+          for (const record of records) {
+            const is = navNode.getAttribute('data-bottom-nav-open');
+            if (record.oldValue === is) continue;
+            const name =
+              is === 'true'
+                ? navNode.dataset.soundOn
+                : navNode.dataset.soundOff;
+            if (name) safe(() => api.play(name));
+          }
+        })
+      : null;
+
+  navObserver?.observe(navNode, {
+    attributes: true,
+    attributeFilter: ['data-bottom-nav-open'],
+    attributeOldValue: true,
+  });
+
   // Clicking a _blank link backgrounds the tab; don't play into it.
   function onVisibility() {
     if (!api) return;
@@ -304,6 +348,7 @@ export function initSound(toggle, options = {}) {
     document.removeEventListener('visibilitychange', onVisibility);
     clearTimeout(armTimer);
     observer?.disconnect();
+    navObserver?.disconnect();
     // cuelume 0.2.2 exposes no unbind(); muting is the best we can do.
     if (api) safe(() => api.setEnabled(false));
   };

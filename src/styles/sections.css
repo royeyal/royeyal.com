@@ -68,6 +68,32 @@
 }
 
 @media (max-width: 40rem) {
+  /* At 375x812 the hero measured 913px tall — 101px MORE than the
+     viewport — because padding-block resolves to 16vh (130px) top and
+     bottom. Two consequences: the logo started 130px down, and
+     `.hero__hint` ("scroll to continue") landed 73px BELOW the fold, so
+     the one cue telling people to scroll was invisible on a phone.
+     9vh brings the whole hero inside 100svh and the hint back on screen.
+     Note this is genuinely the padding, not the centring: `justify-
+     content: center` has no slack to distribute once the content
+     overflows. */
+  /* Asymmetric, and the SUM is what matters. `.hero__inner` is centred in
+     a 100svh hero with only ~12px of slack, so adding bottom padding just
+     overflows again and pushes the hint back off screen. Moving padding
+     from the top to the bottom keeps the total height identical and lifts
+     the content: actions.bottom = 733 + (padTop − padBottom) / 2. This
+     split buys the hint ~26px more clearance without costing any height. */
+  .hero__inner {
+    padding-top: clamp(2.5rem, 6vh, 5rem);
+    padding-bottom: clamp(4.5rem, 12.5vh, 7.5rem);
+  }
+
+  /* 1.75rem is less than an iPhone's ~34px home-indicator inset, so the
+     hint was sitting inside it on real hardware. */
+  .hero__hint {
+    bottom: max(1.75rem, env(safe-area-inset-bottom));
+  }
+
   /* strands fill more of the frame on mobile — darken behind the copy */
   .hero__bg::after {
     background: linear-gradient(

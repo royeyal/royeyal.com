@@ -242,13 +242,16 @@ export function initExpandingBottomNav() {
  * Driven off the data-bottom-nav-open attribute the script already
  * writes, so it needs no hook into the timeline.
  */
-export function initNavInert() {
+export function initNavEnhancements() {
   const nav = document.querySelector('[data-bottom-nav-init]');
   const panel = nav?.querySelector('[data-bottom-nav-panel]');
-  if (!panel) return;
+  const toggle = nav?.querySelector('[data-bottom-nav-toggle]');
+  if (!panel || !toggle) return;
+
+  const isOpen = () => nav.getAttribute('data-bottom-nav-open') === 'true';
 
   const sync = () => {
-    panel.inert = nav.getAttribute('data-bottom-nav-open') !== 'true';
+    panel.inert = !isOpen();
   };
 
   new MutationObserver(sync).observe(nav, {
@@ -257,4 +260,20 @@ export function initNavInert() {
   });
 
   sync();
+
+  /*
+   * Close when you navigate. Without this, tapping "Career" scrolls the
+   * page and leaves the panel sitting open over the destination — you
+   * have to dismiss it before you can read what you asked for.
+   *
+   * In-page anchors only. External links open a new tab, and the email
+   * field must stay put so its "Copied" state is visible.
+   *
+   * Driving it through toggle.click() rather than reaching into the
+   * vendored timeline means the close animation, the aria state and the
+   * `scan` sound cue all run exactly as they do for a real dismissal.
+   */
+  panel.addEventListener('click', (event) => {
+    if (event.target.closest('a[href^="#"]') && isOpen()) toggle.click();
+  });
 }

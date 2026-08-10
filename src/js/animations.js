@@ -118,12 +118,42 @@ export function initAnimations() {
       ['contact', 'Contact'],
     ];
 
+    /* A hard text swap is, counter-intuitively, the LOUDER option: an
+       instant change is exactly what peripheral motion detection is tuned
+       to catch. A short opacity dip reads as quiet.
+       Opacity only — no slide, no scale, no colour flash, and short
+       enough (~300ms end to end) that it never registers as an
+       animation. Anything more would make the pill compete with the
+       page, which is the opposite of the point. */
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     stops.forEach(([id, label]) => {
       const section = document.getElementById(id);
       if (!section) return;
 
       const show = () => {
-        current.textContent = label;
+        // Re-entering a section you're already in shouldn't blink.
+        if (current.textContent === label) return;
+
+        if (reduce.matches) {
+          current.textContent = label;
+          return;
+        }
+
+        // A fast scroll can cross several stops before the first fade
+        // finishes; killing in-flight tweens stops them stacking.
+        gsap.killTweensOf(current);
+        gsap
+          .timeline()
+          .to(current, {
+            opacity: 0,
+            duration: 0.12,
+            ease: 'none',
+            onComplete: () => {
+              current.textContent = label;
+            },
+          })
+          .to(current, { opacity: 1, duration: 0.18, ease: 'none' });
       };
 
       // 60% down the viewport: the band a reader is actually looking at.

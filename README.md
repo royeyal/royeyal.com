@@ -141,10 +141,15 @@ would make the whole setup scriptable from the repo.
   - `src/js/timeline.js` — `data-step-timeline-*`
   - cuelume itself — `data-cuelume-press`
   - `src/js/sound.js` — `data-sound-state`, and `data-sound-on` /
-    `data-sound-off` on the timeline steps. Easiest to miss and the only
-    ones that fail **silently**: they drive the per-step scroll cues
-    through a MutationObserver watching `data-status`, so if they get
-    dropped the page still works perfectly, just mute on scroll.
+    `data-sound-off` in **two** places. Easiest to miss and the only
+    ones that fail **silently**: if they get dropped the page still
+    works perfectly, just mute.
+    - on the timeline steps, driving the per-step scroll cues through a
+      MutationObserver watching `data-status`
+    - on the `<nav>`, driving the menu's open/close cues (`arrival` /
+      `scan`) through a second observer watching
+      `data-bottom-nav-open`. Keeping the cue here rather than in
+      `nav.js` is what lets the Osmo script stay untouched.
   - `src/styles/sections.css` — `data-brand`, the only CSS-only one
     (picks the logo tile colour)
   - `src/js/scroll.js` — none of its own; it delegates off `href="#…"`

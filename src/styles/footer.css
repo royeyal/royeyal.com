@@ -20,7 +20,8 @@
    for the mechanism. Everything below is the look it has always had;
    .clip only resets the button chrome underneath it. */
 .footer__mail {
-  display: inline-block;
+  /* display comes from .clip (inline-flex, so the copy glyph sits on the
+     address's centre line) — don't reinstate inline-block here. */
   max-width: 100%;
   cursor: pointer;
   font-family: var(--font-display);
