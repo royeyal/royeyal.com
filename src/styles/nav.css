@@ -41,6 +41,30 @@
   display: flex;
   position: relative;
   overflow: hidden;
+
+  /* ONLY border-color and box-shadow. width and height are driven by
+     GSAP, which writes them inline every frame — a CSS transition on
+     either would fight the timeline and make the open/close stutter.
+     Never widen this list to `all`.
+
+     The open-state glow is a light switching on, so it borrows the
+     lightbulb curves the tokens already define: this rule governs
+     switching OFF (slow, trailing away as a filament cools), the
+     [data-bottom-nav-open='true'] rule governs switching ON. */
+  transition:
+    border-color var(--bulb-off) var(--ease-bulb-off),
+    box-shadow var(--bulb-off) var(--ease-bulb-off);
+}
+
+[data-bottom-nav-open='true'] .bottom-nav__inner {
+  border-color: var(--magenta-dim);
+  box-shadow:
+    var(--shadow-card),
+    0 0 1.5rem -0.5rem var(--magenta),
+    0 0 4rem -0.75rem var(--magenta-dim);
+  transition:
+    border-color var(--bulb-on) var(--ease-bulb-on),
+    box-shadow var(--bulb-on) var(--ease-bulb-bloom);
 }
 
 .bottom-nav__bar {
@@ -155,11 +179,12 @@
   line-height: 1;
   text-decoration: none;
   display: block;
-  transition: color var(--fast) var(--ease-out);
+  transition: color var(--link-out) var(--ease-link-out);
 }
 
 .bottom-nav__link:hover {
   color: var(--cyan);
+  transition: color var(--link-in) var(--ease-link-in);
 }
 
 .bottom-nav__link.is--cta {
@@ -203,14 +228,14 @@
   line-height: 1;
 }
 
-/* --text-muted, not the inherited --text, for the same reason the footer
-   links are muted: these are secondary to the five nav stops above them,
-   and the LinkedIn mark is a solid knockout block — at full --text it
-   reads as a bright white square rather than a logo. */
 /* Mono + uppercase, matching .footer__links — the panel's secondary row
    and the footer's social row are the same content in two places, so
-   they should read the same. It also puts visual daylight between these
-   and the Tektur nav links above. */
+   they should read the same, and it puts visual daylight between these
+   and the Tektur nav links above.
+   --text-muted rather than the inherited --text for the same reason the
+   footer links are muted: these are secondary to the five stops above,
+   and the LinkedIn mark is a solid knockout block that reads as a bright
+   white square at full --text. */
 .bottom-nav__sublink {
   display: inline-flex;
   align-items: center;
@@ -229,11 +254,12 @@
   align-content: center;
   padding-block: 0.35em;
   text-decoration: none;
-  transition: color var(--fast) var(--ease-out);
+  transition: color var(--link-out) var(--ease-link-out);
 }
 
 .bottom-nav__sublink:hover {
   color: var(--cyan);
+  transition: color var(--link-in) var(--ease-link-in);
 }
 
 /* The sound toggle lives in the bar now, so it needs no positioning of

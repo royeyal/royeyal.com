@@ -31,16 +31,21 @@
   text-decoration: none;
   border-bottom: var(--border-w-thick) solid var(--magenta);
   padding-bottom: 0.375rem;
+  /* Governs the hover-OUT; the :hover rule below governs the hover-IN. */
   transition:
-    color var(--fast) var(--ease-out),
-    border-color var(--fast) var(--ease-out),
-    text-shadow var(--slow) var(--ease-out);
+    color var(--link-out) var(--ease-link-out),
+    border-color var(--link-out) var(--ease-link-out),
+    text-shadow var(--bulb-off) var(--ease-bulb-off);
 }
 
 .footer__mail:hover {
   color: var(--cyan);
   border-color: var(--cyan);
   text-shadow: 0 0 2rem var(--cyan-dim);
+  transition:
+    color var(--link-in) var(--ease-link-in),
+    border-color var(--link-in) var(--ease-link-in),
+    text-shadow var(--bulb-on) var(--ease-bulb-bloom);
 }
 
 .footer__links {
@@ -61,11 +66,12 @@
   text-transform: uppercase;
   text-decoration: none;
   color: var(--text-muted);
-  transition: color var(--fast) var(--ease-out);
+  transition: color var(--link-out) var(--ease-link-out);
 }
 
 .footer__links a:hover {
   color: var(--magenta);
+  transition: color var(--link-in) var(--ease-link-in);
 }
 
 /* Giant outlined wordmark */

@@ -188,11 +188,23 @@ a {
   padding: 0.875rem 1.625rem;
   /* squared-off cyberpunk corners instead of a pill */
   border-radius: var(--radius-btn);
+  /* transform and box-shadow keep their own feel — the lift is a
+     physical move, not a fade. Only the colour pair takes the
+     asymmetric link easing, so the hero's ghost buttons tint in and out
+     like every other link on the page. */
   transition:
     transform var(--fast) var(--ease-snap),
     box-shadow var(--slow) var(--ease-out),
-    border-color var(--fast) var(--ease-out),
-    color var(--fast) var(--ease-out);
+    border-color var(--link-out) var(--ease-link-out),
+    color var(--link-out) var(--ease-link-out);
+}
+
+.btn:hover {
+  transition:
+    transform var(--fast) var(--ease-snap),
+    box-shadow var(--slow) var(--ease-out),
+    border-color var(--link-in) var(--ease-link-in),
+    color var(--link-in) var(--ease-link-in);
 }
 
 .btn--primary {

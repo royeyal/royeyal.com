@@ -64,8 +64,14 @@ export function initSmoothScroll(root = document) {
       },
     });
 
-    if (history.pushState) {
-      history.pushState(null, '', `#${id}`);
-    }
+    /* Deliberately NOT pushing the hash into the address bar. On a
+       one-page CV the URL people see and copy should stay
+       `royeyal.com` — it matches the canonical tag and the address on
+       the page, and `royeyal.com/#career` on a CV or in a paste looks
+       like a broken link even though it works.
+       Two side effects, both wanted: Back leaves the site instead of
+       undoing a scroll, and no history entry is created per section.
+       Inbound deep links still work — those are the browser's own
+       anchor handling, which this never touches. */
   });
 }

@@ -109,6 +109,21 @@
   --fast: 280ms;
   --slow: 550ms;
 
+  /* Link hover — asymmetric, same principle as the lightbulb below and
+     applied the same way (base rule governs leaving, :hover rule governs
+     arriving).
+     --ease-out is wrong for a colour fade: cubic-bezier(0.16, 1, …)
+     dumps almost all its travel in the first few frames, so the colour
+     snaps and then creeps, which reads as a jump rather than a fade.
+     These are gentler at both ends. Arriving is quick and confident;
+     leaving takes roughly twice as long and trails off, so a pointer
+     sweeping across several links leaves a soft wake instead of a row
+     of hard on/off flickers. */
+  --ease-link-in: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-link-out: cubic-bezier(0.33, 0, 0.45, 1);
+  --link-in: 190ms;
+  --link-out: 420ms;
+
   /* Lightbulb easing — deliberately asymmetric, because a filament is.
      ON  surges to full and settles (bloom overshoots slightly).
      OFF drops steeply then trails off as the filament cools, and takes

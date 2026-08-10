@@ -157,11 +157,12 @@
   letter-spacing: 0.02em;
   color: var(--text-muted);
   text-decoration: none;
-  transition: color var(--fast) var(--ease-out);
+  transition: color var(--link-out) var(--ease-link-out);
 }
 
 .footer__mailto:hover {
   color: var(--cyan);
+  transition: color var(--link-in) var(--ease-link-in);
 }
 
 /* ---- Nav instance ------------------------------------------------- */
@@ -174,11 +175,12 @@
   /* 24px floor — WCAG 2.2 SC 2.5.8, same reasoning as .bottom-nav__sublink */
   min-height: 1.5rem;
   padding-block: 0.35rem;
-  transition: color var(--fast) var(--ease-out);
+  transition: color var(--link-out) var(--ease-link-out);
 }
 
 .bottom-nav .clip:hover {
   color: var(--cyan);
+  transition: color var(--link-in) var(--ease-link-in);
 }
 
 /* 0.5em of a --font-size-xs label is 9px — too small to read as an
