@@ -13,8 +13,19 @@
          this tag is the belt to that braces, and covers anything that
          reaches the page without following the redirect. -->
     <link rel="canonical" href="https://royeyal.com/" />
+    <!-- SVG first: it's the R monogram cut from royeyal-logo.svg (the same
+         ANSI wordmark the hero masks), transparent, so it sits correctly on
+         both a light and a dark tab strip with no second file and no
+         prefers-color-scheme branch. Browsers that don't take SVG icons
+         (nothing current, but Safari only gained it in 16.4) fall back to
+         the PNG. To make it cyan in dark UI later, the whole change is a
+         <style> block inside the SVG. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    <!-- 180x180, opaque, square-cornered — iOS applies its own mask, so a
+         pre-rounded source would get rounded twice. Verified: alpha 255 at
+         all four corners, centre is exactly #F900B9. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script type="module" src="/src/main.js"></script>
   </head>
   <body>
