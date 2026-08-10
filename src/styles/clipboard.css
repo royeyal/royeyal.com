@@ -1,0 +1,126 @@
+/* ------------------------------------------------------------------
+   Copy-to-clipboard field
+
+   The motion is the animated-`fr` trick: two grid columns that trade
+   places, so the address wipes out as "Copied" wipes in. `fr` tracks are
+   animatable, and in an auto-width grid container each resolves to its
+   own max-content contribution — which is why the field also retracts to
+   the shorter label instead of leaving a gap.
+
+   Both cells need `overflow: hidden` and `min-width: 0`, or the text
+   refuses to be squeezed and pushes the track back open.
+
+   Reduced motion is already covered: the global block at the bottom of
+   base.css flattens every transition-duration, so the swap becomes
+   instant with no extra rule here.
+   ------------------------------------------------------------------ */
+.clip {
+  display: inline-block;
+  max-width: 100%;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.clip__track {
+  display: grid;
+  grid-template-columns: 1fr 0fr;
+  transition: grid-template-columns var(--slow) var(--ease-inout);
+}
+
+.clip[data-copied] .clip__track {
+  grid-template-columns: 0fr 1fr;
+}
+
+.clip__value,
+.clip__done {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    opacity var(--fast) var(--ease-out),
+    filter var(--fast) var(--ease-out),
+    transform var(--fast) var(--ease-out);
+}
+
+.clip__value {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.clip[data-copied] .clip__value {
+  opacity: 0;
+  filter: blur(0.35rem);
+  transform: scale(0.96);
+}
+
+/* Starts blurred out and slightly small, then lands. The delay lets the
+   address begin clearing first, so the two never read as a hard cut. */
+.clip__done {
+  opacity: 0;
+  filter: blur(0.35rem);
+  transform: scale(0.96);
+  color: var(--cyan);
+}
+
+.clip[data-copied] .clip__done {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+  transition-delay: 0.12s;
+}
+
+/* Visually hidden announcer — one per page, created by clipboard.js.
+   Not `display: none`, which would stop it being announced at all. */
+.clip__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Footer instance --------------------------------------------- */
+
+/* The escape hatch for anyone who does have a mail client configured.
+   Quiet on purpose: copying is the primary path. */
+.footer__mailto {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--fast) var(--ease-out);
+}
+
+.footer__mailto:hover {
+  color: var(--cyan);
+}
+
+/* ---- Nav instance ------------------------------------------------- */
+
+.bottom-nav .clip {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--text);
+  padding-block: 0.25rem;
+  transition: color var(--fast) var(--ease-out);
+}
+
+.bottom-nav .clip:hover {
+  color: var(--cyan);
+}

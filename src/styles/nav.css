@@ -1,0 +1,247 @@
+/* ------------------------------------------------------------------
+   Expanding bottom navigation — Osmo Supply component, re-skinned.
+
+   Structure and class names are Osmo's and must stay: the script reads
+   the data-attributes, and `column-reverse` on __inner is what pins the
+   bar to the bottom while the panel grows above it.
+
+   The three custom properties below are read BY NAME in nav.js
+   (`measure()` writes `var(--open-width)` / `var(--closed-width)`
+   straight into an inline style). Rename them and the nav collapses to
+   zero.
+   ------------------------------------------------------------------ */
+[data-bottom-nav-init] {
+  /* Wider than Osmo's 15em default: this bar carries a section
+     indicator and the sound toggle as well as the logo and button. */
+  --closed-width: min(92vw, 21em);
+  --open-width: min(92vw, 25em);
+  --bar-height: 3.75em;
+}
+
+.bottom-nav {
+  z-index: 100;
+  position: fixed;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translate(-50%);
+}
+
+.bottom-nav__inner {
+  will-change: width, height;
+  width: var(--closed-width);
+  height: var(--bar-height);
+  background: rgba(11, 13, 21, 0.82);
+  backdrop-filter: blur(0.75rem);
+  border: var(--border-w) solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  flex-flow: column-reverse;
+  justify-content: flex-start;
+  align-items: center;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.bottom-nav__bar {
+  width: 100%;
+  height: var(--bar-height);
+  flex: none;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 0.5em 0.5em 1em;
+  display: flex;
+  position: relative;
+}
+
+.bottom-nav__logo {
+  color: var(--magenta);
+  justify-content: center;
+  align-items: center;
+  /* The R is portrait (68.9x94.7), so height drives it — at 1.5rem it
+     came out only 17px wide and read as a speck beside the label. */
+  height: 1.75rem;
+  flex: none;
+  display: flex;
+}
+
+.bottom-nav__logo svg {
+  width: auto;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* Current section, written by the ScrollTrigger set in animations.js.
+   Makes the closed pill a progress indicator rather than dead chrome. */
+.bottom-nav__current {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.bottom-nav__current::before {
+  content: '· ';
+  color: var(--text-muted);
+}
+
+.bottom-nav__toggle {
+  gap: 0.25em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--magenta), #a000f0);
+  border: var(--border-w) solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-chip);
+  box-shadow: var(--shadow-btn);
+  flex-flow: column;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  width: 2.5em;
+  height: 2.5em;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+}
+
+.bottom-nav__toggle-bar {
+  background-color: currentColor;
+  flex: none;
+  width: 1.25em;
+  height: 0.1em;
+  padding: 0;
+  display: block;
+}
+
+.bottom-nav__panel {
+  gap: 1.5em;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+  max-height: calc(100svh - 7em);
+  width: var(--open-width);
+  flex-flow: column;
+  flex: none;
+  padding: 1.25em 1em 1em;
+  display: flex;
+  overflow-y: auto;
+}
+
+.bottom-nav__list {
+  flex-flow: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+}
+
+.bottom-nav__list-item {
+  display: block;
+}
+
+.bottom-nav__link {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  letter-spacing: -0.03em;
+  color: inherit;
+  padding-block: 0.2em;
+  font-size: 1.9em;
+  line-height: 1;
+  text-decoration: none;
+  display: block;
+  transition: color var(--fast) var(--ease-out);
+}
+
+.bottom-nav__link:hover {
+  color: var(--cyan);
+}
+
+.bottom-nav__link.is--cta {
+  color: var(--magenta);
+}
+
+.bottom-nav__link.is--cta:hover {
+  color: var(--cyan);
+}
+
+.bottom-nav__divider {
+  background-color: var(--line-strong);
+  transform-origin: left center;
+  width: 100%;
+  height: 1px;
+}
+
+.bottom-nav__secondary {
+  gap: 3em;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+}
+
+.bottom-nav__col {
+  gap: 0.75em;
+  flex-flow: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+  min-width: 0;
+}
+
+.bottom-nav__label {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  letter-spacing: 0.16em;
+  line-height: 1;
+}
+
+/* --text-muted, not the inherited --text, for the same reason the footer
+   links are muted: these are secondary to the five nav stops above them,
+   and the LinkedIn mark is a solid knockout block — at full --text it
+   reads as a bright white square rather than a logo. */
+.bottom-nav__sublink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 1em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text-muted);
+  padding-block: 0.25em;
+  text-decoration: none;
+  transition: color var(--fast) var(--ease-out);
+}
+
+.bottom-nav__sublink:hover {
+  color: var(--cyan);
+}
+
+/* The sound toggle lives in the bar now, so it needs no positioning of
+   its own — just room to breathe and a tighter label at this size. */
+.bottom-nav .sound-toggle {
+  flex: none;
+  padding: 0.25rem 0.4rem;
+  font-size: var(--font-size-2xs);
+}
+
+/* Under ~26rem the pill runs out of room before the panel does. The
+   section indicator is the least load-bearing thing in the bar. */
+@media (max-width: 26rem) {
+  .bottom-nav__current {
+    display: none;
+  }
+
+  [data-bottom-nav-init] {
+    --closed-width: min(92vw, 15em);
+  }
+}

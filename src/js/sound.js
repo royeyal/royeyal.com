@@ -8,7 +8,7 @@
  * Two kinds of cue, both answering a deliberate act. Keep in sync with
  * index.html:
  *
- *   click   data-cuelume-press on the 11 links   press / ready / page
+ *   click   data-cuelume-press on the 19 targets press / ready / page
  *   scroll  data-sound-on / -off on the steps    toggle / error
  *
  * No hover cues, by choice. cuelume throttles pointerenter with a single

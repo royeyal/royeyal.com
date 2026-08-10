@@ -78,5 +78,62 @@ export function initAnimations() {
         },
       });
     }
+
+    /* --- Bottom nav arrives after the hero ------------------------
+     * The hero is a full-screen WebGL moment and a nav bar sitting on
+     * it from the first frame would undercut it.
+     *
+     * This targets the OUTER .bottom-nav; the Osmo timeline in
+     * src/js/nav.js only ever animates .bottom-nav__inner, so the two
+     * never write the same property on the same element. Keep it that
+     * way. Living inside this matchMedia block also means the nav is
+     * simply always visible under reduced motion, which is correct.
+     */
+    if (document.querySelector('.bottom-nav')) {
+      gsap.from('.bottom-nav', {
+        yPercent: 200,
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'bottom 80%',
+          toggleActions: 'play none none reverse',
+        },
+      });
+    }
   });
+
+  /* --- Current section, shown in the closed nav pill ---------------
+   * Outside the matchMedia block on purpose: this is information, not
+   * motion, so it must work with reduced motion enabled too.
+   */
+  const current = document.querySelector('[data-nav-current]');
+  if (current) {
+    const stops = [
+      ['top', 'Top'],
+      ['about', 'About'],
+      ['career', 'Career'],
+      ['work', 'Work'],
+      ['contact', 'Contact'],
+    ];
+
+    stops.forEach(([id, label]) => {
+      const section = document.getElementById(id);
+      if (!section) return;
+
+      const show = () => {
+        current.textContent = label;
+      };
+
+      // 60% down the viewport: the band a reader is actually looking at.
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 60%',
+        end: 'bottom 60%',
+        onEnter: show,
+        onEnterBack: show,
+      });
+    });
+  }
 }

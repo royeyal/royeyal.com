@@ -12,6 +12,9 @@ import { initStrands } from './js/strands.js';
 import { initAnimations } from './js/animations.js';
 import { initStepTimeline } from './js/timeline.js';
 import { initSound } from './js/sound.js';
+import { initSmoothScroll } from './js/scroll.js';
+import { initClipboard } from './js/clipboard.js';
+import { initExpandingBottomNav, initNavInert } from './js/nav.js';
 
 document.querySelector('[data-year]').textContent = new Date().getFullYear();
 
@@ -30,6 +33,14 @@ initStrands(document.querySelector('[data-strands]'), {
   scale: 1.35,
 });
 
+/* The nav must be measured before anything animates it: measure() reads
+   offsetWidth off a temporarily-restyled element, so it has to run
+   before initAnimations() attaches the reveal tween to .bottom-nav. */
+initExpandingBottomNav();
+initNavInert();
+
 initAnimations();
 initStepTimeline();
+initSmoothScroll();
+initClipboard();
 initSound(document.querySelector('[data-sound-toggle]'));

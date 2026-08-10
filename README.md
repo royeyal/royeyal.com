@@ -7,16 +7,22 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
 ## Stack
 
 - **Vite 8** — dev server + build (`npm run dev`, `npm run build`)
-- **GSAP** (npm) — hero intro, scroll reveals, footer scrub
+- **GSAP** (npm) — hero intro, scroll reveals, footer scrub, anchor
+  scrolling (**ScrollToPlugin**) and the bottom nav's easing
+  (**CustomEase**). Both were Club-only once and have been free since
+  GSAP 3.13, so Webflow's own CDN carries them — the pivot needs no npm
+  fallback for either
 - **ogl** (npm) — WebGL "Strands" hero background, a vanilla port of
   [reactbits.dev/animations/strands](https://reactbits.dev/animations/strands)
   (no React needed)
 - **cuelume** (npm) — opt-in interaction sounds, synthesised via Web Audio
   (no audio files). Default OFF, never persisted — every page load starts
-  silent. The toggle is a body-level fixed control at the bottom-right,
-  not in the footer (nobody found it there); when a nav bar exists, move
-  it in and drop the `.sound-toggle--fixed` modifier. Loaded lazily, so
-  it costs nothing unless enabled
+  silent. The toggle now lives in the **bottom nav bar**, which is what
+  the old `.sound-toggle--fixed` note anticipated; that modifier is gone.
+  It sits in the always-visible bar rather than inside the menu panel on
+  purpose — it was in the footer once and nobody found it, and hiding it
+  behind a click would regress the same way. Loaded lazily, so it costs
+  nothing unless enabled
 - Self-hosted fonts, no font CDN, **latin subset only** (this site is US
   English) — all three live in `src/assets/fonts/` and are declared in
   `src/styles/fonts.css`:
@@ -44,13 +50,17 @@ index.html             page markup (all sections)
 vite.config.js         build config (target es2020 — dynamic import)
 src/main.js            entry — css, strands, animations, timeline, sound
 src/main.css           imports the style layers
-src/styles/            fonts / tokens / base / sections / timeline / footer
+src/styles/            fonts / tokens / base / clipboard / sections /
+                       timeline / footer / nav
 src/styles/fonts.css   self-hosted @font-face declarations
 src/assets/fonts/      the three woff2 files themselves
 src/js/strands.js      WebGL hero background (ogl)
-src/js/animations.js   GSAP hero intro + scroll reveals
+src/js/animations.js   GSAP hero intro, reveals, nav reveal + section indicator
 src/js/timeline.js     GSAP scroll-highlighted "four disciplines" timeline
 src/js/sound.js        cuelume interaction sounds (opt-in)
+src/js/nav.js          expanding bottom nav — VENDORED from Osmo Supply
+src/js/scroll.js       GSAP ScrollToPlugin anchor scrolling
+src/js/clipboard.js    copy-to-clipboard email fields
 public/                static assets, copied verbatim into dist/ on build
 worker/index.js        Cloudflare Worker — serves dist/ via assets binding
 wrangler.jsonc         Worker config — account_id, assets binding
@@ -137,6 +147,18 @@ would make the whole setup scriptable from the repo.
     dropped the page still works perfectly, just mute on scroll.
   - `src/styles/sections.css` — `data-brand`, the only CSS-only one
     (picks the logo tile colour)
+  - `src/js/scroll.js` — none of its own; it delegates off `href="#…"`
+  - `src/js/clipboard.js` — `data-clip` (holds the value **and** is the
+    hook), plus `data-copied`, which the module writes and
+    `clipboard.css` animates off
+  - `src/js/animations.js` — `data-nav-current`, the section label in
+    the closed nav pill
+  - `src/js/nav.js` — **`data-bottom-nav-*`: seven vendor-owned hooks**
+    (`-init`, `-open`, `-inner`, `-bar`, `-toggle`, `-panel`, `-reveal`,
+    `-divider`). These are Osmo Supply's, not ours — the vendored script
+    reads every one by name, and `--closed-width` / `--open-width` /
+    `--bar-height` are read by name too. Renaming any of them collapses
+    the nav to zero width
 
   Class-name-based selectors would **not** survive, since Webflow
   generates its own.
@@ -168,12 +190,27 @@ would make the whole setup scriptable from the repo.
       both need to become `800`.
 - [x] **Cloudflare** — deployed and live at royeyal.com, apex attached
       as a Workers custom domain.
-- [ ] **www redirect** — `www.royeyal.com` does not resolve. Needs a
-      proxied placeholder DNS record plus a Redirect Rule 301ing to the
-      apex; the API token lacks DNS and Rules scopes, so it's a dashboard
-      action. The apex is canonical (`<link rel="canonical">` in
-      `index.html` says so too).
+- [x] **www redirect** — `www.royeyal.com` 301s to the apex, preserving
+      path and query. Verified with `curl --resolve` (this machine's
+      resolver can't reach the zone). Path preservation was **not** what
+      was originally specified, and is kept deliberately: nothing stale
+      points at a www deep link, and stripping would silently break www
+      links the day a second page exists.
+- [x] **Favicon** — `public/favicon.svg`, the R monogram cut from
+      `royeyal-logo.svg`, transparent so one file serves light and dark
+      tab strips. At 16px it is soft; that is accepted, because 16px CSS
+      is 32px physical on retina, where it's clean.
+- [x] **apple-touch-icon** — 180×180, opaque, square-cornered.
 - [ ] **hello@royeyal.com** — becoming the Workspace primary domain, so
       the address on the site can both send and receive. Step-by-step in
       `docs/google-workspace-domain-change.md`.
-- [ ] Decide on navigation (currently none, by design).
+- [x] **Navigation** — expanding bottom nav (Osmo Supply, vendored in
+      `src/js/nav.js`). Five stops, socials, a copy-email, and the sound
+      toggle. Bottom placement keeps the WebGL hero uncontested and means
+      **no `scroll-margin-top` is needed anywhere** — a bottom bar never
+      covers a heading. Section IDs are `#top` / `#about` / `#career` /
+      `#work` / `#contact`; note `#work` is now the portfolio and the
+      employment history is `#career`.
+- [x] **Copy-email** — `hello@royeyal.com` copies rather than firing
+      `mailto:`, in the footer and the nav panel, with a quiet `mailto:`
+      link under the footer field as the escape hatch.
