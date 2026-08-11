@@ -137,6 +137,19 @@ export function initSound(toggle, options = {}) {
         }
         api = mod;
         api.setVolume(volume);
+
+        /* CRITICAL: cuelume's engine starts with `let enabled = true`
+           (verified in node_modules/cuelume/dist/audio/engine.js), so
+           merely importing and binding it arms every cue. Without this
+           line the site plays sounds from the first tap onwards while
+           the toggle still reads "off" — the module is warmed by a
+           document-level pointerdown listener below, so the user never
+           has to touch the toggle for it to happen.
+           Syncing to `enabled` rather than hardcoding false also keeps
+           the case where someone hits the toggle while the import is
+           still in flight. */
+        api.setEnabled(enabled);
+
         api.bind(root); // idempotent — guarded by a WeakSet upstream
         return api;
       })

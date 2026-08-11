@@ -49,18 +49,52 @@ export function initSmoothScroll(root = document) {
 
     event.preventDefault();
 
+    /* ---- iOS hardening ---------------------------------------------
+     * Three changes here, all made because anchor scrolling was jittery
+     * and landed in the wrong place on a real iPhone while being perfect
+     * in macOS Safari and in responsive mode. The common thread is that
+     * iOS Safari's address bar collapses as soon as the page scrolls,
+     * which resizes the viewport MID-TWEEN. None of it reproduces on a
+     * desktop, where the viewport is constant.
+     *
+     * 1. Resolve the destination to a NUMBER now, not an element.
+     *    Passing the element lets the plugin re-measure against a
+     *    layout that is changing underneath it.
+     * 2. Clamp to the real maximum scroll, so a target near the bottom
+     *    can't ask for a position past the end and trigger rubber-band.
+     * 3. autoKill OFF. It kills the tween when the scroll position
+     *    diverges from what the plugin set — which is exactly what the
+     *    address-bar collapse looks like to it. The cost is that a
+     *    scroll gesture no longer interrupts a 1.1s tween; the benefit
+     *    is that the tween actually finishes.
+     */
+    const documentTop = target.getBoundingClientRect().top + window.scrollY;
+    const maxScroll = Math.max(
+      0,
+      document.documentElement.scrollHeight - window.innerHeight
+    );
+    const destination = Math.round(Math.min(documentTop, maxScroll));
+
     gsap.to(window, {
       duration: DURATION,
       ease: 'expo.out', // the site's display ease — arrives with mass
-      scrollTo: { y: target, autoKill: true }, // autoKill: a scroll gesture wins
+      scrollTo: { y: destination, autoKill: false },
       onComplete() {
         /* Anchor navigation normally moves focus as well as the viewport.
            preventDefault() took that away, so give it back — otherwise a
-           keyboard user scrolls the page but keeps tabbing from the nav. */
+           keyboard user scrolls the page but keeps tabbing from the nav.
+
+           preventScroll is requested but NOT trusted: Safari ignored it
+           for years, and focusing a full-height section would then yank
+           the page somewhere else entirely — a strong candidate for the
+           "scrolls to the wrong part of the page" report. Restoring the
+           position afterwards is correct whether or not it's honoured. */
         if (!target.hasAttribute('tabindex')) {
           target.setAttribute('tabindex', '-1');
         }
+        const y = window.scrollY;
         target.focus({ preventScroll: true });
+        if (window.scrollY !== y) window.scrollTo(0, y);
       },
     });
 
