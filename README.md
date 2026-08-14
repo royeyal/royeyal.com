@@ -108,6 +108,19 @@ check token scopes; the real deploy is the test for those).
 appears in every dashboard URL. `CLOUDFLARE_API_TOKEN` lives in the
 gitignored `.env`.
 
+**Deploying from a git worktree**: `.env` is gitignored, and worktrees do
+not share gitignored files — each is its own working directory. A fresh
+worktree therefore has no `.env`, so `npm run deploy` exports nothing and
+`wrangler deploy` fails for lack of a token, with an error that points at
+credentials rather than at the missing file. Symlink it in once per
+worktree, from the repo root:
+
+```bash
+ln -sf "$(git rev-parse --path-format=absolute --git-common-dir)/../.env" .env
+```
+
+A symlink rather than a copy, so it stays current if the token rotates.
+
 The apex is attached as a Workers **custom domain**, which created its
 own DNS record. It is not declared in `wrangler.jsonc` — see the note
 there and the token-scope table below. `workers_dev` is **off**: a live
@@ -223,9 +236,13 @@ would make the whole setup scriptable from the repo.
       Twitter tags in `<head>`. This site's job is being pasted into a
       LinkedIn message or an email to a hiring manager, so the unfurled
       card is the real first impression; without the tags it rendered as
-      a bare URL. The image is **generated, not drawn** —
-      `docs/og-image-source.html` is the source, rendered with headless
-      Chrome so it uses the real Tektur / Departure Mono files and the
+      a bare URL. The card is deliberately sparse — the wordmark and one
+      line. An earlier version carried the eyebrow, the full hero tagline
+      and a footer row of employers; it read well at full size and turned
+      to mush at the ~500px LinkedIn actually renders. A share card is
+      seen small, so it gets one idea. The image is **generated, not
+      drawn** — `docs/og-image-source.html` is the source, rendered with
+      headless Chrome so it uses the real Switzer file and the
       same masked ANSI wordmark as the hero. That file's header carries
       the regenerate command. `og:image` must stay an **absolute** URL:
       scrapers don't resolve relative paths.

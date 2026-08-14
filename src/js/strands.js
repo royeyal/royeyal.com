@@ -151,6 +151,13 @@ export function initStrands(container, options = {}) {
       premultipliedAlpha: true,
       antialias: true,
       webgl: 2,
+      /* ogl defaults dpr to 1, which rendered this full-screen shader at
+         half resolution on a retina display — soft, slightly muddy
+         strands. Capped at 2 deliberately: this is a fragment shader
+         covering the whole viewport, so cost scales with the SQUARE of
+         the dpr. 2 is 4x the pixels of 1; letting a 3x phone through
+         would be 9x, for a soft glow nobody can resolve that finely. */
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
     });
   } catch {
     return null;
@@ -228,8 +235,20 @@ export function initStrands(container, options = {}) {
        in place until a real one arrives. */
     if (width === 0 || height === 0) return;
 
+    /* Re-read each time so dragging the window between a retina and a
+       non-retina display is handled, not just the startup value. */
+    renderer.dpr = Math.min(window.devicePixelRatio || 1, 2);
     renderer.setSize(width, height);
-    program.uniforms.uResolution.value = [width, height];
+
+    /* uResolution must be in DEVICE pixels, not CSS pixels. The fragment
+       shader does `(gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y`,
+       and gl_FragCoord is in device pixels — so feeding it CSS pixels at
+       dpr 2 would double the UV range and halve the size of every
+       strand. That was survivable only while dpr was pinned to 1. */
+    program.uniforms.uResolution.value = [
+      width * renderer.dpr,
+      height * renderer.dpr,
+    ];
 
     /* Under reduced motion there is no animation loop, so without this a
        resize would leave the single startup frame stretched at the old
