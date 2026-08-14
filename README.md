@@ -236,7 +236,15 @@ would make the whole setup scriptable from the repo.
       `"single-page-application"`, which would return `200` for every
       made-up path and let an infinite URL space get indexed. The page is
       standalone (inline CSS, no JS, system mono) because it has to
-      render when something else has already failed.
+      render when something else has already failed. Its **one** external
+      dependency is the ANSI wordmark, and that is safe: `public/` is
+      copied into `dist/` verbatim, so `/images/royeyal-logo.svg` is a
+      path no build step can rename — it is masked, not inlined, so the
+      gradient comes from CSS exactly as `.ansi-logo` does. The copy is a
+      deadpan shell transcript and deliberately never says the page
+      "never existed": retiring royeyal.studio will send real dead links
+      here, and telling someone their link was never real is both wrong
+      and useless.
 - [x] **Security + cache headers** — `public/_headers`. HSTS,
       `nosniff`, `Referrer-Policy`, `frame-ancestors 'none'` +
       `X-Frame-Options`, and a `Permissions-Policy` that hands back

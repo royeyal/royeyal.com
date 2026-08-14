@@ -196,18 +196,53 @@ export function initStrands(container, options = {}) {
   const mesh = new Mesh(gl, { geometry, program });
   container.appendChild(gl.canvas);
 
-  function resize() {
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
-    renderer.setSize(width, height);
-    program.uniforms.uResolution.value = [width, height];
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
   const reducedMotion = window.matchMedia(
     '(prefers-reduced-motion: reduce)'
   ).matches;
+
+  /* ---- Sizing -------------------------------------------------------
+   * This listened only for `window.resize`, which was a real bug: after
+   * following a link back to the page (from /404, for instance) the hero
+   * rendered as five tiny strands strung across the top, and a manual
+   * refresh appeared to "fix" it.
+   *
+   * uResolution is measured once at init. If the container is not laid
+   * out at that exact moment, the shader is handed a near-zero height,
+   * sizes its strands against it, and nothing ever corrects the value —
+   * because a link navigation never fires a window resize. Refreshing
+   * only worked because a cold load happens to measure late enough. The
+   * five blobs were literally uStrandCount strands drawn at the wrong
+   * aspect.
+   *
+   * A ResizeObserver watches the element itself, so every cause of a
+   * size change is covered: layout settling, fonts loading, a restored
+   * page, and the mobile URL bar collapsing — which notably does NOT
+   * reliably fire window.resize on iOS.
+   */
+  function resize() {
+    const width = container.offsetWidth;
+    const height = container.offsetHeight;
+
+    /* Never commit a degenerate measurement — that is exactly the state
+       that produced the tiled strands. Bailing leaves the last good size
+       in place until a real one arrives. */
+    if (width === 0 || height === 0) return;
+
+    renderer.setSize(width, height);
+    program.uniforms.uResolution.value = [width, height];
+
+    /* Under reduced motion there is no animation loop, so without this a
+       resize would leave the single startup frame stretched at the old
+       size forever. */
+    if (reducedMotion) renderer.render({ scene: mesh });
+  }
+
+  /* observe() fires once immediately, but resize() is also called
+     directly so the first size is set synchronously rather than on the
+     observer's first callback. */
+  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver.observe(container);
+  resize();
 
   let animateId = 0;
 
@@ -226,7 +261,7 @@ export function initStrands(container, options = {}) {
 
   return function destroy() {
     cancelAnimationFrame(animateId);
-    window.removeEventListener('resize', resize);
+    resizeObserver.disconnect();
     if (gl.canvas.parentNode === container) container.removeChild(gl.canvas);
     gl.getExtension('WEBGL_lose_context')?.loseContext();
   };

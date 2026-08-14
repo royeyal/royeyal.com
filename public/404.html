@@ -11,14 +11,26 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!--
-      Deliberately standalone: inline CSS, no JS, no build step, no font
-      files. This page has to render when something has already gone
+      Deliberately standalone: inline CSS, no JS, no build step, no
+      webfonts. This page has to render when something has already gone
       wrong, so it depends on nothing that could also be missing.
 
       That's also why it uses the system mono stack instead of Departure
       Mono — the real font lives in src/assets and Vite gives it a hashed
       filename at build time, which this static file in public/ cannot
       know. A terminal voice survives the substitution fine.
+
+      The logo is the ONE exception, and it is safe: public/ is copied
+      into dist/ verbatim, so /images/royeyal-logo.svg is a stable path
+      that no build step can rename. It is masked rather than inlined so
+      the cyan-to-magenta gradient comes from CSS, exactly as .ansi-logo
+      does in sections.css.
+
+      The copy is deliberately deadpan — a real shell transcript, no
+      joke. Note it never claims the page "never existed": old
+      royeyal.studio links may well land here once that site is retired,
+      and telling someone their link was never real would be both wrong
+      and unhelpful.
     -->
     <style>
       * {
@@ -34,52 +46,86 @@
       body {
         min-height: 100svh;
         display: grid;
-        place-content: center;
-        gap: 1.75rem;
-        padding: 2rem;
+        align-content: center;
+        justify-items: start;
+        gap: 1.5rem;
+        padding: 2rem clamp(1.5rem, 7vw, 6rem);
         background: #05060a;
         color: #f2f4fb;
         font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-        font-size: 0.9rem;
-        line-height: 1.6;
+        font-size: clamp(0.8rem, 2.6vw, 0.95rem);
+        line-height: 1.7;
         background-image: radial-gradient(
-          40rem 24rem at 50% 0%,
-          rgba(249, 0, 185, 0.13),
-          transparent 65%
+          44rem 26rem at 18% 0%,
+          rgba(249, 0, 185, 0.14),
+          transparent 62%
         );
       }
 
-      .code {
-        font-size: clamp(4rem, 18vw, 9rem);
-        font-weight: 700;
-        line-height: 0.9;
-        letter-spacing: -0.04em;
-        color: #f900b9;
-        text-shadow:
-          0 0 1.5rem rgba(249, 0, 185, 0.35),
-          0 0 5rem rgba(249, 0, 185, 0.35);
+      .logo {
+        width: min(19rem, 62vw);
+        aspect-ratio: 596 / 117;
+        background: linear-gradient(100deg, #42effe 10%, #f900b9 85%);
+        -webkit-mask: url('/images/royeyal-logo.svg') 0 0 / contain no-repeat;
+        mask: url('/images/royeyal-logo.svg') 0 0 / contain no-repeat;
+        filter: drop-shadow(0 0 1.25rem rgba(66, 239, 254, 0.35))
+          drop-shadow(0 0.5rem 2.5rem rgba(249, 0, 185, 0.25));
+        margin-bottom: 0.75rem;
       }
 
-      p {
-        max-width: 42ch;
-        color: #9aa3b8;
+      .term {
+        display: grid;
+        gap: 0.2rem;
       }
 
       .prompt {
         color: #42effe;
       }
 
-      a {
-        display: inline-block;
-        /* Grid items stretch to the column by default, which made the
-           button as wide as the widest paragraph. */
-        justify-self: start;
+      .err {
+        color: #9aa3b8;
+      }
+
+      .exit {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5ch;
         margin-top: 0.5rem;
-        padding: 0.75rem 1.5rem;
+      }
+
+      .exit-label {
+        color: #9aa3b8;
+      }
+
+      .code {
+        font-size: clamp(2.75rem, 11vw, 5rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: #f900b9;
+        text-shadow:
+          0 0 1.5rem rgba(249, 0, 185, 0.35),
+          0 0 5rem rgba(249, 0, 185, 0.35);
+      }
+
+      .cursor {
+        color: #42effe;
+        animation: blink 1.1s steps(1) infinite;
+      }
+
+      .note {
+        color: #9aa3b8;
+        max-width: 44ch;
+      }
+
+      a {
+        justify-self: start;
+        margin-top: 0.75rem;
+        padding: 0.8rem 1.5rem;
         border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 0.25rem;
+        background: rgba(11, 13, 21, 0.6);
         color: #f2f4fb;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         text-decoration: none;
         transition:
@@ -98,8 +144,19 @@
         outline-offset: 3px;
       }
 
-      .blink {
-        animation: blink 1.1s steps(1) infinite;
+      /* Visually hidden, still announced — the visible transcript reads
+         as flavour to a screen reader, so the page needs a plain heading
+         that states what actually happened. */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
       }
 
       @keyframes blink {
@@ -113,23 +170,30 @@
         *::before,
         *::after {
           animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
           transition-duration: 0.01ms !important;
         }
       }
     </style>
   </head>
   <body>
-    <p class="code">404</p>
-    <p>
-      <span class="prompt">royeyal.com:~$</span> no such file or directory.<span
-        class="blink"
-        aria-hidden="true"
-        >_</span
-      >
+    <div class="logo" role="img" aria-label="ROY EYAL"></div>
+
+    <h1 class="sr-only">404 — page not found</h1>
+
+    <div class="term">
+      <p><span class="prompt">royeyal.com:~$</span> ls ./that-page</p>
+      <p class="err">ls: no such file or directory</p>
+    </div>
+
+    <p class="exit">
+      <span class="exit-label">exit</span>
+      <span class="code">404</span>
+      <span class="cursor" aria-hidden="true">_</span>
     </p>
-    <p>
-      This site is a single page, so there was probably never anything here.
-    </p>
-    <a href="/">Back to the CV</a>
+
+    <p class="note">Everything lives at the root.</p>
+
+    <a href="/">Back to the homepage</a>
   </body>
 </html>
