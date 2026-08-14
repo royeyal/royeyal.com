@@ -37,6 +37,16 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "run_worker_first": false,
+
+    // Without this the asset server answers an unknown path with a 404
+    // and a ZERO-BYTE body — a blank white page. Serves public/404.html
+    // instead, which Vite copies to dist/ verbatim.
+    //
+    // Deliberately NOT "single-page-application": that mode returns the
+    // CV with a 200 for every made-up path, which is a lie to crawlers
+    // and would let an infinite URL space get indexed. This site has
+    // exactly one real page, so a wrong path genuinely is a 404.
+    "not_found_handling": "404-page",
   },
 
   "observability": {

@@ -1,0 +1,238 @@
+<!doctype html>
+<!--
+  SOURCE FOR public/og.png — the 1200x630 link-preview card.
+
+  This is not shipped or linked from anywhere; it exists so the OG image
+  can be regenerated instead of re-drawn. It deliberately reuses the real
+  font files and the same masked ANSI wordmark as .ansi-logo in
+  sections.css, so the card cannot drift away from the site.
+
+  Font and logo paths below are ABSOLUTE on purpose — headless Chrome
+  loads this over file://, where relative paths resolve against docs/.
+  If the repo moves, update the four paths.
+
+  Regenerate from the repo root:
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --no-sandbox --allow-file-access-from-files \
+      --force-device-scale-factor=1 --hide-scrollbars \
+      --window-size=1200,630 --virtual-time-budget=4000 \
+      --screenshot=public/og.png \
+      "file://$PWD/docs/og-image-source.html"
+
+  Then confirm it really is 1200x630 — a wrong size silently degrades the
+  card to a small thumbnail on LinkedIn:
+
+    sips -g pixelWidth -g pixelHeight public/og.png
+
+  --force-device-scale-factor=1 matters: on a retina Mac Chrome otherwise
+  renders at 2x and writes a 2400x1260 file.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Tektur Variable';
+        src: url('/Users/royeyal/Documents/GitHub/royeyal.com/src/assets/fonts/Tektur-Latin-wght.woff2')
+          format('woff2');
+        font-weight: 400 900;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Departure Mono';
+        src: url('/Users/royeyal/Documents/GitHub/royeyal.com/src/assets/fonts/DepartureMono-Regular.woff2')
+          format('woff2');
+        font-weight: 400;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Switzer Variable';
+        src: url('/Users/royeyal/Documents/GitHub/royeyal.com/src/assets/fonts/Switzer-Variable.woff2')
+          format('woff2');
+        font-weight: 100 900;
+        font-display: block;
+      }
+
+      :root {
+        --ink: #05060a;
+        --magenta: #f900b9;
+        --cyan: #42effe;
+        --text: #f2f4fb;
+        --text-muted: #9aa3b8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+
+      body {
+        background: var(--ink);
+        font-family: 'Switzer Variable', sans-serif;
+        position: relative;
+      }
+
+      /* Corner blooms — the same magenta/cyan wash the hero sits in. */
+      .bg {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            60rem 32rem at 12% 0%,
+            rgba(66, 239, 254, 0.16),
+            transparent 60%
+          ),
+          radial-gradient(
+            55rem 30rem at 92% 108%,
+            rgba(249, 0, 185, 0.22),
+            transparent 62%
+          );
+      }
+
+      /* Scanlines, matching .hero__scanlines */
+      .scanlines {
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.028) 0 1px,
+          transparent 1px 3px
+        );
+      }
+
+      .inner {
+        position: relative;
+        height: 100%;
+        padding: 76px 84px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      /* ANSI wordmark, masked so the gradient comes from CSS — identical
+         treatment to .ansi-logo in sections.css */
+      .logo {
+        width: 540px;
+        aspect-ratio: 596 / 117;
+        background: linear-gradient(
+          100deg,
+          var(--cyan) 10%,
+          var(--magenta) 85%
+        );
+        -webkit-mask: url('/Users/royeyal/Documents/GitHub/royeyal.com/public/images/royeyal-logo.svg')
+          0 0 / contain no-repeat;
+        mask: url('/Users/royeyal/Documents/GitHub/royeyal.com/public/images/royeyal-logo.svg')
+          0 0 / contain no-repeat;
+        filter: drop-shadow(0 0 24px rgba(66, 239, 254, 0.35))
+          drop-shadow(0 12px 48px rgba(249, 0, 185, 0.25));
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-family: 'Departure Mono', monospace;
+        font-size: 19px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--cyan);
+        margin-top: 30px;
+      }
+
+      .eyebrow::before {
+        content: '';
+        width: 11px;
+        height: 11px;
+        flex: none;
+        background: var(--magenta);
+        box-shadow:
+          0 0 12px var(--magenta),
+          0 0 32px rgba(249, 0, 185, 0.35);
+      }
+
+      .title {
+        font-family: 'Tektur Variable', sans-serif;
+        font-weight: 666;
+        font-size: 66px;
+        line-height: 1.02;
+        letter-spacing: -0.025em;
+        color: var(--text);
+        max-width: 20ch;
+        text-shadow: 0 4px 40px rgba(0, 0, 0, 0.8);
+      }
+
+      .cy {
+        color: var(--cyan);
+        text-shadow:
+          0 0 18px rgba(66, 239, 254, 0.35),
+          0 0 60px rgba(66, 239, 254, 0.35);
+      }
+
+      .mg {
+        color: var(--magenta);
+        text-shadow:
+          0 0 18px rgba(249, 0, 185, 0.35),
+          0 0 60px rgba(249, 0, 185, 0.35);
+      }
+
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: 'Departure Mono', monospace;
+        font-size: 20px;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+      }
+
+      .foot strong {
+        color: var(--text);
+        font-weight: 400;
+      }
+
+      .rule {
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          rgba(249, 0, 185, 0.6),
+          rgba(66, 239, 254, 0.35) 45%,
+          rgba(255, 255, 255, 0.06)
+        );
+        margin-bottom: 26px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg"></div>
+    <div class="scanlines"></div>
+
+    <div class="inner">
+      <div>
+        <div class="logo"></div>
+        <p class="eyebrow">Marketing Web Developer</p>
+      </div>
+
+      <h1 class="title">
+        I close the gap between <span class="cy">design</span> and
+        <span class="mg">production</span>.
+      </h1>
+
+      <div>
+        <div class="rule"></div>
+        <div class="foot">
+          <span><strong>royeyal.com</strong></span>
+          <span>Lusha &nbsp;·&nbsp; ex-Wix &nbsp;·&nbsp; ex-Elementor</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

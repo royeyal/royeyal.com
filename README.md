@@ -62,8 +62,12 @@ src/js/nav.js          expanding bottom nav — VENDORED from Osmo Supply
 src/js/scroll.js       GSAP ScrollToPlugin anchor scrolling
 src/js/clipboard.js    copy-to-clipboard email fields
 public/                static assets, copied verbatim into dist/ on build
+public/og.png          1200x630 link-preview card (generated — see docs/)
+public/404.html        standalone 404 (inline CSS, no JS, no build step)
+public/_headers        security + cache headers, read from dist/ root
 worker/index.js        Cloudflare Worker — serves dist/ via assets binding
-wrangler.jsonc         Worker config — account_id, assets binding
+wrangler.jsonc         Worker config — account_id, assets, 404 handling
+docs/og-image-source.html  source for public/og.png + regenerate command
 docs/copy-options.md   alternate hero/positioning copy
 docs/font-options.md   font research and pairing recommendations
 docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
@@ -73,12 +77,19 @@ docs/webflow-studio-wind-down.md
                        retiring the .studio site, keeping the Workspace plan
 ```
 
-> ⚠️ The site advertises `hello@royeyal.com`, which is not yet a real
-> mailbox — `royeyal.com` still has **Cloudflare Email Routing** MX
-> records, so at best mail forwards somewhere and cannot be replied to
-> from that address. `royeyal.com` is being promoted to the Workspace
-> primary domain to fix it: `docs/google-workspace-domain-change.md`.
-> Worth finishing before the URL goes on a CV.
+> ⚠️ The site advertises `hello@royeyal.com`, which is **not yet the
+> mailbox's real address**. DNS is done and verified (2026-08-14):
+> Cloudflare Email Routing is off, MX is a single `smtp.google.com`,
+> there is exactly one SPF record, and `google._domainkey` is live — so
+> mail to the domain reaches Google. What's outstanding is Workspace-side:
+> `royeyal.studio` is still the primary domain and the user still has to
+> be renamed (Steps 5–6 of `docs/google-workspace-domain-change.md`).
+>
+> Until that rename lands, `hello@royeyal.com` only receives if it exists
+> as an **alias** — and that alias has to be deleted before the rename,
+> because a primary address cannot collide with one. Mind the gap: the
+> address is published on a live site, so don't leave it aliasless for
+> long. Worth finishing before the URL goes on a CV.
 
 ## Deploy
 
@@ -188,11 +199,13 @@ would make the whole setup scriptable from the repo.
       `public/images/royeyal-logo.svg`, the same ANSI wordmark the hero
       masks, so the two can never drift apart.
 - [x] **Display font** — Tektur is live (self-hosted, latin-only).
-- [ ] **Neue Machina** — optional upgrade. Once purchased, drop the
-      Ultrabold woff2 into `src/assets/fonts/` and follow the switch steps
-      commented at the bottom of `src/styles/fonts.css`. Note it is a
+- [x] **Neue Machina** — **decided against.** Tektur is the display face
+      and this is closed, not pending. The switch steps are still
+      commented at the bottom of `src/styles/fonts.css` in case the
+      decision is ever revisited; if it is, note Neue Machina ships as a
       single static weight, so `--weight-display` / `--weight-display-max`
-      both need to become `800`.
+      would both have to become `800`, giving up the variable-weight
+      range Tektur provides.
 - [x] **Cloudflare** — deployed and live at royeyal.com, apex attached
       as a Workers custom domain.
 - [x] **www redirect** — `www.royeyal.com` 301s to the apex, preserving
@@ -206,6 +219,41 @@ would make the whole setup scriptable from the repo.
       tab strips. At 16px it is soft; that is accepted, because 16px CSS
       is 32px physical on retina, where it's clean.
 - [x] **apple-touch-icon** — 180×180, opaque, square-cornered.
+- [x] **Link preview** — `public/og.png` (1200×630) plus the OG and
+      Twitter tags in `<head>`. This site's job is being pasted into a
+      LinkedIn message or an email to a hiring manager, so the unfurled
+      card is the real first impression; without the tags it rendered as
+      a bare URL. The image is **generated, not drawn** —
+      `docs/og-image-source.html` is the source, rendered with headless
+      Chrome so it uses the real Tektur / Departure Mono files and the
+      same masked ANSI wordmark as the hero. That file's header carries
+      the regenerate command. `og:image` must stay an **absolute** URL:
+      scrapers don't resolve relative paths.
+- [x] **404 page** — `public/404.html`, wired up by
+      `not_found_handling: "404-page"` in `wrangler.jsonc`. Without that
+      key the asset server answered unknown paths with a 404 and a
+      **zero-byte body** — a blank white page. Deliberately not
+      `"single-page-application"`, which would return `200` for every
+      made-up path and let an infinite URL space get indexed. The page is
+      standalone (inline CSS, no JS, system mono) because it has to
+      render when something else has already failed.
+- [x] **Security + cache headers** — `public/_headers`. HSTS,
+      `nosniff`, `Referrer-Policy`, `frame-ancestors 'none'` +
+      `X-Frame-Options`, and a `Permissions-Policy` that hands back
+      camera/mic/geolocation. Also `immutable` year-long caching for
+      `/assets/*`, which is safe because Vite content-hashes those
+      filenames — `index.html` is excluded on purpose, since it is what
+      points at the hashed names. Two deliberate omissions: no `preload`
+      on HSTS (easy to join, months to leave) and no full CSP beyond
+      `frame-ancestors`, which would need testing against GSAP and the
+      inline styles before it could go on a live site. The file **must
+      live in `public/`**, not the repo root: the asset server reads
+      `_headers` from the root of `dist/`, and a misplaced or malformed
+      one fails **silently** — no build error, the header just never
+      appears. So verify against the live edge after every deploy with
+      `curl -sI https://royeyal.com | grep -i strict-transport`, never
+      against the local build.
+
 - [ ] **hello@royeyal.com** — becoming the Workspace primary domain, so
       the address on the site can both send and receive. Step-by-step in
       `docs/google-workspace-domain-change.md`.

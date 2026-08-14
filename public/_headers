@@ -1,0 +1,47 @@
+# Response headers for the Cloudflare Workers asset server.
+#
+# Vite copies public/ into dist/ verbatim, and the asset server reads
+# _headers from the root of the assets directory — so this file has to
+# live in public/, not at the repo root, or it is silently ignored.
+#
+# Verify after deploy (a typo here fails silently — the header simply
+# doesn't appear, there is no build error):
+#   curl -sI https://royeyal.com | grep -i 'strict-transport\|x-content\|referrer'
+
+/*
+  # Enforce HTTPS for a year. Cloudflare already redirects http -> https,
+  # but a redirect still puts one plaintext request on the wire; HSTS
+  # makes the browser skip it entirely on every later visit.
+  #
+  # No `preload` on purpose. Getting onto the browsers' preload list is
+  # easy and getting off it takes months, so it is not something to opt
+  # into for a personal site that might change hosting.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # Stop browsers guessing a content type when the declared one looks
+  # wrong — the mechanism behind most "harmless upload became a script"
+  # bugs.
+  X-Content-Type-Options: nosniff
+
+  # Send the full URL to ourselves, only the origin to third parties.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # No framing anywhere. frame-ancestors is the modern form and beats
+  # X-Frame-Options where both are understood; the older header stays for
+  # anything that doesn't read CSP.
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+
+  # Nothing here uses these, so hand back the permission rather than
+  # leave it available.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+# Vite content-hashes every filename in dist/assets, so a changed file is
+# a changed URL and these can never go stale. immutable additionally
+# tells the browser not to revalidate on a hard refresh.
+#
+# index.html is deliberately NOT covered — it is the file that points at
+# the hashed names, so it must stay revalidated or a deploy would never
+# be picked up.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -26,6 +26,50 @@
          pre-rounded source would get rounded twice. Verified: alpha 255 at
          all four corners, centre is exactly #F900B9. -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Link previews. This site's whole job is being pasted into a
+         LinkedIn message, a Slack DM or an email to a hiring manager, so
+         the unfurled card is the real first impression — without these
+         tags it renders as a bare blue URL.
+
+         og:image MUST be absolute: scrapers don't resolve relative paths
+         against the page they found them on. Width and height are
+         declared so LinkedIn and Slack can reserve the right box before
+         the image downloads, which is what stops the card reflowing.
+
+         The image is public/og.png, 1200x630. It is GENERATED, not drawn
+         by hand — docs/og-image-source.html is the source, rendered with
+         headless Chrome so it uses the site's real Tektur / Departure
+         Mono files and the same masked ANSI wordmark as the hero. Re-run
+         the command in that file's header to regenerate after a rebrand. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Roy Eyal" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://royeyal.com/" />
+    <meta property="og:title" content="Roy Eyal — Marketing Web Developer" />
+    <meta
+      property="og:description"
+      content="I close the gap between design and production — design systems that speak both Figma and SCSS, hand-built marketing sites, and AI workflows. Currently at Lusha."
+    />
+    <meta property="og:image" content="https://royeyal.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="ROY EYAL in ANSI block letters, cyan fading to magenta on black, above the line: I close the gap between design and production."
+    />
+
+    <!-- X/Twitter reads its own namespace and falls back to og:* for
+         anything it's missing, so only the card type and image alt are
+         genuinely additive here. summary_large_image is what gets the
+         full-bleed 1.91:1 card instead of a thumbnail. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image:alt"
+      content="ROY EYAL in ANSI block letters, cyan fading to magenta on black, above the line: I close the gap between design and production."
+    />
+
     <script type="module" src="/src/main.js"></script>
   </head>
   <body>
