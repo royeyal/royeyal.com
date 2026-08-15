@@ -18,20 +18,39 @@
   --bar-height: 3.75em;
 }
 
+/* Centred with auto margins, NOT `left: 50%` + `translate(-50%)`.
+
+   Two reasons, both real:
+
+   1. Safari. `.bottom-nav__inner` carries a backdrop-filter, and WebKit
+      computes the backdrop sampling region in the wrong coordinate space
+      when the filtered element sits inside a transformed ancestor — the
+      blur escapes the pill and floods the viewport from the nav's left
+      edge outward. Removing the transform removes the trigger.
+
+   2. GSAP. animations.js runs `gsap.from('.bottom-nav', { yPercent })`,
+      and GSAP resolves the existing `translate(-50%)` through
+      getComputedStyle, which returns PIXELS. It then rewrites the
+      transform with that frozen pixel offset, so the -50% stops tracking
+      the element's width — and this element changes width, from
+      --closed-width to --open-width. Auto margins re-centre on every
+      resize and every open/close, with nothing to bake. */
 .bottom-nav {
   z-index: 100;
   position: fixed;
   bottom: max(1.5rem, env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translate(-50%);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
 }
 
 .bottom-nav__inner {
   will-change: width, height;
   width: var(--closed-width);
   height: var(--bar-height);
-  background: rgba(11, 13, 21, 0.82);
-  backdrop-filter: blur(0.75rem);
+  /* background AND backdrop-filter live on ::before — see below */
+  isolation: isolate;
   border: var(--border-w) solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
@@ -54,6 +73,31 @@
   transition:
     border-color var(--bulb-off) var(--ease-bulb-off),
     box-shadow var(--bulb-off) var(--ease-bulb-off);
+}
+
+/* The frosted pill itself.
+
+   This is a child rather than a property of .bottom-nav__inner because a
+   backdrop-filter is NOT clipped by the filtered element's own
+   `overflow: hidden` — an element cannot clip its own backdrop. Safari
+   was therefore free to sample and paint the blur far outside the pill.
+   As a descendant it IS clipped by the parent's overflow, so the blurred
+   region is bounded by geometry rather than by WebKit computing the
+   backdrop root correctly.
+
+   z-index: -1 puts it below the in-flow bar and panel but above the
+   parent's own background — which is why the background colour moved
+   here too. `isolation: isolate` on the parent keeps that -1 from
+   escaping into the page's stacking context. */
+.bottom-nav__inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgba(11, 13, 21, 0.82);
+  backdrop-filter: blur(0.75rem);
+  pointer-events: none;
 }
 
 [data-bottom-nav-open='true'] .bottom-nav__inner {
