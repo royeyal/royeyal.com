@@ -29,15 +29,49 @@
 
   /* typography — the display face is settled (Tektur). Alternatives
      that were considered live in docs/font-options.md. */
-  /* Tektur (self-hosted, see fonts.css) — variable wght 400-900.
-     --weight-display is the standard display weight; the oversized
-     footer wordmark uses --weight-display-max so it can shout without
-     dragging every other heading up with it. */
+  /* Tektur (self-hosted, see fonts.css) — variable wght 400-900. */
   --font-display: 'Tektur Variable', system-ui, sans-serif;
-  --weight-display: 666;
-  --weight-display-max: 900;
-  --font-body: 'Switzer Variable', system-ui, sans-serif;
+  /* Body: Satoshi is on trial against Switzer. Both @font-face blocks
+     are live in fonts.css, so switching back is this one line. */
+  --font-body: 'Satoshi Variable', system-ui, sans-serif;
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* weights — one value per role, never a bare number in a component.
+
+     Every weight below is a real instance on a variable axis, so none of
+     them costs a byte and none is a browser-synthesised fake bold.
+
+     --weight-mono is the exception that matters: Departure Mono ships a
+     SINGLE 400 master with no axis at all. It is a token purely so the
+     mono rules read like everything else — do not raise it. Anything
+     other than 400 makes the browser smear a synthetic bold over the
+     pixel grid, which is the whole reason that face is here.
+
+     The numbers look high because Satoshi's axis runs LIGHT: measured by
+     ink coverage at 17px, Satoshi 500 is 98% of Switzer 400 — i.e. the
+     old body weight, not a step up. The rule of thumb is Satoshi ≈
+     Switzer + 100. So 550 here is the real equivalent of Switzer ~455,
+     and 780 matches the Switzer 680 the bold lead-ins used to have.
+     Don't "tidy" these to 500/700; that silently reverts the weight.
+
+     Body is above 400 on purpose: light text on a black background
+     optically thins, and 400 reversed out of --ink reads anaemic. */
+  --weight-body: 550;
+  --weight-body-strong: 780;
+  --weight-display: 666;
+  /* the oversized footer wordmark shouts without dragging every other
+     heading up with it */
+  --weight-display-max: 900;
+  --weight-mono: 400; /* fixed — see above */
+
+  /* line height — named for the job, not the number. Anything tighter
+     than 1 is negative leading and only survives on display type. */
+  --leading-body: 1.6; /* long-form paragraphs */
+  --leading-snug: 1.5; /* short-measure body */
+  --leading-heading: 1.1; /* small headings */
+  --leading-title: 1.02; /* section titles */
+  --leading-flush: 1; /* display type set solid */
+  --leading-giant: 0.8; /* the footer wordmark only */
 
   /* type scale */
   --font-size-2xs: 0.625rem;

@@ -122,7 +122,7 @@
   font-family: var(--font-display);
   font-size: var(--font-size-h1);
   font-weight: var(--weight-display);
-  line-height: 1;
+  line-height: var(--leading-flush);
   letter-spacing: -0.025em;
   text-wrap: balance;
   max-width: 18ch;
@@ -425,9 +425,9 @@
 }
 
 /* highlighted lead-in title on each bullet */
+/* weight now comes from the global `strong` rule in base.css */
 .work-card__points strong {
   color: var(--text);
-  font-weight: 680;
 }
 
 @media (max-width: 40rem) {

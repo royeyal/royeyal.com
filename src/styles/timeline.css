@@ -130,13 +130,13 @@
   font-size: var(--font-size-h3);
   font-weight: var(--weight-display);
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: var(--leading-heading);
 }
 
 .step-timeline__p {
   color: var(--text-muted);
   font-size: var(--font-size-md);
-  line-height: 1.5;
+  line-height: var(--leading-snug);
 }
 
 @media (max-width: 40rem) {

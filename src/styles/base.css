@@ -24,9 +24,18 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
-  line-height: 1.6;
+  /* stated, not inherited from the UA's 400 — the whole page's normal
+     weight should be one token, readable in one place */
+  font-weight: var(--weight-body);
+  line-height: var(--leading-body);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+/* `strong` defaults to the UA's bold (700) and would otherwise be the one
+   weight on the page that no token controls */
+strong {
+  font-weight: var(--weight-body-strong);
 }
 
 ::selection {
@@ -57,7 +66,7 @@ a {
 .mono {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   letter-spacing: 0.02em;
   color: var(--text-muted);
 }
@@ -69,7 +78,7 @@ a {
   gap: 0.65em;
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--cyan);
@@ -92,7 +101,7 @@ a {
   font-family: var(--font-display);
   font-size: var(--font-size-h2);
   font-weight: var(--weight-display);
-  line-height: 1.02;
+  line-height: var(--leading-title);
   letter-spacing: -0.02em;
   text-wrap: balance;
   margin-bottom: 1.75rem;
@@ -146,7 +155,7 @@ a {
 .chip {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   letter-spacing: 0.04em;
   padding: 0.4375rem 0.875rem;
   border: var(--border-w) solid var(--line-strong);
@@ -181,7 +190,7 @@ a {
   gap: 0.625rem;
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
@@ -278,7 +287,7 @@ a {
 .sound-toggle {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   letter-spacing: 0.02em;
   color: var(--text-muted);
   background: none;

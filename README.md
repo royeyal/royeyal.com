@@ -27,8 +27,17 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
   English) — all three live in `src/assets/fonts/` and are declared in
   `src/styles/fonts.css`:
   - **Tektur** — display/headings, variable weight 400–900
-  - **Switzer Variable** — body
+  - **Satoshi Variable** — body, variable weight 300–900. The range in the
+    `@font-face` is load-bearing: Satoshi's default instance is wght 900,
+    so without it body copy can render Black. Switzer, the previous body
+    face, is still declared alongside it so the swap can be reverted from
+    `tokens.css`; an unused `@font-face` is never downloaded.
   - **Departure Mono** — terminal accents (single weight, never fake-bold it)
+- **Typography tokens** — every weight and line-height is a token in
+  `src/styles/tokens.css`; no component carries a bare number.
+  `--weight-mono` is fixed at 400 because Departure Mono has no weight
+  axis, and anything else makes the browser synthesise a bold over its
+  pixel grid.
 - **Prettier** — `npm run format`
 - **Wrangler** — deploys to Cloudflare Workers (see Deploy below)
 
@@ -246,9 +255,13 @@ would make the whole setup scriptable from the repo.
       to mush at the ~500px LinkedIn actually renders. A share card is
       seen small, so it gets one idea. The image is **generated, not
       drawn** — `docs/og-image-source.html` is the source, rendered with
-      headless Chrome so it uses the real Switzer file and the
+      headless Chrome so it uses the real body-font file and the
       same masked ANSI wordmark as the hero. That file's header carries
-      the regenerate command. `og:image` must stay an **absolute** URL:
+      the regenerate command. **Note:** it still points at
+      `Switzer-Variable.woff2`, so the shipped card's one line of text is
+      in the old body face. Repoint it at Satoshi and re-render once the
+      body-face trial is settled — the wordmark, which carries the card,
+      is unaffected either way. `og:image` must stay an **absolute** URL:
       scrapers don't resolve relative paths.
 - [x] **404 page** — `public/404.html`, wired up by
       `not_found_handling: "404-page"` in `wrangler.jsonc`. Without that

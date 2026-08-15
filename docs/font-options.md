@@ -1,9 +1,12 @@
 # Font options — elevating the Apple-meets-cyberpunk direction
 
-> **Decision (2026-08-15): the type stack is final.** Tektur, Switzer and
-> Departure Mono ship, and **Neue Machina was considered and declined** —
-> this is settled, not pending. The research below is kept as a record of
-> how the stack was chosen, not as a shortlist waiting to be picked from.
+> **Decision (2026-08-15): the display face is final; the body face is on
+> trial.** Tektur and Departure Mono ship, and **Neue Machina was
+> considered and declined** — that part is settled. **Switzer was swapped
+> for Satoshi** on the same date; both `@font-face` blocks are live in
+> `src/styles/fonts.css`, so reverting is one line of `tokens.css`.
+> The research below is a record of how the stack was chosen, not a
+> shortlist waiting to be picked from.
 >
 > A commented-out Neue Machina `@font-face` used to sit in
 > `src/styles/fonts.css` as a pending swap. It has been removed rather
@@ -11,13 +14,47 @@
 > the bottom of this file.
 
 Currently live (all free, all self-hosted from `src/assets/fonts/`, latin
-subset only): **Tektur** (display/headings, variable wght 400–900),
-**Switzer Variable** (body), **Departure Mono** (terminal accents).
+only): **Tektur** (display/headings, variable wght 400–900), **Satoshi
+Variable** (body, wght 300–900), **Departure Mono** (terminal accents).
 
-Tektur's squared, techno letterforms echo the ANSI logo's pixel grid;
-Switzer stays quiet underneath; Departure Mono carries the terminal
+Tektur's squared, techno letterforms echo the ANSI logo's pixel grid; the
+body face stays quiet underneath; Departure Mono carries the terminal
 texture. The research below is what led there, and what could still
 elevate it further.
+
+## Satoshi — what the swap actually involved
+
+Two things bit, and both would bite again on any future body-face swap:
+
+**Satoshi's `fvar` default instance is wght 900**, not 400 (min 300,
+default 900, max 900 — genuinely unusual). The `@font-face` block
+therefore _must_ declare `font-weight: 300 900`. Omit the range and the
+default instance can win, setting body copy in Black.
+
+**Satoshi's axis runs light.** Measured by ink coverage at 17px on
+`--ink`, against the Switzer weights it replaced:
+
+| Satoshi | vs. Switzer 400 |
+| ------- | --------------- |
+| 400     | 76%             |
+| 450     | 87%             |
+| 500     | 98%             |
+| 550     | 104%            |
+| 600     | 111%            |
+
+So Satoshi 500 is _the old body weight_, not a step up — the working rule
+is **Satoshi ≈ Switzer + 100**. That is why `--weight-body` is 550 and
+`--weight-body-strong` is 780 rather than the rounder 500/700; those
+rounder numbers silently revert the weight.
+
+Satoshi's webfont build does ship the full feature set (`ss01`–`ss04`,
+`salt`, `dlig`, `frac`, `ordn`, `tnum`, `pnum`). None is enabled: every
+digit on the site renders in Departure Mono, so the numeral features have
+nothing to act on, and the stylistic alternates soften the letterforms in
+the opposite direction from the terminal theme. If the fonts are ever
+subsetted, note that `pyftsubset` **drops OpenType features not named in
+`--layout-features`** — the CSS stays valid and the glyphs silently never
+change.
 
 ## Display / headings
 
