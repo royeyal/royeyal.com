@@ -257,11 +257,10 @@ would make the whole setup scriptable from the repo.
       drawn** — `docs/og-image-source.html` is the source, rendered with
       headless Chrome so it uses the real body-font file and the
       same masked ANSI wordmark as the hero. That file's header carries
-      the regenerate command. **Note:** it still points at
-      `Switzer-Variable.woff2`, so the shipped card's one line of text is
-      in the old body face. Repoint it at Satoshi and re-render once the
-      body-face trial is settled — the wordmark, which carries the card,
-      is unaffected either way. `og:image` must stay an **absolute** URL:
+      the regenerate command. Re-rendered for Satoshi (2026-08-15) — it
+      carries the same `font-feature-settings` as the site so the card's
+      letterforms match the live page, and the role line is weight 800
+      because Satoshi's axis runs ~100 units lighter than Switzer's. `og:image` must stay an **absolute** URL:
       scrapers don't resolve relative paths.
 - [x] **404 page** — `public/404.html`, wired up by
       `not_found_handling: "404-page"` in `wrangler.jsonc`. Without that

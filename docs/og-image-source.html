@@ -41,11 +41,14 @@
   <head>
     <meta charset="UTF-8" />
     <style>
+      /* The site's body face. `font-weight: 300 900` is required, not
+         cosmetic: Satoshi's default variable instance is wght 900, so
+         without the declared range this can render Black. */
       @font-face {
-        font-family: 'Switzer Variable';
-        src: url('/Users/royeyal/Documents/GitHub/royeyal.com/src/assets/fonts/Switzer-Variable.woff2')
+        font-family: 'Satoshi Variable';
+        src: url('/Users/royeyal/Documents/GitHub/royeyal.com/src/assets/fonts/Satoshi-Variable.woff2')
           format('woff2');
-        font-weight: 100 900;
+        font-weight: 300 900;
         font-display: block;
       }
 
@@ -71,7 +74,12 @@
 
       body {
         background: var(--ink);
-        font-family: 'Switzer Variable', system-ui, sans-serif;
+        font-family: 'Satoshi Variable', system-ui, sans-serif;
+        /* same feature set the site runs — keeps the card's letterforms
+           identical to the live page */
+        font-feature-settings:
+          'dlig', 'frac', 'liga', 'ordn', 'salt', 'tnum', 'ss01', 'ss02',
+          'ss03', 'ss04';
         position: relative;
         display: flex;
         flex-direction: column;
@@ -125,7 +133,9 @@
       .role {
         position: relative;
         font-size: 46px;
-        font-weight: 700;
+        /* 800, not the 700 this was under Switzer: Satoshi's axis runs
+           about 100 units lighter for the same apparent weight. */
+        font-weight: 800;
         letter-spacing: -0.015em;
         color: var(--text);
         text-shadow: 0 4px 40px rgba(0, 0, 0, 0.8);

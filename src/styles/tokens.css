@@ -12,6 +12,13 @@
   --line-strong: rgba(255, 255, 255, 0.16);
   --text: #f2f4fb;
   --text-muted: #9aa3b8;
+  /* A deliberately brighter muted, for body copy sitting over the WebGL
+     strands rather than over flat --ink. Against the lit hero backdrop
+     --text-muted falls to ~5.9:1 while this holds ~8:1; on flat --ink the
+     two are 8.0:1 and 11.0:1. Not a duplicate of --text-muted — using
+     that here costs real contrast exactly where the background is
+     busiest. */
+  --text-lede: #b7bfd2;
 
   /* ─── Wide-gamut brand colours ─────────────────────────────────
      OKLCH base — the browser gamut-maps to sRGB on standard
@@ -72,6 +79,42 @@
   --leading-title: 1.02; /* section titles */
   --leading-flush: 1; /* display type set solid */
   --leading-giant: 0.8; /* the footer wordmark only */
+
+  /* OpenType features. These MUST stay paired with the family they were
+     chosen for, because font-feature-settings inherits and a tag means
+     whatever the receiving font says it means.
+
+     Departure Mono turned out to implement frac, ordn, ss01, ss02 and
+     tnum of its own. Inheriting the body list into it rewrites every
+     digit on the site as a superscript — the year ranges, the 01-04
+     section numbers and the footer copyright all collapse to tiny
+     raised numerals. Verified by rendering it, not assumed.
+
+     So: --font-features-body goes on `body`, and every rule that sets
+     `font-family: var(--font-mono)` sets --font-features-mono beside it.
+     Change the family, change the features, in the same place. */
+  --font-features-body:
+    'dlig', 'frac', 'liga', 'ordn', 'salt', 'tnum', 'ss01', 'ss02', 'ss03',
+    'ss04';
+  --font-features-mono: normal;
+
+  /* Departure Mono is a BITMAP design wearing an outline format: its
+     unitsPerEm is 550 and every stem, cap height and x-height is a
+     multiple of 50 — i.e. one design pixel is 50 units and the em is
+     exactly 11px. It is only truly on-grid at 11px and 22px.
+
+     The mono sizes here are 10px, 12px and 13.6px, so a 1px stem lands
+     on 0.91 / 1.09 / 1.24 device pixels. Antialiasing renders that
+     fraction as grey, which is why the pixel font looked thin — and why
+     it looked worse on non-retina, where there is no second device pixel
+     to carry the difference.
+
+     Turning smoothing off makes the rasteriser snap each stem to a whole
+     pixel: solid strokes, no grey. It is the fix for the thinness, and
+     it costs nothing. WebKit/Blink only — Firefox has no equivalent and
+     simply keeps today's rendering, so this degrades quietly.
+     Set to `antialiased` to go back. */
+  --smoothing-mono: none;
 
   /* type scale */
   --font-size-2xs: 0.625rem;

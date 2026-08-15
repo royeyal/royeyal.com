@@ -60,6 +60,9 @@
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-mono);
+  /* body-face features must not reach the pixel font — see tokens.css */
+  font-feature-settings: var(--font-features-mono);
+  -webkit-font-smoothing: var(--smoothing-mono);
   font-size: var(--font-size-sm);
   font-weight: var(--weight-mono);
   letter-spacing: 0.12em;

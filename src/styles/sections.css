@@ -133,7 +133,7 @@
 .hero__sub {
   max-width: 52ch;
   font-size: var(--font-size-lede);
-  color: #b7bfd2;
+  color: var(--text-lede);
   margin-bottom: 2.75rem;
   text-shadow: 0 0.125rem 1.5rem rgba(0, 0, 0, 0.9);
 }
@@ -157,6 +157,9 @@
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-mono);
+  /* body-face features must not reach the pixel font — see tokens.css */
+  font-feature-settings: var(--font-features-mono);
+  -webkit-font-smoothing: var(--smoothing-mono);
   font-size: var(--font-size-2xs);
   letter-spacing: 0.18em;
   text-transform: uppercase;
