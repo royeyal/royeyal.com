@@ -27,8 +27,8 @@
   --magenta-dim: rgba(249, 0, 185, 0.35);
   --cyan-dim: rgba(66, 239, 254, 0.35);
 
-  /* typography — display becomes Neue Machina once purchased
-     (see fonts.css for the switch instructions) */
+  /* typography — the display face is settled (Tektur). Alternatives
+     that were considered live in docs/font-options.md. */
   /* Tektur (self-hosted, see fonts.css) — variable wght 400-900.
      --weight-display is the standard display weight; the oversized
      footer wordmark uses --weight-display-max so it can shout without

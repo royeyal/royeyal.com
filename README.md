@@ -77,19 +77,22 @@ docs/webflow-studio-wind-down.md
                        retiring the .studio site, keeping the Workspace plan
 ```
 
-> ⚠️ The site advertises `hello@royeyal.com`, which is **not yet the
-> mailbox's real address**. DNS is done and verified (2026-08-14):
+> **`hello@royeyal.com` — DNS side complete, verified 2026-08-15.**
 > Cloudflare Email Routing is off, MX is a single `smtp.google.com`,
-> there is exactly one SPF record, and `google._domainkey` is live — so
-> mail to the domain reaches Google. What's outstanding is Workspace-side:
-> `royeyal.studio` is still the primary domain and the user still has to
-> be renamed (Steps 5–6 of `docs/google-workspace-domain-change.md`).
+> there is exactly one SPF record, `google._domainkey` is live, and
+> `_dmarc` points at `dmarc@royeyal.com`. The zone is down to seven
+> records and all seven are correct.
 >
-> Until that rename lands, `hello@royeyal.com` only receives if it exists
-> as an **alias** — and that alias has to be deleted before the rename,
-> because a primary address cannot collide with one. Mind the gap: the
-> address is published on a live site, so don't leave it aliasless for
-> long. Worth finishing before the URL goes on a CV.
+> What's left is the Step 7 long tail in
+> [`docs/google-workspace-domain-change.md`](./docs/google-workspace-domain-change.md):
+> billing and recovery addresses, Gmail's **Send mail as** default (easy
+> to miss — you keep sending as `.studio` without noticing), and
+> re-authorising the account on each device after the rename.
+>
+> Two standing constraints: the `dmarc@` alias must exist or reports
+> bounce, and `royeyal.studio` must keep its MX records or the
+> `hello@royeyal.studio` alias stops routing — relevant to the Webflow
+> wind-down.
 
 ## Deploy
 
@@ -213,12 +216,13 @@ would make the whole setup scriptable from the repo.
       masks, so the two can never drift apart.
 - [x] **Display font** — Tektur is live (self-hosted, latin-only).
 - [x] **Neue Machina** — **decided against.** Tektur is the display face
-      and this is closed, not pending. The switch steps are still
-      commented at the bottom of `src/styles/fonts.css` in case the
-      decision is ever revisited; if it is, note Neue Machina ships as a
-      single static weight, so `--weight-display` / `--weight-display-max`
-      would both have to become `800`, giving up the variable-weight
-      range Tektur provides.
+      and this is closed, not pending. The dead commented-out
+      `@font-face` that used to sit in `src/styles/fonts.css` has been
+      removed; the swap procedure and the reasoning now live in
+      [`docs/font-options.md`](./docs/font-options.md). Short version:
+      Neue Machina ships as a single static weight, so it would collapse
+      `--weight-display` / `--weight-display-max` to one value and cost
+      the footer wordmark its contrast against the headings.
 - [x] **Cloudflare** — deployed and live at royeyal.com, apex attached
       as a Workers custom domain.
 - [x] **www redirect** — `www.royeyal.com` 301s to the apex, preserving
@@ -279,9 +283,10 @@ would make the whole setup scriptable from the repo.
       `curl -sI https://royeyal.com | grep -i strict-transport`, never
       against the local build.
 
-- [ ] **hello@royeyal.com** — becoming the Workspace primary domain, so
-      the address on the site can both send and receive. Step-by-step in
-      `docs/google-workspace-domain-change.md`.
+- [ ] **hello@royeyal.com** — DNS complete and verified; the Workspace
+      rename is done. Only the Step 7 long tail remains (billing and
+      recovery addresses, Gmail's Send-mail-as default, per-device
+      re-auth). Step-by-step in `docs/google-workspace-domain-change.md`.
 - [x] **Navigation** — expanding bottom nav (Osmo Supply, vendored in
       `src/js/nav.js`). Five stops, socials, a copy-email, and the sound
       toggle. Bottom placement keeps the WebGL hero uncontested and means

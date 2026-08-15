@@ -346,9 +346,10 @@
           <ol class="work__list">
             <li class="work-card" data-reveal>
               <header class="work-card__head">
-                <!-- Decorative: "Lusha" is already the visible heading
-                     right next to it, so the icon stays out of the
-                     accessibility tree to avoid a double announcement. -->
+                <!-- aria-hidden on every work-card logo: the company name
+                     is already the visible heading beside it, so exposing
+                     the mark would announce it twice. Applies to all four
+                     cards; not repeated on the rest. -->
                 <div
                   class="work-card__logo"
                   data-brand="lusha"
@@ -417,9 +418,6 @@
 
             <li class="work-card" data-reveal>
               <header class="work-card__head">
-                <!-- Decorative: "Wix" is already the visible heading
-                     right next to it, so the icon stays out of the
-                     accessibility tree to avoid a double announcement. -->
                 <div
                   class="work-card__logo"
                   data-brand="wix"
@@ -461,9 +459,6 @@
 
             <li class="work-card" data-reveal>
               <header class="work-card__head">
-                <!-- Decorative: "Elementor" is already the visible
-                     heading right next to it, so the icon stays out of
-                     the accessibility tree to avoid a double announcement. -->
                 <div
                   class="work-card__logo"
                   data-brand="elementor"
@@ -519,9 +514,6 @@
 
             <li class="work-card" data-reveal>
               <header class="work-card__head">
-                <!-- Decorative: the R monogram is cut from the same ANSI
-                     wordmark as the hero logo, and "Roy Eyal" is already
-                     the visible heading beside it. -->
                 <div
                   class="work-card__logo"
                   data-brand="royeyal"

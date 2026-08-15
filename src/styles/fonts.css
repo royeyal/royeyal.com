@@ -38,21 +38,8 @@
   font-display: swap;
 }
 
-/* Neue Machina Ultrabold (Pangram Pangram) — optional display swap.
-   When the purchased woff2 arrives:
-   1. Drop it at src/assets/fonts/NeueMachina-Ultrabold.woff2
-   2. Uncomment this block
-   3. In tokens.css set:
-        --font-display: 'Neue Machina', 'Tektur Variable', sans-serif;
-   4. Neue Machina is a single static weight, so also set
-        --weight-display: 800; --weight-display-max: 800;
-      (Tektur's 400-900 variable range does not apply to it.)
-
-@font-face {
-  font-family: 'Neue Machina';
-  src: url('../assets/fonts/NeueMachina-Ultrabold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-*/
+/* The three faces above are the final set — the display face is settled.
+   A commented-out Neue Machina @font-face used to sit here as a pending
+   swap; that upgrade was considered and declined, so the dead rule is
+   gone rather than left to rot. Alternatives, and the steps a swap would
+   take, are recorded in docs/font-options.md. */
