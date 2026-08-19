@@ -53,6 +53,10 @@ img {
   display: block;
 }
 
+p {
+  text-wrap: pretty;
+}
+
 a {
   color: inherit;
 }
