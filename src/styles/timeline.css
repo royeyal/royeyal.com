@@ -62,9 +62,6 @@
   background: var(--surface);
   color: var(--text-muted);
   font-family: var(--font-mono);
-  /* body-face features must not reach the pixel font — see tokens.css */
-  font-feature-settings: var(--font-features-mono);
-  -webkit-font-smoothing: var(--smoothing-mono);
   font-size: var(--font-size-xs);
   box-shadow: var(--shadow-chip);
   /* base = unlit. This transition governs turning OFF: a steep initial
@@ -113,19 +110,43 @@
 
 /* Osmo's three-stage legibility ramp: ahead / passed / current.
    Same bulb asymmetry as the markers — text comes up quickly and dims
-   away slowly, so scrolling back never feels like a light switch. */
-[data-step-timeline-item] .step-timeline__content {
-  opacity: 0.25;
-  transition: opacity var(--bulb-off) var(--ease-bulb-off);
+   away slowly, so scrolling back never feels like a light switch.
+
+   Dimming via color-mix, not opacity: opacity fades text toward black,
+   and against --ink (near-black) that crushes contrast well under WCAG
+   AA within a few percent of full fade — "ahead" measured ~1.5:1,
+   "passed" ~2.7:1. The mix percentages below are tuned so even the
+   dimmest (ahead) tier still clears 4.5:1 for both --text and the
+   lower-luminance --text-muted, with "passed" and "current" reading
+   progressively brighter on top of that floor. The marker chip's own
+   opacity ramp is untouched — it's aria-hidden, so it isn't subject to
+   the same contrast check. */
+[data-step-timeline-item] .step-timeline__content-h {
+  color: color-mix(in srgb, var(--text) 75%, var(--ink));
+  transition: color var(--bulb-off) var(--ease-bulb-off);
 }
 
-[data-step-timeline-item][data-status='active'] .step-timeline__content {
-  opacity: 0.5;
-  transition: opacity var(--bulb-on) var(--ease-bulb-on);
+[data-step-timeline-item] .step-timeline__p {
+  color: color-mix(in srgb, var(--text-muted) 75%, var(--ink));
+  transition: color var(--bulb-off) var(--ease-bulb-off);
 }
 
-[data-step-timeline-item][data-current] .step-timeline__content {
-  opacity: 1;
+[data-step-timeline-item][data-status='active'] .step-timeline__content-h {
+  color: color-mix(in srgb, var(--text) 90%, var(--ink));
+  transition: color var(--bulb-on) var(--ease-bulb-on);
+}
+
+[data-step-timeline-item][data-status='active'] .step-timeline__p {
+  color: color-mix(in srgb, var(--text-muted) 90%, var(--ink));
+  transition: color var(--bulb-on) var(--ease-bulb-on);
+}
+
+[data-step-timeline-item][data-current] .step-timeline__content-h {
+  color: var(--text);
+}
+
+[data-step-timeline-item][data-current] .step-timeline__p {
+  color: var(--text-muted);
 }
 
 .step-timeline__content-h {
@@ -133,13 +154,12 @@
   font-size: var(--font-size-h3);
   font-weight: var(--weight-display);
   letter-spacing: -0.02em;
-  line-height: var(--leading-heading);
+  line-height: 1.1;
 }
 
 .step-timeline__p {
-  color: var(--text-muted);
   font-size: var(--font-size-md);
-  line-height: var(--leading-snug);
+  line-height: 1.5;
 }
 
 @media (max-width: 40rem) {
