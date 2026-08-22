@@ -165,7 +165,13 @@
 
   /* layout */
   --container: 70rem;
-  --gutter: clamp(1.25rem, 4vw, 3rem);
+  /* The min() is a text-scale safety valve, not a design choice. The
+     clamp's FLOOR is in rem, so <meta name="text-scale"> grows it while
+     the 4vw term stays put — at 2x OS text on a 375px phone that floor
+     alone ate 80px of a 375px viewport. Capping at 6vw is a no-op at
+     every normal size (20px on that phone, 48px on a desktop, both
+     unchanged) and only bites once rem has run away. */
+  --gutter: min(clamp(1.25rem, 4vw, 3rem), 6vw);
   --section-gap: clamp(6rem, 14vh, 11.25rem);
 
   /* nested-radius recipe: inner-radius = outer-radius − padding.

@@ -273,7 +273,8 @@
   border: var(--border-w) solid var(--line);
   border-radius: var(--radius);
   background: var(--card-gradient);
-  padding: clamp(1.5rem, 4vw, 2.75rem);
+  /* vw cap for the same reason as --gutter in tokens.css */
+  padding: min(clamp(1.5rem, 4vw, 2.75rem), 7vw);
   box-shadow: var(--shadow-card);
   transition:
     border-color var(--bulb-off) var(--ease-bulb-off),

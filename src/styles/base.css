@@ -352,6 +352,55 @@ a {
    of its own — see src/styles/nav.css. */
 
 /* Focus visibility */
+/* ------------------------------------------------------------------
+   Never clip
+
+   body has `overflow-x: hidden` (above), so anything wider than the
+   viewport is not merely off-screen — it is unreachable. There is no
+   scrollbar to drag. Content silently disappears.
+
+   That normally never happens, because the type scale is
+   clamp(Xrem, Yvw, Zrem) and every term shrinks together. But
+   <meta name="text-scale"> (index.html) opts the root font-size into
+   the reader's OS text setting, and that grows `rem` while leaving
+   `vw` alone — so at large OS scales the clamp FLOOR outgrows the
+   viewport and the layout is asked to render wider than it can show.
+   Browser zoom never did this; it scales both terms.
+
+   Everything below is a safety valve, not a layout choice: at normal
+   scale each rule is a no-op, and it only engages when content
+   genuinely cannot fit. That also makes them worth having regardless
+   of text-scale — they catch long unbreakable strings, very narrow
+   viewports, and reader-set minimum font sizes.
+   ------------------------------------------------------------------ */
+
+/* A single long word (`production` in the hero, `performance-marketing`
+   in a bullet) cannot wrap, so it overflows rather than breaking. Set
+   on body and inherited rather than listed per component: the failure
+   is a property of long words, not of particular elements, and a list
+   silently stops covering new copy.
+
+   `break-word`, not `anywhere`: this only engages when a word cannot
+   fit on a line of its own, so normal wrapping is untouched. Not
+   `hyphens: auto`, which produces nicer breaks but hyphenates whenever
+   it improves line filling — that would change the design at normal
+   sizes, which this must not do. */
+body {
+  overflow-wrap: break-word;
+}
+
+/* Grid and flex items default to min-width:auto, which lets their
+   CONTENT set a floor on the track — so a wide child pushes the track
+   wider than its own container instead of being made to wrap. */
+.about__copy,
+.step-timeline__item,
+.step-timeline__content,
+.work-card__company,
+.work-card__role,
+.work-card__years {
+  min-width: 0;
+}
+
 :focus-visible {
   outline: var(--border-w-thick) solid var(--cyan);
   outline-offset: 0.1875rem;

@@ -134,9 +134,22 @@
          tools doing the first-pass read on a candidate. For a CV site
          that is the whole audience, so it is worth the duplication.
 
-         Person is the primary entity, not WebSite: the site is about a
-         person, and the @id lets the two reference each other rather
-         than floating as unrelated blobs.
+         Person is the primary entity; ProfilePage is the wrapper that
+         says so — schema.org's type for a page ABOUT one person, with
+         mainEntity pointing at them. Plain WebSite alone described the
+         container and left the subject implicit.
+
+         `image` MUST be the portrait, not og.png. On a Person, image is
+         read as a photo OF that person, and og.png is the ANSI wordmark
+         social card — a search engine would happily surface it as Roy's
+         face.
+
+         worksFor is an array of OrganizationRole rather than a bare
+         Organization. Role is schema.org's documented way to attach
+         dates to an association (the property repeats inside the Role),
+         so past employers can carry an endDate instead of implying four
+         concurrent jobs. jobTitle above stays a plain string so a naive
+         consumer still gets the current role without walking the Roles.
 
          Keep this in sync with the work cards below. Every value here
          is already stated in the visible page — schema.org that
@@ -148,6 +161,15 @@
       {
         "@context": "https://schema.org",
         "@graph": [
+          {
+            "@type": "ProfilePage",
+            "@id": "https://royeyal.com/#page",
+            "url": "https://royeyal.com/",
+            "name": "Roy Eyal — Marketing Web Developer",
+            "inLanguage": "en",
+            "isPartOf": { "@id": "https://royeyal.com/#website" },
+            "mainEntity": { "@id": "https://royeyal.com/#roy" }
+          },
           {
             "@type": "WebSite",
             "@id": "https://royeyal.com/#website",
@@ -161,15 +183,49 @@
             "@id": "https://royeyal.com/#roy",
             "name": "Roy Eyal",
             "url": "https://royeyal.com/",
-            "image": "https://royeyal.com/og.png",
+            "image": "https://royeyal.com/images/roy-eyal.webp",
             "email": "mailto:hello@royeyal.com",
             "jobTitle": "Marketing Web Developer",
             "description": "Marketing web developer who closes the gap between design and production \u2014 Figma-to-code design systems, hand-built marketing sites, and AI workflows.",
-            "worksFor": {
-              "@type": "Organization",
-              "name": "Lusha",
-              "url": "https://www.lusha.com"
+            "hasOccupation": {
+              "@type": "Occupation",
+              "name": "Marketing Web Developer",
+              "occupationalCategory": "15-1254.00",
+              "skills": "HTML, PHP, SCSS, JavaScript, design systems, Figma-to-code workflows, WordPress, Webflow, SEO, CI/CD"
             },
+            "worksFor": [
+              {
+                "@type": "OrganizationRole",
+                "roleName": "Marketing Web Developer",
+                "startDate": "2023",
+                "worksFor": {
+                  "@type": "Organization",
+                  "name": "Lusha",
+                  "url": "https://www.lusha.com"
+                }
+              },
+              {
+                "@type": "OrganizationRole",
+                "roleName": "Technical Designer",
+                "startDate": "2022",
+                "endDate": "2023",
+                "worksFor": { "@type": "Organization", "name": "Wix" }
+              },
+              {
+                "@type": "OrganizationRole",
+                "roleName": "WordPress Developer & Elementor Expert",
+                "startDate": "2020",
+                "endDate": "2022",
+                "worksFor": { "@type": "Organization", "name": "Elementor" }
+              },
+              {
+                "@type": "OrganizationRole",
+                "roleName": "Freelance Web Developer",
+                "startDate": "2017",
+                "endDate": "2020",
+                "worksFor": { "@type": "Organization", "name": "Roy Eyal" }
+              }
+            ],
             "knowsAbout": [
               "Design systems",
               "Front-end development",
@@ -183,7 +239,7 @@
               "https://www.linkedin.com/in/royeyalcom/",
               "https://github.com/royeyal"
             ],
-            "mainEntityOfPage": { "@id": "https://royeyal.com/#website" }
+            "mainEntityOfPage": { "@id": "https://royeyal.com/#page" }
           }
         ]
       }
