@@ -576,9 +576,40 @@
 
                    These two numbers exist to reserve the right box
                    before the image loads. That is all they do here —
-                   they do not size anything. -->
+                   they do not size anything, and with srcset they only
+                   need to carry the right RATIO, which every candidate
+                   shares.
+
+                   srcset/sizes: .about__portrait is `width: min(100%,
+                   25rem)`, so the image is NEVER displayed wider than
+                   400px — one 1113px file was serving a 400px box, which
+                   is where PageSpeed's "larger than it needs to be" came
+                   from. 400/800 cover 1x and 2x of that cap; the
+                   original 1113 stays as the top candidate for 3x
+                   screens and as the `src` for anything that ignores
+                   srcset.
+
+                   27.5rem is not arbitrary: below a 440px viewport the
+                   gutter stops scaling and settles at 1.25rem a side, so
+                   the column is exactly `100vw - 2.5rem` and the 25rem
+                   cap no longer binds. Above it the cap always wins.
+                   Recompute this if --gutter changes.
+
+                   The variants are generated, not exported by hand:
+                     dwebp roy-eyal.webp -o full.png
+                     sips -Z 800 full.png
+                     cwebp -q 82 full.png -o roy-eyal-800.webp
+                   Re-run from a true original if one ever exists; these
+                   are downscaled from the 1113 webp, which is already
+                   lossy. -->
               <img
                 src="/images/roy-eyal.webp"
+                srcset="
+                  /images/roy-eyal-400.webp  400w,
+                  /images/roy-eyal-800.webp  800w,
+                  /images/roy-eyal.webp     1113w
+                "
+                sizes="(max-width: 27.5rem) calc(100vw - 2.5rem), 25rem"
                 alt="Roy Eyal — professional headshot"
                 width="1113"
                 height="1113"

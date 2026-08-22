@@ -231,6 +231,30 @@ export function initStrands(container, options = {}) {
    * page, and the mobile URL bar collapsing — which notably does NOT
    * reliably fire window.resize on iOS.
    */
+  /* ---- How many device pixels the shader is allowed to fill ---------
+   * Fragment cost scales with PIXEL COUNT, so this is the single biggest
+   * lever on how expensive the hero is: dpr 2 is four times the work of
+   * dpr 1, for the same visible area.
+   *
+   * Desktop keeps 2 — it has the headroom, and the strands are crisper
+   * for it. Phones are pinned to 1, where the same shader costs a
+   * quarter as much. PageSpeed emulates a Moto G Power at dpr ~2.6, so
+   * before this it was rendering the full-screen shader at 4x the
+   * fragments on exactly the class of device least able to afford it.
+   *
+   * This is a soft, blurred glow — no text, no hard edges, nothing with
+   * a high-frequency detail that a lower sample rate would visibly cost.
+   * It is the rare effect where dropping resolution is close to free.
+   *
+   * 51.25rem is the same breakpoint sections.css uses to collapse the
+   * about grid, so "phone" means one thing across the codebase.
+   */
+  const MOBILE_BREAKPOINT = 51.25 * 16; // rem -> px, matches sections.css
+  const targetDpr = () =>
+    window.innerWidth <= MOBILE_BREAKPOINT
+      ? 1
+      : Math.min(window.devicePixelRatio || 1, 2);
+
   function resize() {
     const width = container.offsetWidth;
     const height = container.offsetHeight;
@@ -241,8 +265,10 @@ export function initStrands(container, options = {}) {
     if (width === 0 || height === 0) return;
 
     /* Re-read each time so dragging the window between a retina and a
-       non-retina display is handled, not just the startup value. */
-    renderer.dpr = Math.min(window.devicePixelRatio || 1, 2);
+       non-retina display is handled, not just the startup value — and
+       now also so rotating a tablet across the breakpoint re-rates the
+       shader rather than keeping whatever it booted with. */
+    renderer.dpr = targetDpr();
     renderer.setSize(width, height);
 
     /* uResolution must be in DEVICE pixels, not CSS pixels. The fragment
