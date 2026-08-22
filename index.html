@@ -3,7 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Opts the root font-size into the reader's OS/browser text-scale
+         setting (CSS Fonts; Chromium 146+, ignored elsewhere). Everything
+         on this page is sized in rem off :root, so it scales as a unit
+         rather than shearing — and the bottom nav re-measures itself on
+         resize (nav.js), so its pill geometry follows rather than
+         sticking at the old width.
+         Worth re-checking the hero on a real Android handset at 150-200%
+         before assuming it holds: it is the one block tight enough that
+         the display type could collide. Reverting is deleting this tag. -->
+    <meta name="text-scale" content="scale" />
     <title>Roy Eyal — Marketing Web Developer</title>
+
+    <!-- Font preloads. These two faces are in the critical path: Tektur
+         paints the hero headline (the LCP element) and Satoshi paints
+         every word of body copy. Without a preload the browser cannot
+         discover either until it has downloaded AND parsed the
+         stylesheet, which measured as a full round trip of dead time on
+         this page — locally only ~7ms, but a round trip is 50-150ms on
+         real mobile.
+
+         `crossorigin` is REQUIRED, not decorative: fonts are fetched in
+         CORS mode even from our own origin, and a preload without it is
+         treated as a different request than the one @font-face makes —
+         so the file is downloaded TWICE and the preload makes things
+         worse. If you add a face here, it needs this attribute.
+
+         Departure Mono is deliberately NOT preloaded. It sets small
+         terminal accents rather than the headline or body, and a third
+         preload competes with the JS for the same early bandwidth.
+
+         These paths only work because the files sit in public/fonts/
+         rather than src/assets/ — see the note at the top of
+         src/styles/fonts.css. -->
+    <link
+      rel="preload"
+      href="/fonts/Tektur-Latin-wght.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/Satoshi-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <meta
       name="description"
       content="Roy Eyal is a marketing web developer who closes the gap between design and production — Figma-to-code design systems, hand-built marketing sites, and AI workflows. Previously at Elementor and Wix, currently at Lusha."
@@ -13,6 +59,17 @@
          this tag is the belt to that braces, and covers anything that
          reaches the page without following the redirect. -->
     <link rel="canonical" href="https://royeyal.com/" />
+    <!-- The same page as Markdown, for LLMs and the agent tooling that
+         now does the first-pass read on a candidate. Generated at build
+         time from this file by build/llms-txt.js — never edit the output
+         by hand, and never let it be written separately, or the CV in it
+         goes stale. /llms.txt is the better-established path than a
+         sibling .md, so the alternate points there. -->
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://royeyal.com/llms.txt"
+    />
     <!-- SVG first: it's the R monogram cut from royeyal-logo.svg (the same
          ANSI wordmark the hero masks), transparent, so it sits correctly on
          both a light and a dark tab strip with no second file and no
@@ -70,6 +127,67 @@
       name="twitter:image:alt"
       content="ROY EYAL in ANSI block letters, cyan fading to magenta on black, above the line: Marketing Web Developer"
     />
+
+    <!-- Structured data. The OG block above is for humans looking at an
+         unfurled card; this is the same claim in a form machines parse —
+         search engines for the knowledge graph, and increasingly the AI
+         tools doing the first-pass read on a candidate. For a CV site
+         that is the whole audience, so it is worth the duplication.
+
+         Person is the primary entity, not WebSite: the site is about a
+         person, and the @id lets the two reference each other rather
+         than floating as unrelated blobs.
+
+         Keep this in sync with the work cards below. Every value here
+         is already stated in the visible page — schema.org that
+         contradicts the rendered copy is a manual-action risk, not a
+         ranking trick. The email is likewise already public further
+         down (the mailto fallback under the copy button), so this adds
+         no new exposure to scrapers. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://royeyal.com/#website",
+            "url": "https://royeyal.com/",
+            "name": "Roy Eyal",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://royeyal.com/#roy" }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://royeyal.com/#roy",
+            "name": "Roy Eyal",
+            "url": "https://royeyal.com/",
+            "image": "https://royeyal.com/og.png",
+            "email": "mailto:hello@royeyal.com",
+            "jobTitle": "Marketing Web Developer",
+            "description": "Marketing web developer who closes the gap between design and production \u2014 Figma-to-code design systems, hand-built marketing sites, and AI workflows.",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "Lusha",
+              "url": "https://www.lusha.com"
+            },
+            "knowsAbout": [
+              "Design systems",
+              "Front-end development",
+              "Marketing websites",
+              "Figma",
+              "SCSS",
+              "Webflow",
+              "WordPress"
+            ],
+            "sameAs": [
+              "https://www.linkedin.com/in/royeyalcom/",
+              "https://github.com/royeyal"
+            ],
+            "mainEntityOfPage": { "@id": "https://royeyal.com/#website" }
+          }
+        ]
+      }
+    </script>
 
     <script type="module" src="/src/main.js"></script>
   </head>

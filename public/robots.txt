@@ -1,0 +1,15 @@
+# royeyal.com
+#
+# One page, nothing private, nothing to keep out. This file exists so
+# that /robots.txt returns a 200 with two lines instead of falling
+# through to the Workers asset server's 404.html — a crawler that gets
+# HTML where it expected text/plain is a crawler that logs an error
+# against the site.
+#
+# Add a Disallow here if the site ever grows a staging path. Add the
+# Sitemap line back if it ever grows a second page; a sitemap listing a
+# single URL that is already the canonical root tells Google nothing it
+# does not know.
+
+User-agent: *
+Allow: /

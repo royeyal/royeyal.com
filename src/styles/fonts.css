@@ -6,6 +6,18 @@
    rather than npm-imported, because @fontsource-variable/* packages
    ship no per-subset entrypoint and the bare import pulls all six
    subsets (Cyrillic, Greek, Vietnamese, latin-ext).
+   ---
+
+   These live in public/fonts/, NOT src/assets/. Vite content-hashes
+   anything it bundles, and a hashed filename cannot be named in a
+   <link rel="preload"> written by hand — so the browser could not start
+   fetching a face until it had parsed this stylesheet, one round trip
+   late. public/ is copied to dist/ verbatim, which buys the stable URLs
+   that index.html preloads.
+
+   The cost of that trade is that these filenames are no longer
+   cache-busted. If you ever replace a face, RENAME THE FILE (e.g.
+   Satoshi-Variable-2.woff2) — see the /fonts/* rule in public/_headers.
    ------------------------------------------------------------------ */
 
 /* Tektur (Google) — display / headings. Variable weight 400-900.
@@ -13,7 +25,7 @@
    don't add font-variation-settings: 'wdth', it would be a no-op. */
 @font-face {
   font-family: 'Tektur Variable';
-  src: url('../assets/fonts/Tektur-Latin-wght.woff2') format('woff2');
+  src: url('/fonts/Tektur-Latin-wght.woff2') format('woff2');
   font-weight: 400 900;
   font-style: normal;
   font-display: swap;
@@ -29,7 +41,7 @@
    copy in Black. */
 @font-face {
   font-family: 'Satoshi Variable';
-  src: url('../assets/fonts/Satoshi-Variable.woff2') format('woff2');
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
   font-weight: 300 900;
   font-style: normal;
   font-display: swap;
@@ -41,7 +53,7 @@
    actually renders in. Delete this block once the choice is settled. */
 @font-face {
   font-family: 'Switzer Variable';
-  src: url('../assets/fonts/Switzer-Variable.woff2') format('woff2');
+  src: url('/fonts/Switzer-Variable.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -51,7 +63,7 @@
    browser would fake it and ruin the pixel grid. */
 @font-face {
   font-family: 'Departure Mono';
-  src: url('../assets/fonts/DepartureMono-Regular.woff2') format('woff2');
+  src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;

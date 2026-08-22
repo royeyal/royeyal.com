@@ -1,0 +1,298 @@
+/* ------------------------------------------------------------------
+   Print
+
+   This site is a CV, so Cmd+P is a real path, not an afterthought — the
+   printed page is the artefact someone hands to a hiring panel. The
+   goal is a plain, legible, ink-cheap document, NOT a screenshot of the
+   dark site.
+
+   Loaded last in main.css so these rules win on source order. The
+   !important flags are not defensive habit: they are beating GSAP's
+   inline styles and a deliberately blunt colour reset. Both are noted
+   where they appear.
+   ------------------------------------------------------------------ */
+
+@media print {
+  /* ---- Page box -------------------------------------------------
+     Margins on the page box rather than the body: the UA puts its
+     headers and footers (URL, date, page numbers) in this space, which
+     is exactly what a printed CV wants along the bottom. */
+  @page {
+    margin: 18mm 16mm;
+  }
+
+  /* The site is `color-scheme: dark` (base.css:13). Left alone the
+     printed page inherits dark form controls and some engines try to
+     honour the dark ground. */
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    font-size: 11pt;
+    line-height: 1.45;
+    /* The screen layout hides horizontal overflow; in print that clips
+       a wide element instead of letting it wrap onto the page. */
+    overflow: visible;
+  }
+
+  /* ---- GSAP inline styles ---------------------------------------
+     NOT cosmetic — without this the print is mostly BLANK.
+
+     animations.js reveals every [data-reveal] with gsap.from({opacity:0})
+     driven by ScrollTrigger. `.from()` renders its start state
+     immediately, so everything the reader has not scrolled past yet is
+     carrying an inline `opacity: 0` when they hit print. Measured on a
+     cold load: 8 of 22 reveal elements, including the whole freelance
+     grid. Inline styles beat any stylesheet rule, so !important is the
+     only thing that reaches them, and printing fires no ScrollTrigger
+     refresh so there is no JS-side fix to prefer. */
+  [data-reveal],
+  [data-hero],
+  [data-giant],
+  [data-step-timeline-item],
+  .step-timeline__fill {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  /* ---- Flatten every painted surface ----------------------------
+     Deliberately a blanket rule rather than a list of components.
+     The design paints in a lot of places — .hero, .btn, .chip, the
+     timeline markers and line, the work and project cards — and every
+     one of them is a dark fill or a cyan/magenta gradient that prints
+     as a black slab. Enumerating them means this file silently rots
+     the next time a component gains a background.
+
+     -webkit-text-fill-color matters as much as color here: the
+     headings are gradients clipped to the glyphs with a transparent
+     fill, so merely setting `color` leaves them invisible on white.
+
+     Anything below that genuinely needs its own colour re-states it
+     with a class selector, which outranks `*` even at equal
+     importance. */
+  *,
+  *::before,
+  *::after {
+    background: none !important;
+    background-color: transparent !important;
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-color: #ccc !important;
+    /* Card and panel rounding reads as a screen affordance on paper. */
+    border-radius: 0 !important;
+  }
+
+  /* The reset above makes the root transparent too, which leaves the
+     paper ground up to `color-scheme` and to whether the reader ticked
+     "Background graphics" in the print dialog. Both give white in
+     practice, but neither is worth depending on. An element selector
+     outranks `*`, so this needs no help to win. */
+  html,
+  body {
+    background-color: #fff !important;
+  }
+
+  /* ---- Screen-only furniture ------------------------------------
+     The WebGL strand field, the CRT scanline overlay, the scroll hint
+     and the floating nav are pure atmosphere. The giant footer
+     wordmark is a full-bleed slab. The primary hero button is an
+     in-page scroll anchor ("What I do ↓") — a control, and a dead one
+     once the page is paper. The LinkedIn and GitHub buttons beside it
+     are real destinations and stay. */
+  .hero__bg,
+  .hero__scanlines,
+  .hero__hint,
+  .bottom-nav,
+  .footer__giant,
+  .btn--primary,
+  [data-sound-toggle] {
+    display: none !important;
+  }
+
+  /* ---- The masked ANSI wordmark ---------------------------------
+     .ansi-logo is an empty div painted by a CSS mask over a gradient.
+     The reset above already removed the gradient, which would leave a
+     blank box; drop the mask too and substitute the text it already
+     announces to screen readers (role="img" aria-label="ROY EYAL"
+     in index.html). */
+  .ansi-logo {
+    mask: none !important;
+    -webkit-mask: none !important;
+    block-size: auto !important;
+    inline-size: auto !important;
+  }
+
+  .ansi-logo::after {
+    content: 'ROY EYAL';
+    font-family: var(--font-display);
+    font-size: 26pt;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---- Secondary text -------------------------------------------
+     Class selectors, so they outrank the `*` reset above without
+     needing to come later. Grey rather than black keeps the hierarchy
+     the dark design gets from --text-muted. */
+  .eyebrow,
+  .section__lede,
+  .hero__sub,
+  .step-timeline__p,
+  .work-card__years,
+  .mono {
+    color: #444 !important;
+    -webkit-text-fill-color: #444 !important;
+  }
+
+  /* The skill chips lose their raised surface to the reset, so give
+     them an outline or they run together as loose words. */
+  .chip {
+    border: 0.75pt solid #bbb !important;
+    padding: 1pt 4pt;
+  }
+
+  .work-card {
+    border-block-end: 0.75pt solid #ccc !important;
+    padding-inline: 0;
+  }
+
+  /* The remaining hero buttons (LinkedIn, GitHub) are real
+     destinations, so they stay — but a pill with a border reads as a
+     control on paper, and the fixed screen height clips the URL suffix
+     the link rule appends. Strip them back to plain underlined links
+     and let them size to their content. */
+  .btn {
+    border: 0 !important;
+    padding: 0 !important;
+    block-size: auto !important;
+    min-block-size: 0 !important;
+  }
+
+  .hero__actions {
+    display: block !important;
+  }
+
+  /* ---- Links ----------------------------------------------------
+     A printed link is dead unless the URL is on the page. Only
+     external http(s) links get the treatment — expanding the in-page
+     "#about" anchors would be noise.
+
+     The project cards wrap their whole body in one link, so the URL
+     lands after the description rather than beside the name. That
+     reads fine, and the alternative is duplicating every href into a
+     data-* attribute purely so attr() can reach it from the title. */
+  a {
+    text-decoration: underline;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    /* Deliberately NOT var(--font-mono). Departure Mono is a pixel face
+       built for a screen grid; at 8pt on paper its slashes and dots
+       smear, and this is the one string on the page a reader may have
+       to retype by hand. A plain system mono keeps the monospace
+       texture and stays legible. */
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 8pt;
+    font-weight: 400;
+    word-break: break-all;
+    color: #555 !important;
+    -webkit-text-fill-color: #555 !important;
+  }
+
+  /* ---- The copy-to-clipboard email ------------------------------
+     .footer__mail is a <button>, not a link — on paper it should read
+     as plain text. .clip__done is the "Copied" state stacked behind
+     the address; left visible it prints on top of it. The mailto
+     escape hatch underneath is a control too, and the address is
+     already right there. */
+  .footer__mail {
+    border: 0 !important;
+    font-size: 14pt;
+    padding: 0;
+  }
+
+  .clip__done,
+  .clip__icons,
+  .footer__mailto {
+    display: none !important;
+  }
+
+  /* The blinking block caret after the terminal lines is an animation
+     that cannot animate on paper — it prints as a solid ink rectangle
+     mid-sentence. There are three (hero hint, about, footer). */
+  .cursor {
+    display: none !important;
+  }
+
+  /* ---- Images ---------------------------------------------------
+     The freelance grid is six full-bleed dark screenshots — the single
+     biggest ink cost on the document, and nothing a hiring manager
+     needs from a printout when the name and URL survive above them.
+     To keep them, delete this block; the cards are already sized to
+     fit the column. */
+  .project-card__media {
+    display: none !important;
+  }
+
+  /* ---- Density ---------------------------------------------------
+     The screen rhythm is 77px of block padding per section, which is
+     right for scrolling and profligate on paper — across five sections
+     it is most of a sheet of whitespace. The portrait is the other
+     offender: unconstrained it fills a page on its own. Capping it by
+     height (not width) keeps the figure's aspect ratio intact. */
+  .section {
+    padding-block: 1.5rem !important;
+  }
+
+  .about__portrait img {
+    max-block-size: 70mm;
+    inline-size: auto;
+  }
+
+  /* ---- Pagination -----------------------------------------------
+     Keep a card, a timeline step or a heading off a page boundary. */
+  .work-card,
+  .project-card,
+  [data-step-timeline-item],
+  .about__copy {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  /* orphans/widows do nothing on screen but print engines honour them */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Four work cards plus six projects overflow one sheet regardless, so
+     the breaks may as well fall somewhere deliberate. */
+  .work,
+  .freelance,
+  .footer {
+    break-before: page;
+  }
+
+  /* The hero is the cover. On screen it is a full-viewport moment: the
+     height comes from 176px of block padding on .hero__inner, not from
+     a min-height on .hero, so that is what has to be trimmed — left
+     alone it prints as most of a blank first sheet. */
+  .hero {
+    min-block-size: auto !important;
+  }
+
+  .hero__inner {
+    padding-block: 0 1rem !important;
+  }
+}

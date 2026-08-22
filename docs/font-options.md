@@ -13,7 +13,7 @@
 > than left to rot; if the decision is ever revisited, the steps are at
 > the bottom of this file.
 
-Currently live (all free, all self-hosted from `src/assets/fonts/`, latin
+Currently live (all free, all self-hosted from `public/fonts/`, latin
 only): **Tektur** (display/headings, variable wght 400–900), **Satoshi
 Variable** (body, wght 300–900), **Departure Mono** (terminal accents).
 
@@ -98,7 +98,7 @@ Notes:
 Kept for reference only — see the decision note at the top. Swapping the
 display face is four steps:
 
-1. Drop the woff2 into `src/assets/fonts/`.
+1. Drop the woff2 into `public/fonts/`.
 2. Add an `@font-face` block in `src/styles/fonts.css` alongside the
    existing three.
 3. In `src/styles/tokens.css` set

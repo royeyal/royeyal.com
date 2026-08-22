@@ -24,7 +24,7 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
   behind a click would regress the same way. Loaded lazily, so it costs
   nothing unless enabled
 - Self-hosted fonts, no font CDN, **latin subset only** (this site is US
-  English) — all three live in `src/assets/fonts/` and are declared in
+  English) — all three live in `public/fonts/` and are declared in
   `src/styles/fonts.css`:
   - **Tektur** — display/headings, variable weight 400–900
   - **Satoshi Variable** — body, variable weight 300–900. The range in the
@@ -62,7 +62,8 @@ src/main.css           imports the style layers
 src/styles/            fonts / tokens / base / clipboard / sections /
                        timeline / footer / nav
 src/styles/fonts.css   self-hosted @font-face declarations
-src/assets/fonts/      the three woff2 files themselves
+public/fonts/         the woff2 files themselves (public/ so the URLs stay
+                       stable enough for index.html to preload them)
 src/js/strands.js      WebGL hero background (ogl)
 src/js/animations.js   GSAP hero intro, reveals, nav reveal + section indicator
 src/js/timeline.js     GSAP scroll-highlighted "four disciplines" timeline
