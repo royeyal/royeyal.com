@@ -318,6 +318,13 @@ a {
   border: var(--border-w) solid transparent;
   border-radius: var(--radius-chip);
   padding: 0.375rem 0.625rem;
+  /* The padding above lands this at 23px tall — one pixel under the
+     24x24 floor in WCAG 2.2 SC 2.5.8, which is a silly way to fail it.
+     min-height rather than more padding so the label keeps its optical
+     spacing inside the chip. */
+  min-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
@@ -399,6 +406,29 @@ body {
 .work-card__role,
 .work-card__years {
   min-width: 0;
+}
+
+/* Visually hidden, still in the document. Named to match the identical
+   rule public/404.html carries inline — that page is standalone and
+   cannot import this sheet, so the duplication is deliberate; keep the
+   two in step.
+
+   `clip-path: inset(50%)` rather than the old `clip: rect(...)`, and
+   `white-space: nowrap` so a long string cannot be collapsed into a 1px
+   column and read out one character per line by some screen readers.
+
+   NOT display:none and NOT visibility:hidden — both remove the element
+   from the accessibility tree, which is the exact opposite of the point. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 :focus-visible {

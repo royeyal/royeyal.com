@@ -246,6 +246,19 @@ would make the whole setup scriptable from the repo.
       tab strips. At 16px it is soft; that is accepted, because 16px CSS
       is 32px physical on retina, where it's clean.
 - [x] **apple-touch-icon** — 180×180, opaque, square-cornered.
+- [x] **Search favicon** — `public/icon-96.png`, `public/icon-192.png`
+      and a real `public/favicon.ico` (which used to 404). These are a
+      SEPARATE problem from the tab icons above, not a duplicate of them:
+      Google composites onto its own plate and clips to a rounded square,
+      which turns the tab icon's two virtues into faults — transparency
+      puts magenta hairlines on white at 16px, and an edge-to-edge glyph
+      loses its corners to the crop. So these carry an opaque `#05060a`
+      plate with the R inset to 68%. Generated from
+      [`docs/favicon-source.html`](./docs/favicon-source.html) (Chrome
+      command in its header) and packed into the `.ico` by
+      [`build/favicon-ico.js`](./build/favicon-ico.js) — not hand-drawn,
+      and not wired into `npm run build`, because they change on a
+      rebrand and never otherwise.
 - [x] **Link preview** — `public/og.png` (1200×630) plus the OG and
       Twitter tags in `<head>`. This site's job is being pasted into a
       LinkedIn message or an email to a hiring manager, so the unfurled

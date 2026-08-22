@@ -50,9 +50,35 @@
       type="font/woff2"
       crossorigin
     />
+    <!-- Kept under ~160 characters. Google truncates the snippet around
+         there on desktop and nearer 120 on mobile, and the previous 217-
+         character version was being cut mid-sentence — the "Previously at
+         Elementor and Wix" proof never survived to the SERP.
+
+         Deliberately does NOT repeat the <title> above it. The title
+         already says "Roy Eyal — Marketing Web Developer" directly over
+         this line, so restating the name here would spend a third of the
+         budget on a word the reader has just read. The space goes to the
+         employer names instead, which are the part a recruiter scans for.
+
+         NOTE: build/llms-txt.js reads this attribute verbatim for the
+         blockquote at the top of /llms.txt, and the og:description below
+         becomes the line directly under it. That is why this one stops
+         at "AI workflows" instead of finishing the thought — the longer
+         ending repeated og:description's closing clause word for word,
+         two lines apart, in the generated file.
+
+         Alternates that were measured and rejected, kept so the swap is
+         one paste (all fit the budget):
+           160 "Roy Eyal — marketing web developer. Figma-to-code design
+                systems, hand-built marketing sites and AI workflows.
+                Currently at Lusha; previously Wix and Elementor."
+           143 "I build the marketing web: Figma-to-code design systems,
+                hand-coded sites and AI workflows. A decade shipping for
+                Elementor, Wix and now Lusha." -->
     <meta
       name="description"
-      content="Roy Eyal is a marketing web developer who closes the gap between design and production — Figma-to-code design systems, hand-built marketing sites, and AI workflows. Previously at Elementor and Wix, currently at Lusha."
+      content="Marketing web developer at Lusha, ex-Wix and Elementor. Figma-to-code design systems, hand-built marketing sites, and AI workflows."
     />
     <meta name="theme-color" content="#05060a" />
     <!-- Apex is canonical. www 301s here via a Cloudflare Redirect Rule;
@@ -79,6 +105,30 @@
          <style> block inside the SVG. -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- The SEARCH-facing icons, which are a different problem from the
+         two above. Those are tab icons: transparent, so they sit on a
+         light or a dark tab strip, and drawn edge to edge because a tab
+         does not crop.
+
+         Google composites onto its own plate and clips to a rounded
+         square, which turns both of those properties into faults —
+         magenta hairlines land on white at ~16px, and the crop takes the
+         corners off an edge-to-edge R. These are the same mark on an
+         opaque #05060a plate with the glyph inset to 68%, so it survives
+         the crop. `sizes` is declared so the choice between them is
+         Google's to make on the surface rather than a guess.
+
+         Both are generated — docs/favicon-source.html is the source and
+         carries the Chrome command. Do not hand-edit them.
+
+         There is also a real /favicon.ico now (it used to 404). It is
+         deliberately NOT declared here: root favicon.ico is found by
+         convention, and its whole job is the clients that ask before
+         parsing any HTML, so a link tag would add nothing and only make
+         the declared set ambiguous. -->
+    <link rel="icon" type="image/png" sizes="96x96" href="/icon-96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <!-- 180x180, opaque, square-cornered — iOS applies its own mask, so a
          pre-rounded source would get rounded twice. Verified: alpha 255 at
          all four corners, centre is exactly #F900B9. -->
@@ -258,12 +308,28 @@
       <div class="hero__inner container">
         <!-- ANSI logo (public/images/royeyal-logo.svg, currentColor) applied
              as a CSS mask so the cyan→magenta gradient comes from CSS -->
-        <div
-          class="ansi-logo"
-          data-hero="logo"
-          role="img"
-          aria-label="ROY EYAL"
-        ></div>
+        <!-- The name is REAL TEXT in the document, not an aria-label.
+             Both give a screen reader "Roy Eyal", but an aria-label is
+             the weaker of the two everywhere else: it cannot be found
+             with Ctrl+F, cannot be selected or copied, is skipped by
+             browser translation, and is read only weakly by search
+             engines. On a CV site whose own name is drawn as a picture,
+             all four of those matter.
+
+             So: no role="img" and no aria-label — either would suppress
+             the span below, since aria-label overrides an element's
+             contents. The span IS the accessible name now.
+
+             The mask on .ansi-logo does apply to descendants at paint
+             time, but that is irrelevant here: .sr-only paints nothing
+             either way. Verified the geometry is untouched, so the span
+             cannot disturb the wordmark's layout.
+
+             print.css swaps this whole block for ::after text — see the
+             note there before changing either one. -->
+        <div class="ansi-logo" data-hero="logo">
+          <span class="sr-only">Roy Eyal</span>
+        </div>
 
         <p class="eyebrow" data-hero="eyebrow">Marketing Web Developer</p>
 
@@ -493,11 +559,18 @@
             </div>
 
             <figure class="about__portrait" data-reveal>
+              <!-- Lazy because it is well below the fold: eagerly this
+                   43 kB file competes with the hero's fonts and JS for
+                   the first round trip, and it cannot be the LCP element
+                   from down here. decoding="async" keeps the decode off
+                   the main thread, matching the project shots below. -->
               <img
                 src="/images/roy-eyal.webp"
                 alt="Roy Eyal — professional headshot"
                 width="480"
                 height="560"
+                loading="lazy"
+                decoding="async"
               />
               <figcaption class="mono">
                 hello@royeyal.com:~$ whoami<span class="cursor">▌</span>
@@ -1029,10 +1102,14 @@
             >
           </button>
 
+          <!-- "Menu", not "open menu": aria-expanded next to it already
+               carries the state, and a name that says "open" while the
+               panel IS open contradicts it. The accessible name is the
+               thing, not the action. -->
           <button
             data-bottom-nav-toggle
             aria-expanded="false"
-            aria-label="open menu"
+            aria-label="Menu"
             class="bottom-nav__toggle"
             type="button"
           >

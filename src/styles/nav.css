@@ -130,6 +130,11 @@
   /* The R is portrait (68.9x94.7), so height drives it — at 1.5rem it
      came out only 17px wide and read as a speck beside the label. */
   height: 1.75rem;
+  /* ...which leaves it 20px WIDE, under the 24x24 CSS px floor in WCAG
+     2.2 SC 2.5.8. min-width pads the hit area out to 24 without touching
+     the SVG, which stays 20px and centred by the justify-content above —
+     so the control gets bigger and the mark does not. */
+  min-width: 1.5rem;
   flex: none;
   display: flex;
 }

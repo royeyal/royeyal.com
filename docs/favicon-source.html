@@ -1,0 +1,109 @@
+<!doctype html>
+<!--
+  SOURCE FOR the raster favicons: public/icon-96.png, public/icon-192.png
+  and the 16/32/48 frames packed into public/favicon.ico.
+
+  WHY THIS EXISTS AND public/favicon.svg IS NOT ENOUGH.
+
+  favicon.svg is right for a browser tab: transparent, so it sits on a
+  light or a dark tab strip, and vector, so it stays crisp. Google's
+  search result is a different surface with the opposite requirements —
+  it composites the icon onto its own plate and clips it to a rounded
+  square, which does two things to the tab icon:
+
+    1. Transparent background means the magenta hairlines of the ANSI R
+       land directly on Google's white plate at ~16px. Thin magenta on
+       white is the worst-contrast case the mark has.
+    2. The tab icon's glyph runs edge to edge (measured: the opaque
+       bounding box of favicon.png is y=1..510 of 512). A rounded crop
+       therefore cuts the corners off the R.
+
+  So this file draws the SAME mark on an opaque plate with a real safe
+  margin. Two deliberate departures from public/apple-touch-icon.png,
+  which uses the same magenta-R-on-dark treatment:
+
+    - FLAT background, not the starfield. The stars read at 180px and
+      turn to grey mud at 16px, which is the size that actually matters
+      here.
+    - 68% glyph box. That is the largest inset where a circular crop
+      (some surfaces round all the way) still misses every corner of the
+      R while the mark stays big enough to read at 16px.
+
+  Regenerate from the repo root — one command per size, because Chrome
+  writes exactly the window it is given:
+
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    for S in 16 32 48 96 192; do
+      "$CHROME" --headless --disable-gpu --no-sandbox \
+        --allow-file-access-from-files --force-device-scale-factor=1 \
+        --hide-scrollbars --window-size=$S,$S --virtual-time-budget=2000 \
+        --default-background-color=00000000 \
+        --screenshot=/tmp/icon-$S.png \
+        "file://$PWD/docs/favicon-source.html"
+    done
+
+  --force-device-scale-factor=1 matters for the same reason it does in
+  og-image-source.html: without it a retina Mac renders every one of
+  these at 2x.
+
+  build/favicon-ico.js then packs 16/32/48 into public/favicon.ico. The
+  96 and 192 are copied to public/ as-is.
+
+  The logo path is ABSOLUTE on purpose: headless Chrome loads this over
+  file://, where a relative path would resolve against docs/.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* The plate. #05060a is the site's --ink and the same value as the
+         theme-color meta tag, so the icon, the browser chrome and the
+         page all agree on one black. */
+      body {
+        background: #05060a;
+        display: grid;
+        place-items: center;
+      }
+
+      /* public/favicon.svg is used directly as an <img> rather than as
+         a CSS mask. The file already carries fill="#F900B9", so there is
+         nothing for CSS to colour, and an <img> keeps this source
+         honest: whatever the browser tab shows is exactly what gets
+         rasterised here. The mark changes in one place, not two.
+
+         68% SQUARE. favicon.svg's viewBox is "-12.9 0 94.7 94.7" — a
+         square box with the R already centred inside it — so a square
+         element reproduces the mark's own proportions and no object-fit
+         is needed. Do NOT switch either axis to `auto`: an SVG carrying
+         no width/height attribute falls back to the 300px
+         replaced-element default and blows straight past the canvas.
+
+         Why 68% and not larger: inside that box the R reaches +/-34% of
+         the canvas vertically and +/-24.8% horizontally from centre, so
+         its furthest corner sits 42.1% from centre. A circular crop
+         removes everything past 50%, so the mark clears even that — and
+         comfortably clears the gentler rounded square Google uses. */
+      .mark {
+        width: 68%;
+        height: 68%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <img
+      class="mark"
+      src="file:///Users/royeyal/Documents/GitHub/royeyal.com/.claude/worktrees/site-seo-audit-4f4949/public/favicon.svg"
+      alt=""
+    />
+  </body>
+</html>

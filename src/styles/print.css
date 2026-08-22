@@ -115,11 +115,18 @@
   }
 
   /* ---- The masked ANSI wordmark ---------------------------------
-     .ansi-logo is an empty div painted by a CSS mask over a gradient.
-     The reset above already removed the gradient, which would leave a
-     blank box; drop the mask too and substitute the text it already
-     announces to screen readers (role="img" aria-label="ROY EYAL"
-     in index.html). */
+     .ansi-logo is a div painted by a CSS mask over a gradient. The reset
+     above already removed the gradient, which would leave a blank box;
+     drop the mask too and substitute the name as text.
+
+     It holds a <span class="sr-only">Roy Eyal</span> — the accessible
+     name, which used to be an aria-label. That span stays hidden here
+     rather than being un-hidden and reused, because .sr-only strips it
+     to a 1px absolutely-positioned box and restoring it to a printable
+     line would take more rules than the ::after below. Two spellings of
+     one name, one of which is never visible, is the cheaper trade.
+
+     If the name in index.html changes, change it here too. */
   .ansi-logo {
     mask: none !important;
     -webkit-mask: none !important;
