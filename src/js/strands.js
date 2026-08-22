@@ -207,6 +207,11 @@ export function initStrands(container, options = {}) {
     '(prefers-reduced-motion: reduce)'
   ).matches;
 
+  /* Whether the rAF loop is currently ticking. Declared up here because
+     resize() below has to know: when nothing is looping, resize() is the
+     only thing that will ever repaint the canvas. */
+  let loopRunning = false;
+
   /* ---- Sizing -------------------------------------------------------
    * This listened only for `window.resize`, which was a real bug: after
    * following a link back to the page (from /404, for instance) the hero
@@ -250,10 +255,12 @@ export function initStrands(container, options = {}) {
       height * renderer.dpr,
     ];
 
-    /* Under reduced motion there is no animation loop, so without this a
-       resize would leave the single startup frame stretched at the old
-       size forever. */
-    if (reducedMotion) renderer.render({ scene: mesh });
+    /* When no loop is ticking, this is the ONLY thing that repaints, so
+       without it a resize leaves the last frame stretched at the old
+       size. Two ways to be in that state, and `!loopRunning` covers
+       both: reduced motion never starts a loop at all, and the hero
+       being scrolled out of view pauses it. */
+    if (!loopRunning) renderer.render({ scene: mesh });
   }
 
   /* observe() fires once immediately, but resize() is also called
@@ -264,22 +271,86 @@ export function initStrands(container, options = {}) {
   resize();
 
   let animateId = 0;
+  let visibilityObserver = null;
 
   if (reducedMotion) {
     // one static, pretty frame — no animation loop
     program.uniforms.uTime.value = 12;
     renderer.render({ scene: mesh });
   } else {
+    /* ---- The loop, and why it stops ---------------------------------
+     * This shader used to run unconditionally for as long as the tab was
+     * open. On a page this tall the hero is one screen of roughly nine,
+     * so the overwhelming majority of a session was spent rendering a
+     * full-screen fragment shader nobody could see. PageSpeed measured
+     * the cost on a throttled mobile CPU: 31.5s of Total Blocking Time
+     * and 20 long tasks of ~300ms each, the last of them starting 39
+     * SECONDS into the trace. Almost none of that was script — it was
+     * GPU and raster work, repeated forever.
+     *
+     * So the loop is gated on an IntersectionObserver: it ticks while
+     * any part of the hero is on screen and stops when it is not.
+     *
+     * A hidden TAB is already handled for free — browsers do not fire
+     * requestAnimationFrame in one — which is the other half of the same
+     * problem and needs no code here.
+     */
+
+    /* uTime is accumulated rather than taken from the rAF timestamp.
+       That timestamp is time since navigation, which keeps advancing
+       while we are paused — so resuming with it would jump the animation
+       forward by however long the reader spent further down the page,
+       and the strands would visibly snap. Summing deltas instead means
+       paused time simply does not exist to the shader, and scrolling
+       back resumes exactly where it left off. */
+    let clock = 0;
+    let previous = 0;
+
     const update = (t) => {
       animateId = requestAnimationFrame(update);
-      program.uniforms.uTime.value = t * 0.001;
+      /* First frame of a run has no predecessor, so assume one frame at
+         60fps. The clamp covers the other direction: returning to a
+         backgrounded tab can hand us a delta of many seconds, and
+         without it that would land as the very jump this accumulator
+         exists to avoid. */
+      const delta = previous ? Math.min(t - previous, 50) : 16.7;
+      previous = t;
+      clock += delta;
+      program.uniforms.uTime.value = clock * 0.001;
       renderer.render({ scene: mesh });
     };
-    animateId = requestAnimationFrame(update);
+
+    const start = () => {
+      if (loopRunning) return;
+      loopRunning = true;
+      previous = 0; // resume from a fresh delta, not one spanning the pause
+      animateId = requestAnimationFrame(update);
+    };
+
+    const stop = () => {
+      if (!loopRunning) return;
+      loopRunning = false;
+      cancelAnimationFrame(animateId);
+      animateId = 0;
+    };
+
+    if (typeof IntersectionObserver === 'function') {
+      /* Fires once on observe(), so the initial state is handled here
+         too — including a deep link that lands past the hero, where the
+         loop correctly never starts. */
+      visibilityObserver = new IntersectionObserver(
+        ([entry]) => (entry.isIntersecting ? start() : stop()),
+        { threshold: 0 }
+      );
+      visibilityObserver.observe(container);
+    } else {
+      start();
+    }
   }
 
   return function destroy() {
     cancelAnimationFrame(animateId);
+    visibilityObserver?.disconnect();
     resizeObserver.disconnect();
     if (gl.canvas.parentNode === container) container.removeChild(gl.canvas);
     gl.getExtension('WEBGL_lose_context')?.loseContext();
