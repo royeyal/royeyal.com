@@ -10,14 +10,23 @@
   // is the secret, and that stays gitignored.
   "account_id": "c84d1e6f99329d834a7cb284c20292dd",
 
-  // NOTE: royeyal.com IS attached as a custom domain — it was created by
-  // an earlier deploy and persists in Cloudflare (account-level Worker
-  // domain). It is deliberately NOT declared here: wrangler reconciles a
-  // `routes` key against GET /zones/:id/workers/routes, which this API
-  // token cannot read, so declaring it makes every deploy exit non-zero
-  // even though the upload succeeds. Restore the line below if the token
-  // ever gains Zone -> Workers Routes -> Edit:
-  //   "routes": [{ "pattern": "royeyal.com", "custom_domain": true }],
+  // royeyal.com is declared here as a custom domain, which makes the
+  // attachment part of this file rather than invisible account state.
+  //
+  // It was commented out for a long time, and the reason is worth
+  // keeping: wrangler reconciles this key against
+  // GET /zones/:id/workers/routes, and the previous API token could not
+  // read that endpoint — so declaring it made every deploy exit non-zero
+  // even though the upload had succeeded. The token was reissued on
+  // 2026-08-22 with Zone -> Workers Routes, which is the condition the
+  // old note said to restore this under. Verified against the live API
+  // before uncommenting, not assumed.
+  //
+  // If deploys start exiting non-zero here again, suspect the token
+  // before suspecting the route:
+  //   curl -s https://api.cloudflare.com/client/v4/zones/$ZONE/workers/routes \
+  //     -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+  "routes": [{ "pattern": "royeyal.com", "custom_domain": true }],
   //
   // Apex is canonical — it matches hello@royeyal.com and the footer's
   // terminal prompt. www is a Cloudflare Redirect Rule, not a second
