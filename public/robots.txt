@@ -8,12 +8,11 @@
 # statement about this site at all. Shipping this file replaces that
 # default with our own, and the Content Signals boilerplate goes away.
 #
-# If you WANT the AI signals (search=yes, ai-train=no), that is the
-# "robots.txt setting" toggle under Control AI Crawlers in the zone
-# dashboard — with it on, Cloudflare prepends its managed block to this
-# file rather than replacing it. Worth a thought either way: this site
-# also ships /llms.txt specifically so AI tooling can read the CV, so
-# ai-train=no may not be what you actually want here.
+# DO NOT turn on the "robots.txt setting" toggle under Control AI
+# Crawlers in the zone dashboard. It prepends Cloudflare's managed block
+# to this file, and that block says ai-train=no — the opposite of what
+# the Content-Signal below is asking for. The signals are declared here,
+# in our own file, on purpose.
 #
 # Add a Disallow here if the site ever grows a staging path. Add the
 # Sitemap line back if it ever grows a second page; a sitemap listing a
@@ -21,4 +20,21 @@
 # does not know.
 
 User-agent: *
+
+# Deliberately permissive. This site is a CV whose entire job is being
+# found and read — by recruiters, by search, and increasingly by the AI
+# tooling doing the first pass. That is also why /llms.txt exists. There
+# is nothing here that is not meant to be public.
+#
+#   search:   indexing and excerpting — the obvious yes.
+#   ai-input: feeding the page to a model at query time (RAG, grounding,
+#             AI search answers). This is the one that actually matters
+#             for being found; it is what an assistant asked "who is Roy
+#             Eyal" does.
+#   ai-train: training and fine-tuning. Orthogonal to getting hired and
+#             it neither helps nor hurts, but "open" was the call, and a
+#             public CV is not the thing to be precious about. Flip this
+#             one to `no` if you would rather not, and the other two keep
+#             working — they are independent.
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
