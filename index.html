@@ -563,12 +563,25 @@
                    43 kB file competes with the hero's fonts and JS for
                    the first round trip, and it cannot be the LCP element
                    from down here. decoding="async" keeps the decode off
-                   the main thread, matching the project shots below. -->
+                   the main thread, matching the project shots below.
+
+                   width/height are the FILE's real pixels (1113x1113),
+                   not the display size. They were 480x560, which is a
+                   different aspect ratio to the square source — so the
+                   browser reserved a 6:7 box and then reflowed to a
+                   square when the bytes arrived. The CSS sizes this with
+                   `width:100%; height:auto`, meaning the ratio comes
+                   from the file, so the attributes have to agree with
+                   the file or they are simply wrong.
+
+                   These two numbers exist to reserve the right box
+                   before the image loads. That is all they do here —
+                   they do not size anything. -->
               <img
                 src="/images/roy-eyal.webp"
                 alt="Roy Eyal — professional headshot"
-                width="480"
-                height="560"
+                width="1113"
+                height="1113"
                 loading="lazy"
                 decoding="async"
               />
