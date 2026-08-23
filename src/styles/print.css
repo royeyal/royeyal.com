@@ -103,13 +103,19 @@
      wordmark is a full-bleed slab. The primary hero button is an
      in-page scroll anchor ("What I do ↓") — a control, and a dead one
      once the page is paper. The LinkedIn and GitHub buttons beside it
-     are real destinations and stay. */
+     are real destinations and stay.
+
+     The "One-page CV" button goes too, for a different reason: it is a
+     real destination, but printing this page is the slow way of
+     getting the thing it points at. Offering it on paper points the
+     reader at a better version of the sheet already in their hand. */
   .hero__bg,
   .hero__scanlines,
   .hero__hint,
   .bottom-nav,
   .footer__giant,
   .btn--primary,
+  .hero__actions a[href='/cv'],
   [data-sound-toggle] {
     display: none !important;
   }

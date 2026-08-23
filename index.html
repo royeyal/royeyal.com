@@ -406,6 +406,28 @@
             </svg>
             GitHub
           </a>
+          <!-- The printable one-pager. Internal, so no target/rel — and
+               it is the one control here that is also the site's only
+               unlinked page, which is what makes this link worth having:
+               it is how both a reader and a crawler find /cv at all.
+               print.css hides it, since a link to the CV is noise on a
+               printed copy of the CV. -->
+          <a class="btn btn--ghost" data-cuelume-press="press" href="/cv">
+            <svg
+              class="social-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M3 1.5A1.5 1.5 0 0 1 4.5 0h7A1.5 1.5 0 0 1 13 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 14.5v-13ZM5.5 4h5v1.3h-5V4Zm0 3.35h5v1.3h-5v-1.3Zm0 3.35h3v1.3h-3v-1.3Z"
+              />
+            </svg>
+            One-page CV
+          </a>
         </div>
       </div>
 

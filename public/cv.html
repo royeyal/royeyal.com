@@ -136,7 +136,7 @@
   .band {
     background: #faf8fc;
     border-bottom: 1px solid var(--magenta);
-    padding: 7mm 12mm;
+    padding: 5mm 12mm;
     display: flex;
     align-items: center;
     gap: 6mm;
@@ -181,7 +181,7 @@
     text-align: right;
     font-size: 8pt;
     font-weight: 500;
-    line-height: 1.65;
+    line-height: 1.45;
     color: var(--muted);
   }
   .contact a { color: var(--muted); text-decoration: none; }
@@ -199,7 +199,7 @@
     display: grid;
     grid-template-columns: 128mm 50mm;
     gap: 8mm;
-    padding: 8mm 12mm 10mm;
+    padding: 6mm 12mm 8mm;
     align-items: start;
   }
 
@@ -223,7 +223,7 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ink);
-    margin: 0 0 3mm;
+    margin: 0 0 2.5mm;
   }
   .eyebrow::before {
     content: '';
@@ -242,12 +242,12 @@
     color: var(--ink);
   }
 
-  section + section { margin-top: 6mm; }
+  section + section { margin-top: 5mm; }
 
   /* ================================================================
      Experience
      ================================================================ */
-  .job + .job { margin-top: 4.5mm; }
+  .job + .job { margin-top: 3.5mm; }
 
   .job__head {
     display: flex;
@@ -321,7 +321,7 @@
     letter-spacing: -0.01em;
   }
   .job__points li { position: relative; }
-  .job__points li + li { margin-top: 1.6mm; }
+  .job__points li + li { margin-top: 1.5mm; }
   .job__points li::before {
     content: '';
     position: absolute;
@@ -340,7 +340,7 @@
   /* ================================================================
      Sidebar
      ================================================================ */
-  .side section + section { margin-top: 6mm; }
+  .side section + section { margin-top: 5mm; }
 
   .chips {
     display: flex;
@@ -401,26 +401,67 @@
   }
 
   /* ================================================================
-     Print — the sheet IS the page. No desk, no shadow, no scaling.
+     Print
+
+     THE PAPER MARGIN COMES FROM @page, NOT FROM PADDING INSIDE THE
+     SHEET. This started out the other way round — `margin: 0` plus the
+     sheet's own 12mm padding, so the header band could bleed to the
+     paper edge — and that only works if the browser honours a zero
+     margin exactly. It does in Save-as-PDF with margins set to None,
+     and nowhere else. On default settings the printable box is ~277mm,
+     the sheet was 294.7mm, and it overflowed by 17.7mm.
+
+     The trade-off is that the band no longer reaches the paper edge.
+     That costs nothing real: consumer printers have an unprintable
+     border and cannot do full bleed regardless.
+
+     12mm each way leaves a 186 x 273mm box. The content sits near
+     265mm, so there is ~8mm of genuine slack — where the old layout
+     had 2.3mm and needed perfect settings to use it.
      ================================================================ */
   @page {
     size: A4;
-    margin: 0;
+    margin: 10mm 12mm;
   }
 
   @media print {
     html { color-scheme: light; }
     body { background: #fff; padding: 0; }
     .desk { overflow: visible; padding: 0; }
+
+    /* the page box is already 186 x 273mm — the sheet is only content */
     .sheet {
       width: auto;
       min-height: 0;
       box-shadow: none;
       margin: 0;
     }
-    .band { background: #faf8fc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .mark, .job__logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .job, section { break-inside: avoid; }
+
+    /* @page supplies the side margins now, so the band and the grid
+       drop their own and align to the same two edges. */
+    .band { padding-inline: 0; }
+    .body { padding-inline: 0; padding-bottom: 0; }
+
+    /* Every painted element, or the tint, the magenta squares and the
+       brand-coloured marks all drop out on default print settings. */
+    .band,
+    .mark,
+    .job__logo,
+    .eyebrow::before {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Only things small enough to be worth keeping whole. `section` was
+       in this list, which made the 222mm Experience block indivisible —
+       so the one time it did not fit, the browser moved ALL of it and
+       left page 1's main column blank next to a full sidebar. The worst
+       case now is a single job moving, not the whole section. */
+    .job,
+    .side section {
+      break-inside: avoid;
+    }
+
     .contact a { text-decoration: none; }
   }
 
