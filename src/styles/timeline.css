@@ -62,6 +62,9 @@
   background: var(--surface);
   color: var(--text-muted);
   font-family: var(--font-mono);
+  /* body-face features must not reach the pixel font — see tokens.css */
+  font-feature-settings: var(--font-features-mono);
+  -webkit-font-smoothing: var(--smoothing-mono);
   font-size: var(--font-size-xs);
   box-shadow: var(--shadow-chip);
   /* base = unlit. This transition governs turning OFF: a steep initial
