@@ -61,6 +61,37 @@
   mix-blend-mode: multiply;
 }
 
+/* Bottom fade — dissolves the hero's edge into the page.
+
+   .hero is `overflow: hidden`, so the strand field, its two radial
+   washes and the scanlines all stopped dead on a hard horizontal line
+   at the section boundary: lit atmosphere above, page below, with a
+   visible seam between them. This ramps the bottom of the hero to the
+   same --ink the page sits on, so the boundary has nowhere to show.
+
+   z-index 1 puts it over the strands and the scanlines but under
+   .hero__inner and .hero__hint, both z-index 2 — the copy and the
+   scroll cue keep their full contrast and are not dimmed by it.
+
+   As a pseudo-element of .hero it is the last child, so at equal
+   z-index it paints after .hero__scanlines. That ordering is the point:
+   the scanlines must be faded too, or their stripes stay crisp to the
+   last pixel and re-draw the seam on their own.
+
+   45% is measured, not round: the strand core sits at roughly 55-60%
+   of the hero's height, and starting the ramp any higher begins eating
+   the bright part of the effect people actually came for. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 45%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--ink));
+}
+
 .hero__inner {
   position: relative;
   z-index: 2;

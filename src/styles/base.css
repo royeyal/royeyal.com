@@ -37,6 +37,69 @@ body {
   overflow-x: hidden;
 }
 
+/* ------------------------------------------------------------------
+   Ambient backdrop
+
+   The hero carries a WebGL strand field, two radial washes and CRT
+   scanlines; everything below it used to be flat --ink. Scrolling out
+   of the hero therefore hit a hard edge — atmosphere, then nothing —
+   which read as two different pages stitched together.
+
+   This is one fixed layer of very low-alpha brand light behind the
+   whole document, so the black below the hero is lit rather than
+   uniform. FIXED, not scrolled: the wash stays put while sections
+   travel over it, which reads as depth rather than as a gradient
+   sliding past. Scrolled, the same colours would just look like a band.
+
+   It does not touch the hero. .hero's own background stack ends in an
+   opaque var(--ink), so it covers this completely — the hero looks
+   exactly as it did, and this is only revealed as the hero scrolls
+   away. The footer likewise paints its own opaque gradient over it.
+
+   Alphas are 0.04-0.06 on purpose. Anything higher stops reading as
+   "the black has depth" and starts reading as a coloured page, which
+   costs the cards and the magenta accents their contrast against it.
+
+   Cheap: a static fixed element is rasterised once onto its own
+   compositor layer and then only translated, so scrolling does not
+   repaint it. No will-change — that would pin a viewport-sized layer
+   in memory for no gain on something that never animates.
+
+   z-index -1 puts it behind body's content but still above the page
+   canvas that `background: var(--ink)` above propagates to. Nothing on
+   the page creates a stacking context on <body>, so this stays put.
+   Print is already handled: the blanket `*::before { background: none }`
+   in print.css flattens it, so it paints nothing on paper.
+   ------------------------------------------------------------------ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* cyan, high and left — picks up where the hero's top wash left off */
+    radial-gradient(
+      ellipse 70% 50% at 12% 8%,
+      rgba(66, 239, 254, 0.05),
+      transparent 62%
+    ),
+    /* magenta, right of centre — the site's dominant accent, kept off
+       the text column so the body copy never sits on top of it */
+    radial-gradient(
+        ellipse 65% 55% at 88% 42%,
+        rgba(249, 0, 185, 0.06),
+        transparent 64%
+      ),
+    /* violet floor — the two brand hues meeting, which is also what the
+       footer's own glow resolves to */
+    radial-gradient(
+        ellipse 90% 45% at 45% 100%,
+        rgba(129, 74, 255, 0.05),
+        transparent 66%
+      );
+}
+
 /* `strong` defaults to the UA's bold (700) and would otherwise be the one
    weight on the page that no token controls */
 strong {
