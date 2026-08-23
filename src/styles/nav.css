@@ -254,9 +254,13 @@
   height: 1px;
 }
 
+/* Wraps because there are three columns now (socials, cv, email), and on
+   a narrow panel three of them in one nowrap row squeezed the address
+   until it clipped. Row-gap is smaller than the 3em column gap: wrapped
+   rows are already separated by the columns above them. */
 .bottom-nav__secondary {
-  gap: 3em;
-  flex-flow: row;
+  gap: 1.5em 3em;
+  flex-flow: row wrap;
   justify-content: flex-start;
   align-items: flex-start;
   display: flex;

@@ -197,8 +197,8 @@
      ================================================================ */
   .body {
     display: grid;
-    grid-template-columns: 128mm 50mm;
-    gap: 8mm;
+    grid-template-columns: 128fr 50fr;
+    column-gap: 4.3%;
     padding: 6mm 12mm 8mm;
     align-items: start;
   }
@@ -317,7 +317,7 @@
     list-style: none;
     font-size: 9pt;
     font-weight: var(--w-body);
-    line-height: 1.43;
+    line-height: 1.38;
     letter-spacing: -0.01em;
   }
   .job__points li { position: relative; }
@@ -459,6 +459,15 @@
        case now is a single job moving, not the whole section. */
     .job,
     .side section {
+      break-inside: avoid;
+    }
+
+    /* Belt and braces. break-inside on .job alone was not honoured by
+       the engine in the field report — a job header printed at the foot
+       of page 1 with its bullets stranded on page 2. break-after on the
+       head says the same thing in a form more engines respect. */
+    .job__head {
+      break-after: avoid;
       break-inside: avoid;
     }
 

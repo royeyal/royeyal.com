@@ -1282,6 +1282,41 @@
               </ul>
             </div>
 
+            <!-- The CV goes HERE rather than in the list above, and the
+                 distinction is not cosmetic: every entry in that list is
+                 an in-page anchor that scrolls. /cv is a different
+                 document. Putting it among them would mean four items
+                 that scroll and one that navigates away, wearing the
+                 same affordance — so it sits with the other things that
+                 leave, next to the socials and the address. -->
+            <div class="bottom-nav__col">
+              <span data-bottom-nav-reveal class="bottom-nav__label">cv</span>
+              <ul class="bottom-nav__list">
+                <li data-bottom-nav-reveal class="bottom-nav__list-item">
+                  <a
+                    href="/cv"
+                    class="bottom-nav__sublink"
+                    data-cuelume-press="press"
+                  >
+                    <svg
+                      class="social-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M3 1.5A1.5 1.5 0 0 1 4.5 0h7A1.5 1.5 0 0 1 13 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 14.5v-13ZM5.5 4h5v1.3h-5V4Zm0 3.35h5v1.3h-5v-1.3Zm0 3.35h3v1.3h-3v-1.3Z"
+                      />
+                    </svg>
+                    One-page CV
+                  </a>
+                </li>
+              </ul>
+            </div>
+
             <div class="bottom-nav__col">
               <span data-bottom-nav-reveal class="bottom-nav__label"
                 >email</span
