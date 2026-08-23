@@ -213,6 +213,17 @@ would make the whole setup scriptable from the repo.
 - **cuelume is ESM-only**, so the CDN form is a pinned module URL:
   `<script type="module">import { bind } from 'https://esm.sh/cuelume@0.2.2'`.
   Same bundled-now/CDN-later situation as GSAP.
+- **The build-time HTML pipeline has no Webflow equivalent.** Two Vite
+  plugins rewrite the page at build: `build/llms-txt.js` emits
+  `llms.txt`, and `build/strip-html-comments.js` strips the comments and
+  prepends the signature. Webflow generates its own HTML with no build
+  step, so both simply stop happening — and **silently**, in the same way
+  the sound attributes do: the page still works, it just ships every
+  comment and loses the View Source signature. Paste the signature into
+  Site Settings → Custom Code → Head by hand, and either generate
+  `llms.txt` another way or drop it. The console half of the signature
+  needs nothing: `src/js/signature.js` is bundled JS like everything
+  else.
 - Everything driven by `data-*` attributes ports cleanly — Webflow's
   custom-attributes panel takes them verbatim. **All of them have to come
   across**: each is a JS hook with no class-name fallback, and one of the
