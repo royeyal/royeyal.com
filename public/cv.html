@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Roy Eyal CV</title>
+</head>
+<body>
+
+<style>
+  /* ================================================================
+     Fonts — self-hosted, inlined as data URIs because the Artifact CSP
+     site already self-hosts these three faces, so this page points at
+     them. (The published-artifact copy inlines them as base64 instead,
+     because the Artifact CSP only admits Google Fonts.)
+     ================================================================ */
+  @font-face {
+    font-family: 'Tektur Variable';
+    src: url('/fonts/Tektur-Latin-wght.woff2') format('woff2');
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+  }
+  /* The 300 900 range is NOT optional — Satoshi's fvar declares its
+     default instance at wght=900. Omit the range and body copy renders
+     Black. (Same note as the site's fonts.css.) */
+  @font-face {
+    font-family: 'Satoshi Variable';
+    src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: block;
+  }
+  @font-face {
+    font-family: 'Departure Mono';
+    src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+  }
+
+  /* ================================================================
+     Tokens. Paper-adapted from src/styles/tokens.css.
+     Neutrals carry a violet bias, because the site's neutrals do
+     (--surface #0b0d15, --text-muted #9aa3b8) — a pure grey here would
+     read as unrelated to the site.
+     ================================================================ */
+  :root {
+    --paper: #ffffff;
+    --ink: #05060a;
+    --muted: #4a4754;
+    --faint: #6d6a78;
+    --rule: #d6d2de;
+    --rule-soft: #e7e4ec;
+
+    /* Solid marks only — 3.7:1, fine for a square, not for text. */
+    --magenta: #f900b9;
+    /* Text-safe magenta on white: 6.5:1. Same hue, dropped lightness. */
+    --magenta-ink: #b3007f;
+
+    /* screen-only ground the sheet rests on */
+    --desk: #e9e7ef;
+    --desk-shadow: rgba(24, 20, 40, 0.22);
+
+    --font-display: 'Tektur Variable', system-ui, sans-serif;
+    --font-body: 'Satoshi Variable', system-ui, sans-serif;
+    --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
+
+    /* Body sits at 460, not the site's 550. That token compensates for
+       light-on-dark optically thinning; dark-on-paper does the
+       opposite, so copying 550 here would print heavy. */
+    --w-body: 460;
+    --w-body-strong: 680;
+    --w-display: 666;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --desk: #0b0d15;
+      --desk-shadow: rgba(0, 0, 0, 0.6);
+    }
+  }
+  :root[data-theme='dark'] {
+    --desk: #0b0d15;
+    --desk-shadow: rgba(0, 0, 0, 0.6);
+  }
+
+  /* ================================================================
+     Screen: an A4 sheet on a desk. The sheet stays white in both
+     themes on purpose — it is paper, and what you print is what you
+     see. Only the ground behind it follows the viewer's theme.
+     ================================================================ */
+  body {
+    background: var(--desk);
+    margin: 0;
+    padding: 24px 0;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .desk {
+    overflow-x: auto;
+    padding: 0 16px;
+  }
+
+  .sheet {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 2px 6px var(--desk-shadow), 0 24px 60px -12px var(--desk-shadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ================================================================
+     Header band
+     ================================================================ */
+  .band {
+    background: #faf8fc;
+    border-bottom: 1px solid var(--magenta);
+    padding: 7mm 12mm;
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+  }
+
+  /* Roy's own mark, the same one the site inlines for
+     data-brand="royeyal". No dark disc behind it — on paper that is a
+     lot of toner for no gain, and the magenta reads perfectly well
+     straight on white. */
+  .mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    color: var(--magenta);
+  }
+  .mark svg {
+    height: 15mm;
+    width: auto;
+    fill: currentColor;
+  }
+
+  .who { flex: 1; }
+
+  .who h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: var(--w-display);
+    font-size: 22pt;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .who p {
+    margin: 1mm 0 0;
+    font-size: 9.5pt;
+    font-weight: var(--w-body);
+    color: var(--muted);
+    letter-spacing: -0.01em;
+  }
+
+  .contact {
+    text-align: right;
+    font-size: 8pt;
+    font-weight: 500;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  .contact a { color: var(--muted); text-decoration: none; }
+  .contact a:hover { color: var(--magenta-ink); }
+  .contact a:focus-visible {
+    outline: 2px solid var(--magenta-ink);
+    outline-offset: 2px;
+  }
+
+  /* ================================================================
+     Two-column grid — proportions carried over from the Figma frame
+     (main 363pt / sidebar 144pt / 20pt gutter on a 595pt page).
+     ================================================================ */
+  .body {
+    display: grid;
+    grid-template-columns: 128mm 50mm;
+    gap: 8mm;
+    padding: 8mm 12mm 10mm;
+    align-items: start;
+  }
+
+  /* ================================================================
+     Eyebrow — the site's .eyebrow, on paper. Square + tracked caps.
+     The glow is dropped (it is a screen effect); the square stays
+     solid magenta.
+
+     Departure Mono is a pixel face. If it reads too coarse in print,
+     swapping --font-mono for var(--font-body) on this one rule is the
+     whole change.
+     ================================================================ */
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1.6mm;
+    font-family: var(--font-mono);
+    font-feature-settings: normal;
+    font-size: 8pt;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0 0 3mm;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 1.5mm;
+    height: 1.5mm;
+    flex: none;
+    background: var(--magenta);
+  }
+
+  .lede {
+    margin: 0;
+    font-size: 9pt;
+    font-weight: var(--w-body);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  section + section { margin-top: 6mm; }
+
+  /* ================================================================
+     Experience
+     ================================================================ */
+  .job + .job { margin-top: 4.5mm; }
+
+  .job__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.5mm;
+  }
+
+  /* Ported from the site's .work-card__logo (sections.css:336). Same
+     per-brand hues, same 32% border recipe, same rule that the portrait
+     R sizes by height where the square marks size by width.
+
+     Two paper adaptations: the tile loses its fill and its glow (both
+     are dark-surface effects that print as a slab), and every hue drops
+     ~20 points of OKLCH lightness, because the site's values are tuned
+     for a dark tile and would wash out on white. Hue and chroma are
+     untouched, so the marks stay recognisably themselves. */
+  .job__logo {
+    --logo-color: var(--ink);
+    width: 7mm;
+    height: 7mm;
+    flex: none;
+    border-radius: 1.5mm;
+    border: 0.4pt solid color-mix(in oklab, var(--logo-color) 38%, transparent);
+    display: grid;
+    place-items: center;
+    color: var(--logo-color);
+    margin-top: 0.4mm;
+  }
+  .job__logo svg {
+    width: 62%;
+    height: auto;
+    fill: currentColor;
+  }
+  .job__logo[data-brand='lusha']     { --logo-color: oklch(52% 0.19 293deg); }
+  .job__logo[data-brand='wix']       { --logo-color: oklch(52% 0.16 258deg); }
+  .job__logo[data-brand='elementor'] { --logo-color: oklch(50% 0.22 4deg); }
+  .job__logo[data-brand='royeyal']   { --logo-color: var(--magenta-ink); }
+  /* portrait mark — size by height or it runs to ~89% of the tile */
+  .job__logo[data-brand='royeyal'] svg { width: auto; height: 68%; }
+
+  .job__title {
+    margin: 0;
+    font-size: 11pt;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    font-weight: var(--w-body);
+  }
+  .job__co {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .job__role { color: var(--muted); }
+
+  .job__date {
+    margin: 0.4mm 0 0;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--magenta-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .job__points {
+    margin: 2.5mm 0 0;
+    padding: 0 0 0 4mm;
+    list-style: none;
+    font-size: 9pt;
+    font-weight: var(--w-body);
+    line-height: 1.43;
+    letter-spacing: -0.01em;
+  }
+  .job__points li { position: relative; }
+  .job__points li + li { margin-top: 1.6mm; }
+  .job__points li::before {
+    content: '';
+    position: absolute;
+    left: -3mm;
+    top: 1.55mm;
+    width: 1mm;
+    height: 1mm;
+    border-radius: 50%;
+    background: var(--rule);
+  }
+  .job__points b {
+    font-weight: var(--w-body-strong);
+    color: var(--ink);
+  }
+
+  /* ================================================================
+     Sidebar
+     ================================================================ */
+  .side section + section { margin-top: 6mm; }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.3mm;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* The site's .chip, minus the fill — print.css already makes exactly
+     this call for the on-screen chips (0.75pt border, no background). */
+  .chip {
+    font-size: 7.5pt;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 0.7mm 1.5mm;
+    border: 0.4pt solid var(--rule);
+    border-radius: 0.9mm;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .stack {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 8.5pt;
+    font-weight: var(--w-body);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
+  .langs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 8.5pt;
+    line-height: 1.5;
+  }
+  .langs li { display: flex; gap: 1.5mm; align-items: baseline; }
+  .langs b { font-weight: 600; }
+  .langs span { color: var(--faint); font-size: 7.5pt; }
+
+  .edu__degree {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 9pt;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+  .edu__inst {
+    margin: 0.8mm 0 0;
+    font-size: 8pt;
+    font-weight: var(--w-body);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  /* ================================================================
+     Print — the sheet IS the page. No desk, no shadow, no scaling.
+     ================================================================ */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    html { color-scheme: light; }
+    body { background: #fff; padding: 0; }
+    .desk { overflow: visible; padding: 0; }
+    .sheet {
+      width: auto;
+      min-height: 0;
+      box-shadow: none;
+      margin: 0;
+    }
+    .band { background: #faf8fc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .mark, .job__logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .job, section { break-inside: avoid; }
+    .contact a { text-decoration: none; }
+  }
+
+  @media (max-width: 820px) {
+    body { padding: 12px 0; }
+  }
+</style>
+
+<div class="desk">
+  <div class="sheet">
+
+    <header class="band">
+      <div class="mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68.9 94.7" fill="currentColor" > <path d="M3.801 94.7v-7.5h-3.801v-16.699h8.801h8.898v16.699h-8.898h-1.701v4.1h2.701v1.099h-3.801v-5.199h-1.199v6.4h5v1.1zM18.699 94.7v-0.1h-8.799v-1.099h8.799v0.099h5v-9.099h1.102v10.199zM47.801 94.7v-7.5h-3.701v-16.699h8.8h8.799v16.699h-8.799h-1.599v4.1h2.699h8.801h2.699v-6.799h1.1v7.898h-3.799h-8.801h-3.801v-5.199h-1.299v6.4h5v1.1zM62.801 94.7v-0.1h-8.801v-1.099h8.801v0.099h5v-9.099h1.099v10.199zM9.9 92.399v-1.099h8.799h2.701v-6.799h1.1v7.898h-3.801zM21.4 83.501v-16.602h1.1v16.602zM23.699 83.501v-16.602h1.102v16.602zM65.5 83.501v-16.602h1.1v16.602zM67.801 83.501v-16.602h1.099v16.602zM0 69.501v-16.602h8.801h8.898v16.602h-8.898zM44.1 69.501v-10.102h-7.799h-8.801v0.102h-2.699v6.398h-1.102v-7.5h3.801v-0.099h8.801h7.799v-1.2h-7.799h-8.801h-5v8.799h-1.1v-9.898h6.1h8.801h7.799v-3.102h8.8h3.7v-14.5h6.099v1.102h-5v13.398h1.301v-12.199h3.801h5v-9.1h1.099v10.2h-6.099h-2.801v11.099h1.699v16.602h-8.799zM65.5 65.8v-6.401h-2.699v-1.099h3.799v7.5zM67.801 65.8v-8.7h-5v-1.099h6.099v9.799zM0 51.899v-16.599h8.801h8.898h3.701v-14.5h6.1v-0.1h8.801h7.799v-3.1h8.8h3.799v-11.099h-2.699v-1.102h3.801v12.201h1.199v-13.4h-5v-1.1h6v14.5h1.699v16.7h-8.799h-8.8v-10.2h-7.799h-8.801v0.1h-2.699v11.1h1.699h8.801h8.799h8.8v16.599h-8.8h-8.799h-8.801h-8.801h-8.898zM62.801 39.501v-1.102h2.699v-6.799h1.1v7.901zM22.5 35.3h1.199v-12.2h3.801v-0.099h8.801h7.799v-1.201h-7.799h-8.801v0.099h-5zM0 34.3v-16.7h8.801h8.898v16.7h-8.898zM65.5 30.501v-6.401h-2.699v-1.099h3.799v7.5zM67.801 30.501v-8.701h-5v-1.1h6.099v9.801zM0 16.6v-16.599h8.801h8.898h8.801h8.801h8.799h8.8v16.599h-8.8h-8.799h-8.801h-8.801h-8.898z" /> </svg></div>
+      <div class="who">
+        <h1>Roy Eyal</h1>
+        <p>Marketing Web Developer</p>
+      </div>
+      <div class="contact">
+        +972-54-4978054<br />
+        <a href="mailto:hello@royeyal.com">hello@royeyal.com</a><br />
+        <a href="https://linkedin.com/in/royeyalcom/">linkedin.com/in/royeyalcom</a><br />
+        <a href="https://royeyal.com">royeyal.com</a>
+      </div>
+    </header>
+
+    <div class="body">
+      <main>
+        <section>
+          <h2 class="eyebrow">About</h2>
+          <p class="lede">
+            Design systems that speak both Figma and SCSS. Marketing sites
+            hand-built for speed. AI workflows that turn briefs into shipped
+            pages.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="eyebrow">Experience</h2>
+
+          <article class="job">
+            <div class="job__head">
+              <div class="job__logo" data-brand="lusha" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" fill="none"><g clip-path="url(#lusha-clip)"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.2336 4.37143C13.2336 4.71429 13.1896 5.01429 13.1017 5.31429C16.7069 7.37143 14.8603 14.1429 14.3327 15.8571C14.3327 15.9 14.2448 15.9 14.2448 15.8571C14.2448 15.3 14.1569 14.4857 13.7612 13.7143C13.7612 13.8 13.7612 13.9286 13.7612 14.0143C13.7612 15.4714 12.5301 16.6714 11.0353 16.6714C9.54049 16.6714 8.30945 15.4714 8.30945 14.0143C8.30945 13.7571 8.35342 13.5 8.44135 13.2429C8.44135 13.2429 8.39739 13.2429 8.35342 13.2429C8.17756 13.2 8.04566 13.1571 7.91376 13.1571C7.78187 13.1571 7.64997 13.2 7.47411 13.2429C7.43014 13.2429 7.43014 13.2429 7.38618 13.2429C7.47411 13.5 7.51808 13.7571 7.51808 14.0143C7.51808 15.4714 6.28704 16.6714 4.79221 16.6714C3.38532 16.6714 2.24221 15.6429 2.06635 14.3571C1.80256 15.4286 1.75859 16.6286 1.84652 18C1.89049 18 1.80256 18 1.80256 18C0.571524 15.9429 -0.527614 11.7 0.263765 8.57143C0.967213 5.78571 3.03359 4.41429 4.26463 3.94286C4.52842 1.71429 6.41894 0 8.74911 0C11.2112 0 13.2336 1.97143 13.2336 4.37143ZM3.64911 11.6143C4.00083 11.4429 4.39652 11.3571 4.83618 11.3571C5.80342 11.3571 6.68273 11.8714 7.16635 12.6C7.21032 12.6 7.29825 12.5571 7.38618 12.5571C7.56204 12.5143 7.78187 12.4714 7.95773 12.4714C8.17756 12.4714 8.39739 12.5143 8.57325 12.5571C8.66118 12.5571 8.70514 12.6 8.74911 12.6C9.23273 11.8286 10.0681 11.3571 11.0793 11.3571C11.1672 11.3571 11.2991 11.3571 11.387 11.3571C10.4638 10.2857 10.0681 8.74286 9.93618 7.8C6.77066 9.12857 4.83618 10.3286 3.64911 11.6143ZM12.9258 14.0143C12.9258 15.0429 12.0905 15.8571 11.0353 15.8571C9.98014 15.8571 9.1448 15.0429 9.1448 14.0143C9.1448 12.9857 9.98014 12.1714 11.0353 12.1714C12.0905 12.1714 12.9258 12.9857 12.9258 14.0143ZM6.68273 14.0143C6.68273 15.0429 5.84739 15.8571 4.79221 15.8571C3.73704 15.8571 2.94566 15 2.94566 14.0143C2.94566 12.9857 3.78101 12.1714 4.83618 12.1714C5.89135 12.1714 6.68273 12.9857 6.68273 14.0143Z" fill="currentColor"/></g><defs><clipPath id="lusha-clip"><rect width="15.3" height="18" fill="white"/></clipPath></defs></svg></div>
+              <div>
+                <h3 class="job__title">
+                  <span class="job__co">Lusha</span>
+                  <span class="job__role">· Marketing Web Developer</span>
+                </h3>
+                <p class="job__date">Dec 2024 – Present</p>
+              </div>
+            </div>
+            <ul class="job__points">
+              <li><b>Production code.</b> Hand-coded, high-performing marketing pages in HTML, PHP, SCSS and JavaScript — no page builders.</li>
+              <li><b>AI automation.</b> Engineered a suite of Claude Code skills that automated the performance-marketing pipeline — keyword to production-ready landing page in minutes, not hours.</li>
+              <li><b>Figma to production.</b> Built a token-based design system where every Figma variable maps to a live design token on the site — mirrored components, no drift. Plus a skill that converts a full Figma page into an editable WordPress marketing page (ACF Pro).</li>
+              <li><b>Self-serve at scale.</b> Created a reusable Webflow component toolkit for PMMs and designers, and maintain the WordPress codebase through a GitHub workflow with CI/CD across teams.</li>
+            </ul>
+          </article>
+
+          <article class="job">
+            <div class="job__head">
+              <div class="job__logo" data-brand="wix" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="m0 7.354 2.113 9.292h.801a1.54 1.54 0 0 0 1.506-1.218l1.351-6.34a.171.171 0 0 1 .167-.137c.08 0 .15.058.167.137l1.352 6.34a1.54 1.54 0 0 0 1.506 1.218h.805l2.113-9.292h-.565c-.62 0-1.159.43-1.296 1.035l-1.26 5.545-1.106-5.176a1.76 1.76 0 0 0-2.19-1.324c-.639.176-1.113.716-1.251 1.365l-1.094 5.127-1.26-5.537A1.33 1.33 0 0 0 .563 7.354H0zm13.992 0a.951.951 0 0 0-.951.95v8.342h.635a.952.952 0 0 0 .951-.95V7.353h-.635zm1.778 0 3.158 4.66-3.14 4.632h1.325c.368 0 .712-.181.918-.486l1.756-2.59a.12.12 0 0 1 .197 0l1.754 2.59c.206.305.55.486.918.486h1.326l-3.14-4.632L24 7.354h-1.326c-.368 0-.712.181-.918.486l-1.772 2.617a.12.12 0 0 1-.197 0L18.014 7.84a1.108 1.108 0 0 0-.918-.486H15.77z"/></svg></div>
+              <div>
+                <h3 class="job__title">
+                  <span class="job__co">Wix</span>
+                  <span class="job__role">· Web Developer &amp; Technical Designer</span>
+                </h3>
+                <p class="job__date">September 2022 – October 2023</p>
+              </div>
+            </div>
+            <ul class="job__points">
+              <li><b>Wix Studio rebrand.</b> Played a key role in the rebrand, developing optimized, SEO-friendly landing pages with CSS3, modern JavaScript (ES6+) and Velo.</li>
+              <li><b>Community references.</b> Authored CSS guides for Wix's developer community that became go-to references for accessible, well-structured styling.</li>
+            </ul>
+          </article>
+
+          <article class="job">
+            <div class="job__head">
+              <div class="job__logo" data-brand="elementor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none"><path d="M200 0C89.5321 0 0 89.5321 0 200C0 310.431 89.5321 400 200 400C310.468 400 400 310.468 400 200C399.964 89.5321 310.431 0 200 0ZM150.009 283.306H116.694V116.658H150.009V283.306ZM283.306 283.306H183.324V249.991H283.306V283.306ZM283.306 216.639H183.324V183.324H283.306V216.639ZM283.306 149.973H183.324V116.658H283.306V149.973Z" fill="currentColor"/></svg></div>
+              <div>
+                <h3 class="job__title">
+                  <span class="job__co">Elementor</span>
+                  <span class="job__role">· WordPress Web Developer</span>
+                </h3>
+                <p class="job__date">February 2020 – August 2022</p>
+              </div>
+            </div>
+            <ul class="job__points">
+              <li><b>Rebranding.</b> Spearheaded the rebranding of Elementor — SEO-optimized, high-conversion landing pages in CSS3, PHP and JavaScript.</li>
+              <li><b>Design system.</b> Co-architected the Elementor design system: scalable technical frameworks for brand consistency across platforms.</li>
+              <li><b>Community &amp; live shows.</b> Hosted 10+ webinars, in-person meetups and YouTube live shows — lifting engagement metrics and company KPIs.</li>
+              <li><b>Content &amp; CRO.</b> Published well-received blog posts and “Site of the Month” features, and ran A/B tests through Google Tag Manager to fine-tune conversion and UX across touchpoints.</li>
+            </ul>
+          </article>
+
+          <article class="job">
+            <div class="job__head">
+              <div class="job__logo" data-brand="royeyal" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68.9 94.7" fill="currentColor" > <path d="M3.801 94.7v-7.5h-3.801v-16.699h8.801h8.898v16.699h-8.898h-1.701v4.1h2.701v1.099h-3.801v-5.199h-1.199v6.4h5v1.1zM18.699 94.7v-0.1h-8.799v-1.099h8.799v0.099h5v-9.099h1.102v10.199zM47.801 94.7v-7.5h-3.701v-16.699h8.8h8.799v16.699h-8.799h-1.599v4.1h2.699h8.801h2.699v-6.799h1.1v7.898h-3.799h-8.801h-3.801v-5.199h-1.299v6.4h5v1.1zM62.801 94.7v-0.1h-8.801v-1.099h8.801v0.099h5v-9.099h1.099v10.199zM9.9 92.399v-1.099h8.799h2.701v-6.799h1.1v7.898h-3.801zM21.4 83.501v-16.602h1.1v16.602zM23.699 83.501v-16.602h1.102v16.602zM65.5 83.501v-16.602h1.1v16.602zM67.801 83.501v-16.602h1.099v16.602zM0 69.501v-16.602h8.801h8.898v16.602h-8.898zM44.1 69.501v-10.102h-7.799h-8.801v0.102h-2.699v6.398h-1.102v-7.5h3.801v-0.099h8.801h7.799v-1.2h-7.799h-8.801h-5v8.799h-1.1v-9.898h6.1h8.801h7.799v-3.102h8.8h3.7v-14.5h6.099v1.102h-5v13.398h1.301v-12.199h3.801h5v-9.1h1.099v10.2h-6.099h-2.801v11.099h1.699v16.602h-8.799zM65.5 65.8v-6.401h-2.699v-1.099h3.799v7.5zM67.801 65.8v-8.7h-5v-1.099h6.099v9.799zM0 51.899v-16.599h8.801h8.898h3.701v-14.5h6.1v-0.1h8.801h7.799v-3.1h8.8h3.799v-11.099h-2.699v-1.102h3.801v12.201h1.199v-13.4h-5v-1.1h6v14.5h1.699v16.7h-8.799h-8.8v-10.2h-7.799h-8.801v0.1h-2.699v11.1h1.699h8.801h8.799h8.8v16.599h-8.8h-8.799h-8.801h-8.801h-8.898zM62.801 39.501v-1.102h2.699v-6.799h1.1v7.901zM22.5 35.3h1.199v-12.2h3.801v-0.099h8.801h7.799v-1.201h-7.799h-8.801v0.099h-5zM0 34.3v-16.7h8.801h8.898v16.7h-8.898zM65.5 30.501v-6.401h-2.699v-1.099h3.799v7.5zM67.801 30.501v-8.701h-5v-1.1h6.099v9.801zM0 16.6v-16.599h8.801h8.898h8.801h8.801h8.799h8.8v16.599h-8.8h-8.799h-8.801h-8.801h-8.898z" /> </svg></div>
+              <div>
+                <h3 class="job__title">
+                  <span class="job__co">Roy Eyal Studio</span>
+                  <span class="job__role">· WordPress &amp; Webflow Developer</span>
+                </h3>
+                <p class="job__date">2017 – 2020</p>
+              </div>
+            </div>
+            <ul class="job__points">
+              <li><b>Agency partnerships.</b> Partnered with leading design studios to build pixel-perfect sites, e-commerce stores and landing pages straight from Figma — in WordPress, Elementor and Webflow.</li>
+              <li><b>UX, SEO and speed together.</b> Every build shipped accessible, search-ready and fast, without trading one of the three for the other two.</li>
+              <li><b>Clients who kept building.</b> Taught clients to run their own CMS to its full depth, so the sites kept improving long after launch.</li>
+            </ul>
+          </article>
+        </section>
+      </main>
+
+      <aside class="side">
+        <section>
+          <h2 class="eyebrow">Tools</h2>
+          <ul class="chips">
+            <li class="chip">WordPress</li>
+            <li class="chip">Figma</li>
+            <li class="chip">Webflow</li>
+            <li class="chip">Github</li>
+            <li class="chip">Elementor</li>
+            <li class="chip">Wix</li>
+            <li class="chip">UX/UI</li>
+            <li class="chip">a11y</li>
+            <li class="chip">SEO</li>
+            <li class="chip">PHP</li>
+            <li class="chip">SCSS</li>
+            <li class="chip">JavaScript</li>
+            <li class="chip">GSAP</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="eyebrow">Specialties</h2>
+          <ul class="stack">
+            <li>WordPress developer</li>
+            <li>Wix technical designer</li>
+            <li>Webflow developer</li>
+            <li>User experience</li>
+            <li>Meetup speaking</li>
+            <li>Video content creation</li>
+            <li>Figma</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="eyebrow">Hobbies</h2>
+          <ul class="stack">
+            <li>Playing bass guitar</li>
+            <li>Assembling Ikea / Lego</li>
+            <li>YouTube</li>
+            <li>Making lists where to eat next</li>
+            <li>MacOS &amp; iPhone</li>
+            <li>Reading fantasy books</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="eyebrow">Languages</h2>
+          <ul class="langs">
+            <li><b>English</b> <span>Fluent</span></li>
+            <li><b>Hebrew</b> <span>Native</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="eyebrow">Education</h2>
+          <p class="edu__degree">B.A. Psychology and Sociology</p>
+          <p class="edu__inst">The Academic College of Tel Aviv-Yafo</p>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
