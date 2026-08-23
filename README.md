@@ -71,6 +71,12 @@ src/js/sound.js        cuelume interaction sounds (opt-in)
 src/js/nav.js          expanding bottom nav — VENDORED from Osmo Supply
 src/js/scroll.js       GSAP ScrollToPlugin anchor scrolling
 src/js/clipboard.js    copy-to-clipboard email fields
+src/js/signature.js    the ANSI wordmark + hello, in the console and (via
+                       the build) in the HTML source. Single source of truth
+build/llms-txt.js      Vite plugin — emits dist/llms.txt from index.html
+build/strip-html-comments.js
+                       Vite plugin — removes HTML comments from dist/ and
+                       prepends the signature block
 public/                static assets, copied verbatim into dist/ on build
 public/og.png          1200x630 link-preview card (generated — see docs/)
 public/404.html        standalone 404 (inline CSS, no JS, no build step)
@@ -103,6 +109,44 @@ docs/webflow-studio-wind-down.md
 > bounce, and `royeyal.studio` must keep its MX records or the
 > `hello@royeyal.studio` alias stops routing — relevant to the Webflow
 > wind-down.
+
+## Comments, and what ships
+
+The comments in `index.html` are the point, not clutter — they are why
+the next change to this page is a five-minute change. **Keep writing
+them.** They do not go over the wire.
+
+`build/strip-html-comments.js` removes every HTML comment from
+`dist/index.html` at build time. Source is untouched; only the built file
+is rewritten. Measured on the real build, that is **17.1 kB of 66.2 kB
+raw and 7.4 kB of 17.0 kB gzipped** — the comments were 43% of the
+transferred HTML on a page that preloads two fonts to save one round
+trip.
+
+- **To keep a comment in the shipped file**, write it as `<!--! … -->`.
+  It survives with the `!` removed. Same convention Terser and esbuild
+  use for legal banners.
+- **Conditional comments** (`<!--[if …]>`) are never touched.
+- The contents of `<script>`, `<style>`, `<pre>` and `<textarea>` are
+  lifted out before the strip and put back after, so a `-->` inside the
+  `application/ld+json` block cannot end a comment early and eat live
+  markup. The plugin asserts the output still ends in `</html>` and that
+  something was actually removed, and **fails the build** rather than
+  emitting a damaged page.
+- CSS and JS comments need no equivalent — esbuild already strips those
+  when it minifies. Only HTML was leaking.
+
+The one comment that does ship is the signature: the ANSI wordmark and a
+hello, prepended above the doctype (valid HTML5, and verified not to
+trigger quirks mode — `document.compatMode` is `CSS1Compat`). It is also
+printed to the DevTools console. Both come from `LOGO` and `HELLO` in
+`src/js/signature.js`, which the build plugin imports, so the two copies
+cannot drift — **edit the wording there, not in the plugin.** Everything
+above `initSignature()` in that file is inert data with no DOM access,
+because Node evaluates the module during the build.
+
+`build/llms-txt.js` is unaffected by any of this: it reads `index.html`
+off disk rather than taking the transformed HTML.
 
 ## Deploy
 

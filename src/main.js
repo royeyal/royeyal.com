@@ -15,6 +15,7 @@ import { initSound } from './js/sound.js';
 import { initSmoothScroll } from './js/scroll.js';
 import { initClipboard } from './js/clipboard.js';
 import { initExpandingBottomNav, initNavEnhancements } from './js/nav.js';
+import { initSignature } from './js/signature.js';
 
 document.querySelector('[data-year]').textContent = new Date().getFullYear();
 
@@ -44,3 +45,8 @@ initStepTimeline();
 initSmoothScroll();
 initClipboard();
 initSound(document.querySelector('[data-sound-toggle]'));
+
+/* Last, so the greeting is the final thing in the console rather than
+   something the init logs scroll away. Its twin lives in the HTML
+   comment at the top of View Source — see build/strip-html-comments.js. */
+initSignature();
