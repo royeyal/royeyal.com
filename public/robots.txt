@@ -1,6 +1,6 @@
 # royeyal.com
 #
-# One page, nothing private, nothing to keep out.
+# Two pages, nothing private, nothing to keep out.
 #
 # NOTE: crawlers were never seeing a 404 here. With no robots.txt at the
 # origin, Cloudflare was answering /robots.txt itself on the free plan
@@ -14,10 +14,13 @@
 # the Content-Signal below is asking for. The signals are declared here,
 # in our own file, on purpose.
 #
-# Add a Disallow here if the site ever grows a staging path. Add the
-# Sitemap line back if it ever grows a second page; a sitemap listing a
-# single URL that is already the canonical root tells Google nothing it
-# does not know.
+# Add a Disallow here if the site ever grows a staging path.
+#
+# The sitemap is back, per the note that used to sit here: it was worth
+# skipping while the site was a single URL that was already the
+# canonical root, because that told Google nothing it did not know. /cv
+# changes that. Nothing links to it from the homepage, so the sitemap is
+# the only thing that will lead a crawler there.
 
 User-agent: *
 
@@ -38,3 +41,5 @@ User-agent: *
 #             working — they are independent.
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
+
+Sitemap: https://royeyal.com/sitemap.xml

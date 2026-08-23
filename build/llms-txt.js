@@ -24,6 +24,17 @@ import { resolve } from 'node:path';
 
 const SITE = 'https://royeyal.com/';
 
+/* The printable one-page CV (public/cv.html, served at /cv). Named as a
+   constant rather than extracted, because it is a location rather than
+   content — there is nothing in index.html to derive it from, and a
+   constant cannot drift out of step with markup the way an extraction
+   can. Same reasoning as SITE above.
+
+   Worth surfacing here specifically: an agent doing the first-pass read
+   is exactly who wants the one-page version, and it is the only URL on
+   the site that is not reachable by following a link from the root. */
+const CV = 'https://royeyal.com/cv';
+
 /* Only the entities index.html actually uses, plus the numeric form.
    Deliberately not a full table: an unknown entity should look wrong in
    review rather than be silently half-decoded. */
@@ -181,6 +192,7 @@ export function renderMarkdown(html) {
   out.push(`> ${description}`, '');
   out.push(heroSub, '');
   out.push(`Canonical page: ${SITE}`, '');
+  out.push(`Printable one-page CV: ${CV}`, '');
 
   out.push('## About', '');
   for (const p of aboutText) out.push(p, '');

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Two URLs, which is exactly why this file now exists: robots.txt said
+  to add the Sitemap line back "if it ever grows a second page", and /cv
+  is that second page.
+
+  It earns its keep for one reason. Nothing on the homepage links to
+  /cv, so a crawler following links from the root will never reach it.
+  This is the only thing telling anyone the page is there.
+
+  No <lastmod>. It would have to be maintained by hand and a stale date
+  is worse than none — Google discounts the whole file once the dates
+  stop matching reality. Add it only if it ever becomes generated.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://royeyal.com/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://royeyal.com/cv</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>
