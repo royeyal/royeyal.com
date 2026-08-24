@@ -35,26 +35,19 @@
 
    The `font-weight: 300 900` range is NOT optional here. Satoshi's fvar
    table declares its default instance at wght=900 (min 300, default 900,
-   max 900) — unusual, and unlike Switzer, whose default is a normal 400.
+   max 900), which is unusual — most faces default to a normal 400.
    Declare the range and the browser maps CSS font-weight onto the axis
    correctly; omit it and the default instance can win, rendering body
-   copy in Black. */
+   copy in Black.
+
+   NOT IN THE REPO. Satoshi's licence forbids redistribution, so this
+   file is gitignored — see public/fonts/LICENSES.md for where to get
+   it. Without it the body copy falls back to system-ui and the page
+   still works; it just is not the design. */
 @font-face {
   font-family: 'Satoshi Variable';
   src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
   font-weight: 300 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Switzer (Fontshare) — the previous body face, kept during the Satoshi
-   evaluation so reverting is a one-token change in tokens.css. An unused
-   @font-face costs nothing: browsers only download a face that something
-   actually renders in. Delete this block once the choice is settled. */
-@font-face {
-  font-family: 'Switzer Variable';
-  src: url('/fonts/Switzer-Variable.woff2') format('woff2');
-  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }

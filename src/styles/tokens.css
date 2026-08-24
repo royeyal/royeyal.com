@@ -38,8 +38,10 @@
      that were considered live in docs/font-options.md. */
   /* Tektur (self-hosted, see fonts.css) — variable wght 400-900. */
   --font-display: 'Tektur Variable', system-ui, sans-serif;
-  /* Body: Satoshi is on trial against Switzer. Both @font-face blocks
-     are live in fonts.css, so switching back is this one line. */
+  /* Body: Satoshi, and that is settled — the Switzer it was on trial
+     against has been removed. system-ui is a real fallback here, not
+     boilerplate: Satoshi is gitignored (its licence forbids
+     redistribution), so a fresh clone renders in it. */
   --font-body: 'Satoshi Variable', system-ui, sans-serif;
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
 
@@ -54,12 +56,13 @@
      other than 400 makes the browser smear a synthetic bold over the
      pixel grid, which is the whole reason that face is here.
 
-     The numbers look high because Satoshi's axis runs LIGHT: measured by
-     ink coverage at 17px, Satoshi 500 is 98% of Switzer 400 — i.e. the
-     old body weight, not a step up. The rule of thumb is Satoshi ≈
-     Switzer + 100. So 550 here is the real equivalent of Switzer ~455,
-     and 780 matches the Switzer 680 the bold lead-ins used to have.
-     Don't "tidy" these to 500/700; that silently reverts the weight.
+     The numbers look high because Satoshi's axis runs LIGHT. Measured
+     by ink coverage at 17px when it replaced Switzer, Satoshi 500 came
+     out at 98% of Switzer 400 — the old body weight, not a step up. The
+     rule of thumb was Satoshi ≈ Switzer + 100, which is how 550 and 780
+     were arrived at. Switzer is gone, but the calibration is why these
+     are not round numbers: don't "tidy" them to 500/700, that silently
+     lightens the whole page.
 
      Body is above 400 on purpose: light text on a black background
      optically thins, and 400 reversed out of --ink reads anaemic. */

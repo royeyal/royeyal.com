@@ -3,3 +3,9 @@ dist/
 .DS_Store
 .env
 .wrangler/
+
+# Satoshi is licensed under the ITF Free Font License, which forbids
+# redistributing the font file — including via a public repository.
+# Self-hosting it on royeyal.com is expressly permitted; shipping it in
+# this repo is not. See public/fonts/LICENSES.md to re-fetch it.
+public/fonts/Satoshi-Variable.woff2

@@ -23,15 +23,18 @@ built as plain HTML/CSS/JS with Vite, hosted on Cloudflare Workers.
   behind a click would regress the same way. Loaded lazily, so it costs
   nothing unless enabled
 - Self-hosted fonts, no font CDN, **latin subset only** (this site is US
-  English) — all three live in `public/fonts/` and are declared in
-  `src/styles/fonts.css`:
-  - **Tektur** — display/headings, variable weight 400–900
+  English) — declared in `src/styles/fonts.css`, served from
+  `public/fonts/`, licences in
+  [`public/fonts/LICENSES.md`](./public/fonts/LICENSES.md):
+  - **Tektur** — display/headings, variable weight 400–900. SIL OFL 1.1.
   - **Satoshi Variable** — body, variable weight 300–900. The range in the
     `@font-face` is load-bearing: Satoshi's default instance is wght 900,
-    so without it body copy can render Black. Switzer, the previous body
-    face, is still declared alongside it so the swap can be reverted from
-    `tokens.css`; an unused `@font-face` is never downloaded.
-  - **Departure Mono** — terminal accents (single weight, never fake-bold it)
+    so without it body copy can render Black. **Not in this repo** — the
+    ITF Free Font License forbids redistributing the file, so it is
+    gitignored; grab it from Fontshare after cloning. The page still
+    builds and renders without it, on `system-ui`.
+  - **Departure Mono** — terminal accents (single weight, never fake-bold
+    it). MIT.
 - **Typography tokens** — every weight and line-height is a token in
   `src/styles/tokens.css`; no component carries a bare number.
   `--weight-mono` is fixed at 400 because Departure Mono has no weight
@@ -295,8 +298,9 @@ drop one in the markup and the feature stops, usually with no error.
       the regenerate command. Re-rendered for Satoshi (2026-08-15) — it
       carries the same `font-feature-settings` as the site so the card's
       letterforms match the live page, and the role line is weight 800
-      because Satoshi's axis runs ~100 units lighter than Switzer's. `og:image` must stay an **absolute** URL:
-      scrapers don't resolve relative paths.
+      because Satoshi's axis runs light — see the weight note in
+      `tokens.css`. `og:image` must stay an **absolute** URL: scrapers
+      don't resolve relative paths.
 - [x] **404 page** — `public/404.html`, wired up by
       `not_found_handling: "404-page"` in `wrangler.jsonc`. Without that
       key the asset server answered unknown paths with a 404 and a

@@ -1,11 +1,13 @@
 # Font options — elevating the Apple-meets-cyberpunk direction
 
-> **Decision (2026-08-15): the display face is final; the body face is on
-> trial.** Tektur and Departure Mono ship, and **Neue Machina was
-> considered and declined** — that part is settled. **Switzer was swapped
-> for Satoshi** on the same date; both `@font-face` blocks are live in
-> `src/styles/fonts.css`, so reverting is one line of `tokens.css`.
-> The research below is a record of how the stack was chosen, not a
+> **Decision: the stack is final.** Tektur (display), Satoshi (body) and
+> Departure Mono (accents) ship. **Neue Machina was considered and
+> declined**, and **Switzer was swapped for Satoshi** on 2026-08-15.
+>
+> **Update 2026-08-24: Switzer is gone.** Its `@font-face` and its
+> `.woff2` were removed once the body face was settled, so reverting is
+> no longer one line — it would mean re-downloading the file. The
+> research below is a record of how the stack was chosen, not a
 > shortlist waiting to be picked from.
 >
 > A commented-out Neue Machina `@font-face` used to sit in
