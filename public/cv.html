@@ -421,7 +421,7 @@
      ================================================================ */
   @page {
     size: A4;
-    margin: 10mm 12mm;
+    margin: 10mm 8mm;
   }
 
   @media print {
@@ -439,8 +439,15 @@
 
     /* @page supplies the side margins now, so the band and the grid
        drop their own and align to the same two edges. */
-    .band { padding-inline: 0; }
-    .body { padding-inline: 0; padding-bottom: 0; }
+    /* NOT zero. At zero the header content sat flush against the edge of
+       its own tint — the R touching one side, the contact block the
+       other — which reads as clipped even where the printer is not
+       actually cutting anything. 6mm here, against 8mm of @page margin,
+       puts content 14mm from the paper edge and gives the tint 6mm of
+       bleed around it. Both keep the same inset, so the band and the
+       grid below it stay on the same two edges. */
+    .band { padding-inline: 6mm; }
+    .body { padding-inline: 6mm; padding-bottom: 0; }
 
     /* Every painted element, or the tint, the magenta squares and the
        brand-coloured marks all drop out on default print settings. */
