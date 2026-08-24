@@ -101,8 +101,7 @@ docs/cloudflare-workers.md  hosting and deployment reference
 > exist or reports bounce. And `royeyal.studio` must keep both its MX
 > records and its registration — the `hello@royeyal.studio` alias stops
 > routing the day either goes, and a live 301 to this site depends on
-> the registration too. **It expires 2026-12-04; auto-renew must stay
-> on.**
+> the registration too. **Auto-renew must stay on.**
 
 ## Comments, and what ships
 
