@@ -1,11 +1,10 @@
 # Cloudflare Workers — deployment reference
 
-Two scenarios for this repo. Scenario A is scaffolded; Scenario B is
-for later, if the design moves to Webflow.
+How royeyal.com is hosted. This is the live setup, not a plan.
 
 ---
 
-## Scenario A — host royeyal.com on Cloudflare (scaffolded)
+## Hosting royeyal.com on Cloudflare
 
 Vite already cache-busts (hashed asset names are written into
 `index.html` on every build), so **no stable-URL worker logic is
@@ -93,48 +92,14 @@ dashboard action — no external DNS/nameserver changes needed.
 
 ---
 
-## Scenario B — Webflow custom-code pivot (later)
-
-When the design moves to Webflow, Webflow hardcodes the
-`<script>`/`<link>` URLs, so hashed filenames break every deploy.
-That's when the **stable-URL worker** pattern from the project
-scaffold applies:
-
-- Worker statically imports `dist/.vite/manifest.json`
-  (set `build.manifest: true` in `vite.config.js` first).
-- `GET /main.js` and `GET /main.css` look up the current hashed
-  file in the manifest and serve it with
-  `Cache-Control: public, no-cache` (browser revalidates, CF serves
-  fast, deploys are instant).
-- Everything else falls through to `env.ASSETS.fetch(request)`.
-- `OPTIONS *` answered with `Access-Control-Allow-Origin: *` —
-  required because Webflow pages load these cross-origin.
-- `GET /health` → 200 for monitoring.
-- **`run_worker_first = true` becomes REQUIRED** — without it,
-  requests matching a literal file in `./dist` bypass the worker
-  and never get CORS headers.
-
-### Webflow side
-
-In Site settings → Custom code, reference the stable URLs:
-
-```html
-<link rel="stylesheet" href="https://<worker>.workers.dev/main.css" />
-<script defer src="https://<worker>.workers.dev/main.js"></script>
-```
-
-And remember the standing rule: remove the bundled GSAP import and
-use Webflow's global instead — never ship two copies.
-
----
-
-## Gotcha recap (both scenarios)
+## Gotcha recap
 
 1. Set the real `account_id` in `wrangler.jsonc` before deploying —
    dry-run doesn't catch a missing/placeholder value.
-2. Build before every deploy (Scenario B's worker imports the
-   manifest, so a stale `dist/` means a stale — or broken — deploy).
+2. Build before every deploy; a stale `dist/` means a stale deploy.
+   `npm run deploy` does both in order for exactly this reason.
 3. `run_worker_first: true` whenever the worker must intercept paths
-   that also exist as files in `dist/` (required for Scenario B).
+   that also exist as files in `dist/`. It is currently `false`, which
+   is correct while the worker serves static assets and nothing else.
 4. `.env` and `.wrangler/` stay gitignored; the API token never
    enters the repo.

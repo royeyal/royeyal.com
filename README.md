@@ -2,7 +2,7 @@
 
 Personal CV site for Roy Eyal — Marketing Web Developer. Single page,
 Apple-meets-cyberpunk (magenta `#F900B9` / cyan `#42EFFE` on black),
-built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
+built as plain HTML/CSS/JS with Vite, hosted on Cloudflare Workers.
 
 ## Stack
 
@@ -10,8 +10,7 @@ built as plain HTML/CSS/JS with Vite so it can later be rebuilt in Webflow.
 - **GSAP** (npm) — hero intro, scroll reveals, footer scrub, anchor
   scrolling (**ScrollToPlugin**) and the bottom nav's easing
   (**CustomEase**). Both were Club-only once and have been free since
-  GSAP 3.13, so Webflow's own CDN carries them — the pivot needs no npm
-  fallback for either
+  GSAP 3.13, so they come straight from npm with no licence gate
 - **ogl** (npm) — WebGL "Strands" hero background, a vanilla port of
   [reactbits.dev/animations/strands](https://reactbits.dev/animations/strands)
   (no React needed)
@@ -86,29 +85,21 @@ wrangler.jsonc         Worker config — account_id, assets, 404 handling
 docs/og-image-source.html  source for public/og.png + regenerate command
 docs/copy-options.md   alternate hero/positioning copy
 docs/font-options.md   font research and pairing recommendations
-docs/cloudflare-workers.md  hosting + Webflow-pivot deployment reference
-docs/google-workspace-domain-change.md
-                       moving Workspace from royeyal.studio to royeyal.com
-docs/webflow-studio-wind-down.md
-                       retiring the .studio site, keeping the Workspace plan
+docs/cloudflare-workers.md  hosting and deployment reference
 ```
 
-> **`hello@royeyal.com` — DNS side complete, verified 2026-08-15.**
-> Cloudflare Email Routing is off, MX is a single `smtp.google.com`,
-> there is exactly one SPF record, `google._domainkey` is live, and
-> `_dmarc` points at `dmarc@royeyal.com`. The zone is down to seven
-> records and all seven are correct.
+> **`hello@royeyal.com` is live and that migration is closed.** The
+> Workspace account moved off `royeyal.studio`, and DNS was verified
+> 2026-08-15: Cloudflare Email Routing off, MX a single
+> `smtp.google.com`, exactly one SPF record, `google._domainkey` live,
+> `_dmarc` pointed at `dmarc@royeyal.com`. Seven records, all correct.
 >
-> What's left is the Step 7 long tail in
-> [`docs/google-workspace-domain-change.md`](./docs/google-workspace-domain-change.md):
-> billing and recovery addresses, Gmail's **Send mail as** default (easy
-> to miss — you keep sending as `.studio` without noticing), and
-> re-authorising the account on each device after the rename.
->
-> Two standing constraints: the `dmarc@` alias must exist or reports
-> bounce, and `royeyal.studio` must keep its MX records or the
-> `hello@royeyal.studio` alias stops routing — relevant to the Webflow
-> wind-down.
+> Two standing constraints outlive the move. The `dmarc@` alias must
+> exist or reports bounce. And `royeyal.studio` must keep both its MX
+> records and its registration — the `hello@royeyal.studio` alias stops
+> routing the day either goes, and a live 301 to this site depends on
+> the registration too. **It expires 2026-12-04; auto-renew must stay
+> on.**
 
 ## Comments, and what ships
 
@@ -152,8 +143,8 @@ off disk rather than taking the transformed HTML.
 
 Hosted on Cloudflare Workers using a static assets binding — Vite already
 writes hashed filenames into `index.html`, so no stable-URL worker logic
-is needed. Full reference, including the Webflow-pivot variant and the two
-silent-failure gotchas, is in `docs/cloudflare-workers.md`.
+is needed. Full reference, including the two silent-failure gotchas, is
+in `docs/cloudflare-workers.md`.
 
 **Live at [royeyal.com](https://royeyal.com)** since 2026-08-09.
 
@@ -204,64 +195,39 @@ upload.
 Granting `Workers Routes:Edit`, `DNS:Edit` and `Transform Rules:Edit`
 would make the whole setup scriptable from the repo.
 
-## ⚠️ Webflow migration notes
+## JS hooks (`data-*`)
 
-- **Remove bundled GSAP**: `src/main.js`, `src/js/animations.js` and
-  `src/js/timeline.js` import GSAP from npm. In Webflow, delete those
-  imports and use the global `gsap` / `ScrollTrigger` from Webflow's CDN
-  script — never ship two copies.
-- **cuelume is ESM-only**, so the CDN form is a pinned module URL:
-  `<script type="module">import { bind } from 'https://esm.sh/cuelume@0.2.2'`.
-  Same bundled-now/CDN-later situation as GSAP.
-- **The build-time HTML pipeline has no Webflow equivalent.** Two Vite
-  plugins rewrite the page at build: `build/llms-txt.js` emits
-  `llms.txt`, and `build/strip-html-comments.js` strips the comments and
-  prepends the signature. Webflow generates its own HTML with no build
-  step, so both simply stop happening — and **silently**, in the same way
-  the sound attributes do: the page still works, it just ships every
-  comment and loses the View Source signature. Paste the signature into
-  Site Settings → Custom Code → Head by hand, and either generate
-  `llms.txt` another way or drop it. The console half of the signature
-  needs nothing: `src/js/signature.js` is bundled JS like everything
-  else.
-- Everything driven by `data-*` attributes ports cleanly — Webflow's
-  custom-attributes panel takes them verbatim. **All of them have to come
-  across**: each is a JS hook with no class-name fallback, and one of the
-  files below reads it by name.
-  - `src/main.js` — `data-strands`, `data-sound-toggle`, `data-year`
-  - `src/js/animations.js` — `data-hero`, `data-reveal`, `data-giant`
-  - `src/js/timeline.js` — `data-step-timeline-*`
-  - cuelume itself — `data-cuelume-press`
-  - `src/js/sound.js` — `data-sound-state`, and `data-sound-on` /
-    `data-sound-off` in **two** places. Easiest to miss and the only
-    ones that fail **silently**: if they get dropped the page still
-    works perfectly, just mute.
-    - on the timeline steps, driving the per-step scroll cues through a
-      MutationObserver watching `data-status`
-    - on the `<nav>`, driving the menu's open/close cues (`arrival` /
-      `scan`) through a second observer watching
-      `data-bottom-nav-open`. Keeping the cue here rather than in
-      `nav.js` is what lets the Osmo script stay untouched.
-  - `src/styles/sections.css` — `data-brand`, the only CSS-only one
-    (picks the logo tile colour)
-  - `src/js/scroll.js` — none of its own; it delegates off `href="#…"`
-  - `src/js/clipboard.js` — `data-clip` (holds the value **and** is the
-    hook), plus `data-copied`, which the module writes and
-    `clipboard.css` animates off
-  - `src/js/animations.js` — `data-nav-current`, the section label in
-    the closed nav pill
-  - `src/js/nav.js` — **`data-bottom-nav-*`: seven vendor-owned hooks**
-    (`-init`, `-open`, `-inner`, `-bar`, `-toggle`, `-panel`, `-reveal`,
-    `-divider`). These are Osmo Supply's, not ours — the vendored script
-    reads every one by name, and `--closed-width` / `--open-width` /
-    `--bar-height` are read by name too. Renaming any of them collapses
-    the nav to zero width
+Every behaviour on this page is wired through a `data-*` attribute
+rather than a class name. **There is no class-name fallback**: rename or
+drop one in the markup and the feature stops, usually with no error.
 
-  Class-name-based selectors would **not** survive, since Webflow
-  generates its own.
-
-- The Strands background ports to Webflow as an embed `<div data-strands>` +
-  the built JS; ogl stays bundled (Webflow doesn't provide it).
+- `src/main.js` — `data-strands`, `data-sound-toggle`, `data-year`
+- `src/js/animations.js` — `data-hero`, `data-reveal`, `data-giant`, and
+  `data-nav-current` (the section label in the closed nav pill)
+- `src/js/timeline.js` — `data-step-timeline-*`
+- cuelume itself — `data-cuelume-press`
+- `src/js/sound.js` — `data-sound-state`, plus `data-sound-on` /
+  `data-sound-off` in **two** places. The easiest to miss and the only
+  ones that fail **silently**: drop them and the page still works
+  perfectly, just mute.
+  - on the timeline steps, driving the per-step scroll cues through a
+    MutationObserver watching `data-status`
+  - on the `<nav>`, driving the menu's open/close cues (`arrival` /
+    `scan`) through a second observer watching `data-bottom-nav-open`.
+    Keeping the cue here rather than in `nav.js` is what lets the Osmo
+    script stay untouched.
+- `src/styles/sections.css` — `data-brand`, the only CSS-only one
+  (picks the logo tile colour)
+- `src/js/clipboard.js` — `data-clip` (holds the value **and** is the
+  hook), plus `data-copied`, which the module writes and
+  `clipboard.css` animates off
+- `src/js/scroll.js` — none of its own; it delegates off `href="#…"`
+- `src/js/nav.js` — **`data-bottom-nav-*`: seven vendor-owned hooks**
+  (`-init`, `-open`, `-inner`, `-bar`, `-toggle`, `-panel`, `-reveal`,
+  `-divider`). These are Osmo Supply's, not ours — the vendored script
+  reads every one by name, and `--closed-width` / `--open-width` /
+  `--bar-height` are read by name too. Renaming any collapses the nav to
+  zero width.
 
 ## TODO (placeholders to replace)
 
@@ -364,10 +330,11 @@ would make the whole setup scriptable from the repo.
       `curl -sI https://royeyal.com | grep -i strict-transport`, never
       against the local build.
 
-- [ ] **hello@royeyal.com** — DNS complete and verified; the Workspace
-      rename is done. Only the Step 7 long tail remains (billing and
-      recovery addresses, Gmail's Send-mail-as default, per-device
-      re-auth). Step-by-step in `docs/google-workspace-domain-change.md`.
+- [x] **hello@royeyal.com** — done. DNS verified, the Workspace rename
+      off `royeyal.studio` completed, and the Step 7 long tail (billing
+      and recovery addresses, Gmail's Send-mail-as default, per-device
+      re-auth) is closed out. The step-by-step runbook has been retired;
+      see the standing constraints under **Structure**.
 - [x] **Navigation** — expanding bottom nav (Osmo Supply, vendored in
       `src/js/nav.js`). Five stops, socials, a copy-email, and the sound
       toggle. Bottom placement keeps the WebGL hero uncontested and means

@@ -40,8 +40,8 @@
 
   // Static hosting for dist/. Vite already writes hashed filenames into
   // index.html on every build, so no stable-URL worker logic is needed —
-  // see docs/cloudflare-workers.md for the Webflow-pivot scenario where
-  // run_worker_first must flip to true.
+  // see docs/cloudflare-workers.md for the case where run_worker_first
+  // must flip to true.
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
