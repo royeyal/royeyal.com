@@ -81,6 +81,11 @@
       content="Marketing web developer at Lusha, ex-Wix and Elementor. Figma-to-code design systems, hand-built marketing sites, and AI workflows."
     />
     <meta name="theme-color" content="#05060a" />
+    <!-- Google's default preview size is its own choice; this makes the
+         large image preview explicit. It costs nothing and it is the
+         only lever on preview SIZE — WHICH image gets picked is a
+         heuristic with no tag behind it, see the Person.image note. -->
+    <meta name="robots" content="max-image-preview:large" />
     <!-- Apex is canonical. www 301s here via a Cloudflare Redirect Rule;
          this tag is the belt to that braces, and covers anything that
          reaches the page without following the redirect. -->
@@ -194,6 +199,21 @@
          social card — a search engine would happily surface it as Roy's
          face.
 
+         It is an ImageObject with explicit dimensions rather than a bare
+         URL string, and the file behind it is 1200x1200, because of what
+         Google does with SERP thumbnails. That slot is SQUARE, and
+         Google fits rather than crops — so og.png at 1.91:1 renders
+         letterboxed, with grey bars above and below. The portrait was
+         always the better-shaped candidate but sat at 1113px, under the
+         1200px floor Google documents for structured-data images.
+         Stating width/height here means Google does not have to fetch
+         the file to learn its shape.
+
+         Being straight about the confidence: WHICH image Google picks
+         is a heuristic, not a contract. There is no tag that forces it.
+         This widens the odds rather than settling the matter, and the
+         SERP can take weeks to catch up.
+
          worksFor is an array of OrganizationRole rather than a bare
          Organization. Role is schema.org's documented way to attach
          dates to an association (the property repeats inside the Role),
@@ -233,7 +253,12 @@
             "@id": "https://royeyal.com/#roy",
             "name": "Roy Eyal",
             "url": "https://royeyal.com/",
-            "image": "https://royeyal.com/images/roy-eyal.webp",
+            "image": {
+              "@type": "ImageObject",
+              "url": "https://royeyal.com/images/roy-eyal.webp",
+              "width": 1200,
+              "height": 1200
+            },
             "email": "mailto:hello@royeyal.com",
             "jobTitle": "Marketing Web Developer",
             "description": "Marketing web developer who closes the gap between design and production \u2014 Figma-to-code design systems, hand-built marketing sites, and AI workflows.",
@@ -621,20 +646,33 @@
                      dwebp roy-eyal.webp -o full.png
                      sips -Z 800 full.png
                      cwebp -q 82 full.png -o roy-eyal-800.webp
-                   Re-run from a true original if one ever exists; these
-                   are downscaled from the 1113 webp, which is already
-                   lossy. -->
+                   Provenance, because the files no longer show it:
+                   everything here descends from a 1113px webp that was
+                   ALREADY lossy — there is no true original in the repo
+                   or its history. 400/800 are downscaled from it.
+
+                   The top candidate was resampled UP to 1200 on
+                   2026-08-24. Not for display — though it happens to fit,
+                   since a 400px box at 3x wants exactly 1200 and 1113 was
+                   marginally under. The actual reason is that Google
+                   floors structured-data image candidates at 1200px wide
+                   and the portrait was landing beneath it; see the
+                   Person.image note. A 7.8% upscale, verified as visually
+                   clean, but it is still invented detail.
+
+                   Re-run the WHOLE set if a true original ever turns
+                   up. -->
               <img
                 src="/images/roy-eyal.webp"
                 srcset="
                   /images/roy-eyal-400.webp  400w,
                   /images/roy-eyal-800.webp  800w,
-                  /images/roy-eyal.webp     1113w
+                  /images/roy-eyal.webp     1200w
                 "
                 sizes="(max-width: 27.5rem) calc(100vw - 2.5rem), 25rem"
                 alt="Roy Eyal — professional headshot"
-                width="1113"
-                height="1113"
+                width="1200"
+                height="1200"
                 loading="lazy"
                 decoding="async"
               />
