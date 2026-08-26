@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Two URLs, which is exactly why this file now exists: robots.txt said
-  to add the Sitemap line back "if it ever grows a second page", and /cv
-  is that second page.
+  Four URLs. The file first appeared for /cv, and that reason still
+  holds: nothing on the homepage links to it, so a crawler following
+  links from the root will never reach it. This is the only thing
+  telling anyone the page is there.
 
-  It earns its keep for one reason. Nothing on the homepage links to
-  /cv, so a crawler following links from the root will never reach it.
-  This is the only thing telling anyone the page is there.
+  /privacy and /accessibility are the opposite case — both are linked
+  from the footer, so a crawler would find them anyway. They are listed
+  because a sitemap that covers three of four pages invites the question
+  of what is being left out, and because the answer to "is that page
+  actually published" should be checkable in one place.
+
+  Priority is relative and only meaningful within this file: the CV is
+  what the site is for, and the two documents are reference material
+  that should never outrank it in a site links block.
 
   No <lastmod>. It would have to be maintained by hand and a stale date
   is worse than none — Google discounts the whole file once the dates
@@ -20,5 +27,13 @@
   <url>
     <loc>https://royeyal.com/cv</loc>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://royeyal.com/accessibility</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://royeyal.com/privacy</loc>
+    <priority>0.3</priority>
   </url>
 </urlset>

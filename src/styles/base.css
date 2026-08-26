@@ -49,7 +49,7 @@ body {
    whole document, so the black below the hero is lit rather than
    uniform. FIXED, not scrolled: the wash stays put while sections
    travel over it, which reads as depth rather than as a gradient
-   sliding past. Scrolled, the same colours would just look like a band.
+   sliding past. Scrolled, the same colors would just look like a band.
 
    It does not touch the hero. .hero's own background stack ends in an
    opaque var(--ink), so it covers this completely — the hero looks
@@ -57,7 +57,7 @@ body {
    away. The footer likewise paints its own opaque gradient over it.
 
    Alphas are 0.04-0.06 on purpose. Anything higher stops reading as
-   "the black has depth" and starts reading as a coloured page, which
+   "the black has depth" and starts reading as a colored page, which
    costs the cards and the magenta accents their contrast against it.
 
    Cheap: a static fixed element is rasterised once onto its own
@@ -84,7 +84,7 @@ body::before {
       rgba(66, 239, 254, 0.05),
       transparent 62%
     ),
-    /* magenta, right of centre — the site's dominant accent, kept off
+    /* magenta, right of center — the site's dominant accent, kept off
        the text column so the body copy never sits on top of it */
     radial-gradient(
         ellipse 65% 55% at 88% 42%,
@@ -259,6 +259,45 @@ a {
     0 0 1.5rem -0.25rem var(--cyan-dim);
 }
 
+/* The one linked chip (the Accessibility tag on the Wix card).
+
+   .chip:hover brightens EVERY chip, interactive or not, which is fine
+   as texture but means hover carries no information about which one is
+   clickable. So the affordance has to be visible at rest and has to
+   survive without color: an underline and a trailing arrow, both of
+   which read the same in a high-contrast mode or a monochrome print.
+
+   The padding moves from the li to the anchor so the whole chip is the
+   target rather than just the word — 24px is the floor and the chip
+   clears it, but only if the link actually fills it. */
+.chip--link {
+  padding: 0;
+}
+
+.chip--link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-thickness: var(--border-w);
+}
+
+/* :focus-within, not just :hover — the chip's lit state is on the li,
+   and a keyboard user lands on the anchor inside it. */
+.chip--link:focus-within {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+}
+
+.chip__out {
+  /* The arrow is a hair heavy against the pixel font at this size. */
+  font-size: 0.9em;
+  opacity: 0.75;
+}
+
 .chips--small {
   margin-top: 1.5rem;
 }
@@ -282,7 +321,7 @@ a {
   /* squared-off cyberpunk corners instead of a pill */
   border-radius: var(--radius-btn);
   /* transform and box-shadow keep their own feel — the lift is a
-     physical move, not a fade. Only the colour pair takes the
+     physical move, not a fade. Only the color pair takes the
      asymmetric link easing, so the hero's ghost buttons tint in and out
      like every other link on the page. */
   transition:

@@ -1,0 +1,378 @@
+/* ------------------------------------------------------------------
+   Shared stylesheet for the two standing documents — /privacy and
+   /accessibility.
+
+   WHY A FILE RATHER THAN INLINE CSS
+   404.html inlines its styles on purpose: it is the page that has to
+   render when something has already gone wrong, so it depends on
+   nothing. These two are ordinary pages with no such constraint, and
+   they are typographically identical — inlining would mean maintaining
+   the same 200 lines twice and letting them drift.
+
+   WHY IT LIVES IN public/ AND NOT src/
+   Same reason as the fonts: Vite content-hashes anything it bundles,
+   and these two pages are static files in public/ that cannot know a
+   hashed filename. public/ is copied to dist/ verbatim, so /doc.css is
+   a stable URL. The cost is that it is not cache-busted — but nothing
+   in public/_headers gives it a long max-age, so it revalidates
+   normally. Do not add it to the /assets/* rule.
+
+   The tokens below are a deliberate SUBSET of src/styles/tokens.css,
+   copied rather than imported for the same reason. Keep the values in
+   step by hand if the site's palette ever moves; nothing here is
+   load-bearing enough to be worth a build step.
+   ------------------------------------------------------------------ */
+
+/* Only the three faces a text document actually needs. font-display is
+   `swap`, not the `block` cv.html uses: a CV is a designed sheet where
+   a flash of the wrong face is a visible defect, whereas this is prose
+   whose job is to be read as early as possible. */
+@font-face {
+  font-family: 'Tektur Variable';
+  src: url('/fonts/Tektur-Latin-wght.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+/* The 300 900 range is NOT optional — Satoshi's fvar declares its
+   default instance at wght=900, so omitting it renders body copy in
+   Black. Same note as src/styles/fonts.css. The file itself is
+   gitignored (its license forbids redistribution); without it this page
+   falls back to system-ui and reads fine. */
+@font-face {
+  font-family: 'Satoshi Variable';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink: #05060a;
+  --surface: #0b0d15;
+  --line: rgba(255, 255, 255, 0.09);
+  --text: #f2f4fb;
+  --text-muted: #9aa3b8;
+  --cyan: #42effe;
+  --magenta: #f900b9;
+
+  --font-display: 'Tektur Variable', system-ui, sans-serif;
+  --font-body: 'Satoshi Variable', system-ui, sans-serif;
+  --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Body above 400 on purpose: light text on a black ground optically
+     thins. See the weights note in tokens.css. */
+  --w-body: 550;
+  --w-strong: 780;
+  --w-display: 666;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  /* No smooth scroll. The in-page anchors here are a table of contents,
+     and a reader who clicks one wants to be there, not to watch a
+     journey. */
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  padding: clamp(2.5rem, 7vw, 5rem) clamp(1.25rem, 5vw, 2rem)
+    clamp(4rem, 10vw, 7rem);
+  background: var(--ink);
+  /* The same magenta bloom the 404 uses, so these pages read as part of
+     the site rather than as something bolted on. */
+  background-image: radial-gradient(
+    46rem 28rem at 50% 0%,
+    rgba(249, 0, 185, 0.1),
+    transparent 64%
+  );
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: var(--w-body);
+  font-size: clamp(1rem, 0.97rem + 0.16vw, 1.0625rem);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* One measure for the whole document. 68ch lands around 60-70
+   characters of Satoshi at this size, which is the readable band for
+   long prose — the site's own container is much wider because it is
+   laying out cards, not paragraphs. */
+.doc {
+  max-width: 68ch;
+  margin: 0 auto;
+}
+
+/* ---- Masthead --------------------------------------------------- */
+
+.doc__home {
+  display: inline-block;
+  width: min(11rem, 44vw);
+  aspect-ratio: 596 / 117;
+  /* Masked rather than inlined so the gradient comes from CSS, exactly
+     as .ansi-logo does in sections.css and .logo does in 404.html.
+     /images/ is copied verbatim, so this path cannot be renamed by a
+     build. */
+  background: linear-gradient(100deg, var(--cyan) 10%, var(--magenta) 85%);
+  -webkit-mask: url('/images/royeyal-logo.svg') 0 0 / contain no-repeat;
+  mask: url('/images/royeyal-logo.svg') 0 0 / contain no-repeat;
+}
+
+.doc__eyebrow {
+  margin: clamp(2rem, 5vw, 3rem) 0 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-weight: var(--w-display);
+  font-size: clamp(2rem, 1.4rem + 3vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* The one-line answer, before anyone has to read the document. */
+.doc__lede {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.doc__updated {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+/* ---- Body ------------------------------------------------------- */
+
+h2 {
+  margin: clamp(2.5rem, 6vw, 3.5rem) 0 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-weight: var(--w-display);
+  font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  margin: 2rem 0 0.5rem;
+  font-family: var(--font-body);
+  font-weight: var(--w-strong);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+p,
+ul,
+ol,
+dl {
+  margin: 0 0 1rem;
+}
+
+ul,
+ol {
+  padding-left: 1.25rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+li::marker {
+  color: var(--magenta);
+}
+
+strong {
+  font-weight: var(--w-strong);
+  color: var(--text);
+}
+
+/* --text-muted is 8.0:1 on --ink, comfortably past AA for body text —
+   it is a muted tone, not a low-contrast one. Measured, not assumed;
+   see the note in tokens.css. */
+.muted {
+  color: var(--text-muted);
+}
+
+/* kbd shares code's treatment — a key name and an element name are the
+   same kind of literal here, and giving them two looks would imply a
+   distinction the prose does not make. */
+code,
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  background: var(--surface);
+  color: var(--cyan);
+}
+
+a {
+  color: var(--cyan);
+  /* Underlined, always. Color alone would fail SC 1.4.1 inside a
+     paragraph, and these pages are almost entirely paragraphs. */
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  color: var(--magenta);
+}
+
+:focus-visible {
+  outline: 0.125rem solid var(--cyan);
+  outline-offset: 0.1875rem;
+  border-radius: 0.125rem;
+}
+
+/* ---- Callout ---------------------------------------------------- */
+
+/* Used once per page, for the thing a reader who reads nothing else
+   should still come away with. */
+.callout {
+  margin: 1.5rem 0;
+  padding: 1.125rem 1.25rem;
+  border: 1px solid var(--line);
+  border-left: 0.1875rem solid var(--magenta);
+  /* Square on the left, rounded on the right. The magenta rule is the
+     point of this component, and a radius on the corners it runs
+     between bends its two ends inward — so it reads as a bracket
+     someone drew badly rather than as a straight edge. Squaring only
+     the left keeps the rule dead straight and leaves the rounding where
+     it still does something. */
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: var(--surface);
+}
+
+.callout > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Definition lists ------------------------------------------- */
+
+/* The cookie table and the "what a server log holds" list are both
+   term/description pairs, so they are marked up as one rather than
+   faked with a grid of divs. */
+dt {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--cyan);
+}
+
+dd {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+}
+
+/* ---- Footer ----------------------------------------------------- */
+
+.doc__foot {
+  margin-top: clamp(3rem, 8vw, 4.5rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.doc__foot a {
+  color: var(--text-muted);
+}
+
+.doc__foot a:hover {
+  color: var(--magenta);
+}
+
+.doc__foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+/* ---- Print ------------------------------------------------------ */
+
+/* Someone will forward one of these to a compliance inbox, and it
+   should not arrive as a black rectangle. */
+@media print {
+  body {
+    background: #fff;
+    background-image: none;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  a {
+    color: #000;
+  }
+
+  .muted,
+  dd,
+  .doc__foot,
+  .doc__updated {
+    color: #333;
+  }
+
+  .doc__home {
+    background: #000;
+  }
+
+  code,
+  kbd {
+    background: none;
+    color: #000;
+  }
+
+  /* Print the destination of every outbound link — a URL the reader
+     cannot click is a URL they cannot follow up. In-page anchors are
+     excluded: "(#feedback)" on paper is noise. */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

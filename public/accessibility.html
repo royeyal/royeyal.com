@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Accessibility — Roy Eyal</title>
+
+    <link rel="canonical" href="https://royeyal.com/accessibility" />
+    <meta
+      name="description"
+      content="How royeyal.com is built for accessibility, how it was tested, and what is still missing. Self-assessed against WCAG 2.2 Level AA."
+    />
+    <meta name="theme-color" content="#05060a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/doc.css" />
+
+    <!--
+      THE RULE FOR THIS PAGE: NOTHING HERE IS ASPIRATIONAL.
+
+      An accessibility statement that says "we strive to comply with WCAG
+      2.1 AA" on a site nobody has tested is worse than no statement at
+      all. It is unfalsifiable, it is on ten thousand other sites word for
+      word, and anyone who actually does this work reads it as a claim
+      made by someone who does not.
+
+      So every line under "How it is built" points at something real in
+      this repo, and every line under "What is still missing" is a gap
+      that has not been closed yet. The limitations section is the part
+      that makes the rest of the page worth reading — do not trim it to
+      make the site look better. If a limitation gets fixed, move it up;
+      do not just delete it.
+
+      Same maintenance rule as /privacy: this page changes in the commit
+      that changes the behavior, not in a cleanup pass six months later.
+    -->
+  </head>
+  <body>
+    <main class="doc">
+      <a class="doc__home" href="/" aria-label="Roy Eyal — home"></a>
+
+      <p class="doc__eyebrow">royeyal.com</p>
+      <h1>Accessibility</h1>
+
+      <p class="doc__lede">
+        I build accessible sites for a living, so this one had better be one.
+        Here is what that actually amounts to, how it was checked, and what is
+        still missing.
+      </p>
+
+      <p class="doc__updated">
+        Last updated <time datetime="2026-08-26">26 August 2026</time>
+      </p>
+
+      <h2>Where it stands</h2>
+
+      <p>
+        This site is built to meet
+        <a href="https://www.w3.org/TR/WCAG22/" rel="noreferrer" target="_blank"
+          >WCAG 2.2</a
+        >
+        Level AA. That is a target I have tested against myself, not a formal
+        conformance claim: nobody independent has audited this site, and it
+        carries no certification. Treat the list below as evidence you can go
+        and check, and the list after it as the reason I am not claiming more.
+      </p>
+
+      <p class="muted">
+        This statement covers the homepage at royeyal.com, the one-page CV at
+        <a href="/cv">/cv</a>, these two document pages, and the 404 page —
+        which is the whole site.
+      </p>
+
+      <h2>How it is built</h2>
+
+      <h3>Structure</h3>
+      <ul>
+        <li>
+          One <code>&lt;h1&gt;</code> per page and headings that descend in
+          order, with no skipped levels — so a screen reader's heading list is a
+          usable table of contents rather than a flat wall.
+        </li>
+        <li>
+          Real landmarks (<code>header</code>, <code>main</code>,
+          <code>nav</code>, <code>footer</code>), and the navigation elements
+          carry labels so they can be told apart.
+        </li>
+        <li>
+          A language is declared on every page, and every image has an
+          <code>alt</code> attribute. Purely decorative graphics — the animated
+          hero backdrop, the scanline overlay, the company logos that sit beside
+          a heading already carrying the name — are hidden from assistive
+          technology instead of being announced twice.
+        </li>
+        <li>
+          Every page still reads with JavaScript switched off. The reveal
+          animations start from the element's natural visible state, so a bundle
+          that never loads costs you the motion, not the content.
+        </li>
+      </ul>
+
+      <h3>Keyboard</h3>
+      <ul>
+        <li>
+          Everything interactive is reachable and operable from the keyboard, in
+          document order. There is no positive
+          <code>tabindex</code> anywhere, so the tab order is the reading order.
+        </li>
+        <li>
+          Focus is always visible: a 2px cyan outline, offset from the element,
+          applied site-wide rather than per component — and never removed
+          without a replacement.
+        </li>
+        <li>
+          The floating menu is inert while it is closed, so it is not a set of
+          invisible tab stops you have to page through. Opening it reports
+          <code>aria-expanded</code>, and <kbd>Esc</kbd> closes it.
+        </li>
+        <li>
+          Standalone controls are sized to the 24&nbsp;×&nbsp;24&nbsp;px floor
+          that WCAG 2.2 introduced. Links inside a sentence are left at text
+          size, which is the exception the same rule allows.
+        </li>
+      </ul>
+
+      <h3>Motion and sound</h3>
+      <ul>
+        <li>
+          <code>prefers-reduced-motion</code> is honored, and not just by a
+          blanket rule that zeroes durations. The hero intro, the scroll-driven
+          timeline and the scroll behavior each have their own reduced branch,
+          and the animated WebGL backdrop renders a single static frame instead
+          of running a render loop.
+        </li>
+        <li>
+          Nothing moves, flashes or auto-plays without you starting it. Sound
+          effects are off until you switch them on, and the toggle reports its
+          state rather than just looking different.
+        </li>
+      </ul>
+
+      <h3>Color and layout</h3>
+      <ul>
+        <li>
+          Text contrast was measured, not eyeballed: every visible run of text
+          on the homepage and the CV was checked against its actual composited
+          background. None of it falls below AA. Muted body copy sits around
+          8:1, well clear of the 4.5:1 floor.
+        </li>
+        <li>
+          Color is never the only signal. Links in prose are underlined, and
+          states that matter are carried by text or an ARIA property as well as
+          a color change.
+        </li>
+        <li>
+          The layout reflows to a 320&nbsp;px viewport with no horizontal
+          scrolling, and sizes are in relative units so browser zoom and a
+          larger default font size both work.
+        </li>
+        <li>
+          Confirmation messages are announced. Copying my email address updates
+          a polite live region, and the visual "Copied" flash is hidden from
+          screen readers so the same fact is not said twice.
+        </li>
+      </ul>
+
+      <h2>How it was tested</h2>
+
+      <p>
+        Self-assessment, most recently on
+        <time datetime="2026-08-26">26 August 2026</time>, covering:
+      </p>
+
+      <ul>
+        <li>
+          A programmatic pass over the rendered DOM — heading order, landmarks,
+          alt text, accessible names on every focusable control, tab order, and
+          the state of the menu while closed.
+        </li>
+        <li>
+          Contrast measured on every visible text node against its composited
+          background, rather than sampling a few tokens by hand.
+        </li>
+        <li>Reflow and layout checked down to a 320&nbsp;px viewport.</li>
+        <li>
+          The no-JavaScript and print paths, both of which are easy to break
+          with scroll-triggered reveals and both of which work.
+        </li>
+      </ul>
+
+      <h2 id="limitations">What is still missing</h2>
+
+      <div class="callout">
+        <p>
+          <strong
+            >The most useful thing on this page is this list, not the one above
+            it.</strong
+          >
+          Automated checks catch a minority of real accessibility problems.
+          These are the gaps I know about.
+        </p>
+      </div>
+
+      <ul>
+        <li>
+          <strong>No end-to-end screen reader pass.</strong> The markup and ARIA
+          have been reviewed carefully, but I have not yet sat down and driven
+          the whole site with VoiceOver, NVDA and JAWS in turn. Until I have,
+          anything on this page about how it sounds is inference from the code,
+          not observation.
+        </li>
+        <li>
+          <strong>No independent audit.</strong> Everything here is my own
+          assessment of my own work, which is the weakest kind of assessment
+          there is.
+        </li>
+        <li>
+          <strong
+            >Contrast over the hero backdrop is not a fixed number.</strong
+          >
+          The headline sits over an animated WebGL layer, so the ratio moves as
+          it moves. The body color used there is chosen to hold roughly 8:1
+          against the lit backdrop, but that is a measurement taken at one
+          moment rather than a guarantee, and no automated tool can check it.
+        </li>
+        <li>
+          <strong>Sound has no system preference to obey.</strong> There is a
+          <code>prefers-reduced-motion</code>; there is no equivalent for audio.
+          Off-by-default and an explicit toggle is the best answer I have, and
+          it is a choice rather than a solved problem.
+        </li>
+        <li>
+          <strong>Links leave this site.</strong> LinkedIn, GitHub and the
+          client sites in the work section are not mine, and I cannot speak for
+          how accessible they are.
+        </li>
+      </ul>
+
+      <h2 id="feedback">Telling me something is broken</h2>
+
+      <p>
+        If any part of this site is hard or impossible to use, I want to know —
+        including, and especially, something that is not on the list above.
+      </p>
+
+      <p>
+        Email
+        <a href="mailto:hello@royeyal.com">hello@royeyal.com</a>. What helps:
+        the page, what you were trying to do, and what your setup is — browser,
+        operating system, and any assistive technology, with versions if you
+        have them. Any one of those is better than not writing.
+      </p>
+
+      <p>
+        I will reply within five working days. If it is something I can fix, I
+        will tell you when it is fixed; if it is not, I will tell you that
+        plainly instead of leaving it open.
+      </p>
+
+      <p class="muted">
+        This is a personal site, so there is no formal enforcement procedure
+        behind that promise — only me, and this page, which is a public record
+        of what I said I would do.
+      </p>
+
+      <footer class="doc__foot">
+        <p>© 2026 Roy Eyal</p>
+        <p class="doc__foot-links">
+          <a href="/">Home</a>
+          <a href="/privacy">Privacy</a>
+          <a href="mailto:hello@royeyal.com">hello@royeyal.com</a>
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

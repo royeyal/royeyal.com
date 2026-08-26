@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy — Roy Eyal</title>
+
+    <!-- Canonical is the clean URL. The Workers asset server serves
+         privacy.html at /privacy and 307s the .html form to it, the same
+         way it does for /cv — see the html_handling default in
+         wrangler.jsonc. Nothing extra to configure. -->
+    <link rel="canonical" href="https://royeyal.com/privacy" />
+    <meta
+      name="description"
+      content="What royeyal.com collects: nothing. No analytics, no tracking, no third-party embeds — and the one cookie Cloudflare may set for security."
+    />
+    <meta name="theme-color" content="#05060a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/doc.css" />
+
+    <!--
+      DELIBERATELY BORING, AND DELIBERATELY SHORT.
+
+      The temptation with a page like this is to reach for the boilerplate
+      that every generator emits — "we may collect", "our partners",
+      fourteen headings covering things the site does not do. That prose
+      is worse than nothing here, because every sentence of it is a claim
+      about processing that is not happening, and a reader cannot tell the
+      real line from the padding.
+
+      So: only what is true, and each claim traceable to something in this
+      repo. If the site ever grows a form, an analytics tag or an embed,
+      this page changes in the same commit. That is the whole maintenance
+      rule.
+    -->
+  </head>
+  <body>
+    <main class="doc">
+      <a class="doc__home" href="/" aria-label="Roy Eyal — home"></a>
+
+      <p class="doc__eyebrow">royeyal.com</p>
+      <h1>Privacy</h1>
+
+      <p class="doc__lede">
+        This site has no analytics, no tracking pixels, no embeds and no forms.
+        It does not know who you are, and neither do I.
+      </p>
+
+      <p class="doc__updated">
+        Last updated <time datetime="2026-08-26">26 August 2026</time>
+      </p>
+
+      <h2>What this site collects</h2>
+
+      <p>
+        Nothing that identifies you, and nothing I ever see. There is no
+        analytics script on any page — no Google Analytics, no Plausible, no
+        self-hosted alternative. There is no dashboard behind this site telling
+        me you visited, which page you read, or how long you stayed.
+      </p>
+
+      <p>
+        There is also nothing to fill in. The contact control in the footer
+        copies my email address to your clipboard; it does not submit anywhere.
+        Writing to me is a normal email from your own mail client, and the only
+        thing I learn is whatever you choose to put in it.
+      </p>
+
+      <div class="callout">
+        <p>
+          <strong>No consent banner, on purpose.</strong> A cookie banner is for
+          asking permission to do something you would otherwise have to be asked
+          about. Nothing here qualifies, so putting a banner up would be theater
+          — and it would imply tracking that is not happening.
+        </p>
+      </div>
+
+      <h2>Cookies</h2>
+
+      <p>
+        This site sets none of its own. The only cookie that can appear comes
+        from Cloudflare, which serves the site:
+      </p>
+
+      <dl>
+        <dt>__cf_bm</dt>
+        <dd>
+          Cloudflare's bot-mitigation cookie. It is set on some requests to tell
+          automated traffic apart from human traffic, expires after about 30
+          minutes, and carries nothing about you or your visit that outlives it.
+          It is a strictly necessary security cookie, which the ePrivacy rules
+          exempt from consent — which is the other reason there is no banner.
+        </dd>
+        <dt>cf_clearance</dt>
+        <dd>
+          Only if Cloudflare ever challenges your connection, to remember that
+          you passed. Most visits never see it.
+        </dd>
+      </dl>
+
+      <p class="muted">
+        At the time of writing, a plain request to this site returns no cookie
+        at all — those two are what Cloudflare's protections
+        <em>can</em> set, not a list of what you will get.
+      </p>
+
+      <h2>Server logs</h2>
+
+      <p>
+        Serving a page means receiving a request, and a request carries
+        information whether or not anyone wants it to. Cloudflare handles that
+        on my behalf, as a processor:
+      </p>
+
+      <dl>
+        <dt>What a log line holds</dt>
+        <dd>
+          Your IP address, the URL you asked for, the time, your browser's
+          user-agent string, and the response code it got back.
+        </dd>
+        <dt>What it is for</dt>
+        <dd>
+          Delivering the page and keeping the site up — rate limiting, abuse
+          handling, and diagnosing outages. Not audience measurement.
+        </dd>
+        <dt>How long it lives</dt>
+        <dd>
+          Cloudflare retains it for a limited period under its own policy and
+          then discards it. I do not export it, keep a copy, or join it to
+          anything else.
+        </dd>
+      </dl>
+
+      <p>
+        Cloudflare's own handling is described in its
+        <a
+          href="https://www.cloudflare.com/privacypolicy/"
+          rel="noreferrer"
+          target="_blank"
+          >privacy policy</a
+        >.
+      </p>
+
+      <h2>Fonts, images and everything else on the page</h2>
+
+      <p>
+        All of it is served from this domain. The three typefaces are
+        self-hosted rather than pulled from Google Fonts, which matters here for
+        a reason beyond speed: a webfont request hands your IP address to
+        whoever serves the font. Nothing on these pages makes a request to a
+        third party, so there is no such disclosure to make.
+      </p>
+
+      <h2>Links to other places</h2>
+
+      <p>
+        The site links out — to LinkedIn, to GitHub, and to sites I have worked
+        on. Following one takes you somewhere I do not control and whose privacy
+        practices are its own. Nothing from those places is embedded here, so
+        none of them can see you until you click.
+      </p>
+
+      <h2 id="rights">Your rights, and how to use them</h2>
+
+      <p>
+        If you are in the EU, the UK, California or anywhere with comparable
+        law, you have rights of access, correction, deletion and objection over
+        personal data held about you. For this site I am the controller, and you
+        can exercise any of them by writing to
+        <a href="mailto:hello@royeyal.com">hello@royeyal.com</a>.
+      </p>
+
+      <p>
+        A straight answer about what that gets you: because nothing identifying
+        is stored, an access or deletion request usually has very little to act
+        on. The honest response to "what do you hold on me" is normally
+        "nothing" — and if you ask, that is what I will tell you, rather than
+        sending a form back.
+      </p>
+
+      <h2>If this changes</h2>
+
+      <p>
+        It changes when the site does. If I ever add a form, an analytics tag or
+        an embedded third party, this page gets updated in the same change that
+        adds it, and the date at the top moves. There is no version of this site
+        where the code and this page disagree and I find out later.
+      </p>
+
+      <footer class="doc__foot">
+        <p>© 2026 Roy Eyal</p>
+        <p class="doc__foot-links">
+          <a href="/">Home</a>
+          <a href="/accessibility">Accessibility</a>
+          <a href="mailto:hello@royeyal.com">hello@royeyal.com</a>
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

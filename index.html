@@ -136,7 +136,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <!-- 180x180, opaque, square-cornered — iOS applies its own mask, so a
          pre-rounded source would get rounded twice. Verified: alpha 255 at
-         all four corners, centre is exactly #F900B9. -->
+         all four corners, center is exactly #F900B9. -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Link previews. This site's whole job is being pasted into a
@@ -205,7 +205,7 @@
          URL string, and the file behind it is 1200x1200, because of what
          Google does with SERP thumbnails. That slot is SQUARE, and
          Google fits rather than crops — so og.png at 1.91:1 renders
-         letterboxed, with grey bars above and below. The portrait was
+         letterboxed, with gray bars above and below. The portrait was
          always the better-shaped candidate but sat at 1113px, under the
          1200px floor Google documents for structured-data images.
          Stating width/height here means Google does not have to fetch
@@ -802,11 +802,28 @@
                   accessible, well-structured styling.
                 </li>
               </ul>
+              <!-- The only chip on the page that is a link, and the only
+                   one that needs to look like one. Every .chip already
+                   brightens on hover whether or not it does anything, so
+                   hover cannot be the thing that says "this one is
+                   clickable" — hence the arrow and the underline, both
+                   present at rest. See .chip--link in base.css.
+
+                   The visually hidden tail is there because a link named
+                   only "Accessibility" tells a screen-reader user nothing
+                   about where it goes when it is pulled out of context
+                   into a links list. -->
               <ul class="chips chips--small">
                 <li class="chip">CSS3</li>
                 <li class="chip">ES6+</li>
                 <li class="chip">Velo</li>
-                <li class="chip">Accessibility</li>
+                <li class="chip chip--link">
+                  <a href="/accessibility" data-cuelume-press="press">
+                    Accessibility<span class="sr-only">
+                      — how this site is built and tested</span
+                    ><span class="chip__out" aria-hidden="true">↗</span>
+                  </a>
+                </li>
               </ul>
             </li>
 
@@ -1052,7 +1069,7 @@
             <span class="clip__done" aria-hidden="true">Copied</span>
           </span>
           <!-- The affordance. Without it the address reads as a link —
-               underlined, coloured, hover-reactive — which promises
+               underlined, colored, hover-reactive — which promises
                navigation and then does something else entirely. -->
           <span class="clip__icons" aria-hidden="true">
             <svg
@@ -1133,10 +1150,21 @@
         <span data-giant>ROY&nbsp;EYAL</span>
       </div>
 
+      <!-- The two standing documents. They live in the meta row rather
+           than up in footer__links, because that nav is contact — the
+           places to reach me — and these are reference: read once, or
+           never, or when someone in procurement asks. Standard practice
+           puts both in the footer, and it is also the only place on a
+           one-page site where a reader would think to look. -->
       <div class="footer__meta container">
         <p class="mono">
           hello@royeyal.com:~$ exit<span class="cursor">▌</span>
         </p>
+
+        <nav class="footer__docs mono" aria-label="Site information">
+          <a href="/accessibility" data-cuelume-press="press">Accessibility</a>
+          <a href="/privacy" data-cuelume-press="press">Privacy</a>
+        </nav>
 
         <p class="mono">© <span data-year>2026</span> Roy Eyal</p>
       </div>

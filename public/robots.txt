@@ -1,6 +1,8 @@
 # royeyal.com
 #
-# Two pages, nothing private, nothing to keep out.
+# Four pages, nothing private, nothing to keep out.
+# (Homepage, /cv, /accessibility, /privacy — and /privacy is a
+# statement about the site, not a page that needs protecting.)
 #
 # NOTE: crawlers were never seeing a 404 here. With no robots.txt at the
 # origin, Cloudflare was answering /robots.txt itself on the free plan
