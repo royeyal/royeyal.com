@@ -57,7 +57,7 @@
   /* ================================================================
      Tokens. Paper-adapted from src/styles/tokens.css.
      Neutrals carry a violet bias, because the site's neutrals do
-     (--surface #0b0d15, --text-muted #9aa3b8) — a pure grey here would
+     (--surface #0b0d15, --text-muted #9aa3b8) — a pure gray here would
      read as unrelated to the site.
      ================================================================ */
   :root {
@@ -263,7 +263,7 @@
      are dark-surface effects that print as a slab), and every hue drops
      ~20 points of OKLCH lightness, because the site's values are tuned
      for a dark tile and would wash out on white. Hue and chroma are
-     untouched, so the marks stay recognisably themselves. */
+     untouched, so the marks stay recognizably themselves. */
   .job__logo {
     --logo-color: var(--ink);
     width: 7mm;
@@ -406,7 +406,7 @@
      THE PAPER MARGIN COMES FROM @page, NOT FROM PADDING INSIDE THE
      SHEET. This started out the other way round — `margin: 0` plus the
      sheet's own 12mm padding, so the header band could bleed to the
-     paper edge — and that only works if the browser honours a zero
+     paper edge — and that only works if the browser honors a zero
      margin exactly. It does in Save-as-PDF with margins set to None,
      and nowhere else. On default settings the printable box is ~277mm,
      the sheet was 294.7mm, and it overflowed by 17.7mm.
@@ -450,7 +450,7 @@
     .body { padding-inline: 6mm; padding-bottom: 0; }
 
     /* Every painted element, or the tint, the magenta squares and the
-       brand-coloured marks all drop out on default print settings. */
+       brand-colored marks all drop out on default print settings. */
     .band,
     .mark,
     .job__logo,
@@ -469,7 +469,7 @@
       break-inside: avoid;
     }
 
-    /* Belt and braces. break-inside on .job alone was not honoured by
+    /* Belt and braces. break-inside on .job alone was not honored by
        the engine in the field report — a job header printed at the foot
        of page 1 with its bullets stranded on page 2. break-after on the
        head says the same thing in a form more engines respect. */

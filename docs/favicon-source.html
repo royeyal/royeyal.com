@@ -23,7 +23,7 @@
   which uses the same magenta-R-on-dark treatment:
 
     - FLAT background, not the starfield. The stars read at 180px and
-      turn to grey mud at 16px, which is the size that actually matters
+      turn to gray mud at 16px, which is the size that actually matters
       here.
     - 68% glyph box. That is the largest inset where a circular crop
       (some surfaces round all the way) still misses every corner of the
@@ -76,20 +76,20 @@
 
       /* public/favicon.svg is used directly as an <img> rather than as
          a CSS mask. The file already carries fill="#F900B9", so there is
-         nothing for CSS to colour, and an <img> keeps this source
+         nothing for CSS to color, and an <img> keeps this source
          honest: whatever the browser tab shows is exactly what gets
          rasterised here. The mark changes in one place, not two.
 
          68% SQUARE. favicon.svg's viewBox is "-12.9 0 94.7 94.7" — a
-         square box with the R already centred inside it — so a square
+         square box with the R already centered inside it — so a square
          element reproduces the mark's own proportions and no object-fit
          is needed. Do NOT switch either axis to `auto`: an SVG carrying
          no width/height attribute falls back to the 300px
          replaced-element default and blows straight past the canvas.
 
          Why 68% and not larger: inside that box the R reaches +/-34% of
-         the canvas vertically and +/-24.8% horizontally from centre, so
-         its furthest corner sits 42.1% from centre. A circular crop
+         the canvas vertically and +/-24.8% horizontally from center, so
+         its furthest corner sits 42.1% from center. A circular crop
          removes everything past 50%, so the mark clears even that — and
          comfortably clears the gentler rounded square Google uses. */
       .mark {

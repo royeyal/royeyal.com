@@ -8,7 +8,7 @@
 
    Loaded last in main.css so these rules win on source order. The
    !important flags are not defensive habit: they are beating GSAP's
-   inline styles and a deliberately blunt colour reset. Both are noted
+   inline styles and a deliberately blunt color reset. Both are noted
    where they appear.
    ------------------------------------------------------------------ */
 
@@ -23,7 +23,7 @@
 
   /* The site is `color-scheme: dark` (base.css:13). Left alone the
      printed page inherits dark form controls and some engines try to
-     honour the dark ground. */
+     honor the dark ground. */
   html {
     color-scheme: light;
   }
@@ -70,7 +70,7 @@
      headings are gradients clipped to the glyphs with a transparent
      fill, so merely setting `color` leaves them invisible on white.
 
-     Anything below that genuinely needs its own colour re-states it
+     Anything below that genuinely needs its own color re-states it
      with a class selector, which outranks `*` even at equal
      importance. */
   *,
@@ -150,7 +150,7 @@
 
   /* ---- Secondary text -------------------------------------------
      Class selectors, so they outrank the `*` reset above without
-     needing to come later. Grey rather than black keeps the hierarchy
+     needing to come later. Gray rather than black keeps the hierarchy
      the dark design gets from --text-muted. */
   .eyebrow,
   .section__lede,
@@ -283,7 +283,7 @@
     break-after: avoid;
   }
 
-  /* orphans/widows do nothing on screen but print engines honour them */
+  /* orphans/widows do nothing on screen but print engines honor them */
   p {
     orphans: 3;
     widows: 3;

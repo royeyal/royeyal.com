@@ -10,7 +10,7 @@ built as plain HTML/CSS/JS with Vite, hosted on Cloudflare Workers.
 - **GSAP** (npm) — hero intro, scroll reveals, footer scrub, anchor
   scrolling (**ScrollToPlugin**) and the bottom nav's easing
   (**CustomEase**). Both were Club-only once and have been free since
-  GSAP 3.13, so they come straight from npm with no licence gate
+  GSAP 3.13, so they come straight from npm with no license gate
 - **ogl** (npm) — WebGL "Strands" hero background, a vanilla port of
   [reactbits.dev/animations/strands](https://reactbits.dev/animations/strands)
   (no React needed)
@@ -24,7 +24,7 @@ built as plain HTML/CSS/JS with Vite, hosted on Cloudflare Workers.
   nothing unless enabled
 - Self-hosted fonts, no font CDN, **latin subset only** (this site is US
   English) — declared in `src/styles/fonts.css`, served from
-  `public/fonts/`, licences in
+  `public/fonts/`, licenses in
   [`public/fonts/LICENSES.md`](./public/fonts/LICENSES.md):
   - **Tektur** — display/headings, variable weight 400–900. SIL OFL 1.1.
   - **Satoshi Variable** — body, variable weight 300–900. The range in the
@@ -199,7 +199,7 @@ would make the whole setup scriptable from the repo.
 
 ## JS hooks (`data-*`)
 
-Every behaviour on this page is wired through a `data-*` attribute
+Every behavior on this page is wired through a `data-*` attribute
 rather than a class name. **There is no class-name fallback**: rename or
 drop one in the markup and the feature stops, usually with no error.
 
@@ -219,7 +219,7 @@ drop one in the markup and the feature stops, usually with no error.
     Keeping the cue here rather than in `nav.js` is what lets the Osmo
     script stay untouched.
 - `src/styles/sections.css` — `data-brand`, the only CSS-only one
-  (picks the logo tile colour)
+  (picks the logo tile color)
 - `src/js/clipboard.js` — `data-clip` (holds the value **and** is the
   hook), plus `data-copied`, which the module writes and
   `clipboard.css` animates off

@@ -27,7 +27,7 @@
   position: relative;
 }
 
-/* the faint rail — the script sets top/height to span marker centres */
+/* the faint rail — the script sets top/height to span marker centers */
 .step-timeline__line {
   pointer-events: none;
   position: absolute;
@@ -80,7 +80,7 @@
 /* every step the fill has passed — lit.
    This transition governs turning ON: a fast surge, with the glow and
    scale allowed to overshoot slightly so the filament visibly blooms
-   before settling. Colours use the non-overshooting curve to avoid
+   before settling. Colors use the non-overshooting curve to avoid
    interpolating out of gamut. */
 [data-step-timeline-item][data-status='active'] [data-step-timeline-marker] {
   background: var(--magenta);

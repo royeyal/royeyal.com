@@ -43,8 +43,8 @@ export function initSmoothScroll(root = document) {
     /* Checked per click rather than through gsap.matchMedia(): this is a
        single delegated listener, not a set of tweens to build and tear
        down, and reading the query here means a mid-session OS change is
-       honoured immediately. Not preventing default hands the browser its
-       own instant jump, which is exactly the reduced-motion behaviour. */
+       honored immediately. Not preventing default hands the browser its
+       own instant jump, which is exactly the reduced-motion behavior. */
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     event.preventDefault();
@@ -88,7 +88,7 @@ export function initSmoothScroll(root = document) {
            for years, and focusing a full-height section would then yank
            the page somewhere else entirely — a strong candidate for the
            "scrolls to the wrong part of the page" report. Restoring the
-           position afterwards is correct whether or not it's honoured. */
+           position afterwards is correct whether or not it's honored. */
         if (!target.hasAttribute('tabindex')) {
           target.setAttribute('tabindex', '-1');
         }

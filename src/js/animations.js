@@ -121,7 +121,7 @@ export function initAnimations() {
     /* A hard text swap is, counter-intuitively, the LOUDER option: an
        instant change is exactly what peripheral motion detection is tuned
        to catch. A short opacity dip reads as quiet.
-       Opacity only — no slide, no scale, no colour flash, and short
+       Opacity only — no slide, no scale, no color flash, and short
        enough (~300ms end to end) that it never registers as an
        animation. Anything more would make the pill compete with the
        page, which is the opposite of the point. */

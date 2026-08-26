@@ -148,7 +148,7 @@
    As an inline-level sibling of an inline-level button it would sit
    beside the address whenever there happened to be room. */
 .footer__mailto {
-  /* flex, not block, only so align-items can centre the text inside the
+  /* flex, not block, only so align-items can center the text inside the
      min-height below — it is still block-LEVEL, so the note above about
      always claiming its own line continues to hold. At 19px tall this
      was the furthest under WCAG 2.2 SC 2.5.8's 24x24 floor of anything

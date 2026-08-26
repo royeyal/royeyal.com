@@ -40,7 +40,7 @@
    correctly; omit it and the default instance can win, rendering body
    copy in Black.
 
-   NOT IN THE REPO. Satoshi's licence forbids redistribution, so this
+   NOT IN THE REPO. Satoshi's license forbids redistribution, so this
    file is gitignored — see public/fonts/LICENSES.md for where to get
    it. Without it the body copy falls back to system-ui and the page
    still works; it just is not the design. */

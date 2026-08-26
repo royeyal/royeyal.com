@@ -20,7 +20,7 @@
      busiest. */
   --text-lede: #b7bfd2;
 
-  /* ─── Wide-gamut brand colours ─────────────────────────────────
+  /* ─── Wide-gamut brand colors ──────────────────────────────────
      OKLCH base — the browser gamut-maps to sRGB on standard
      screens. P3 overrides below unlock full chroma on wide-gamut
      displays (Apple, modern Android/Windows). */
@@ -40,7 +40,7 @@
   --font-display: 'Tektur Variable', system-ui, sans-serif;
   /* Body: Satoshi, and that is settled — the Switzer it was on trial
      against has been removed. system-ui is a real fallback here, not
-     boilerplate: Satoshi is gitignored (its licence forbids
+     boilerplate: Satoshi is gitignored (its license forbids
      redistribution), so a fresh clone renders in it. */
   --font-body: 'Satoshi Variable', system-ui, sans-serif;
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
@@ -108,12 +108,12 @@
 
      The mono sizes here are 10px, 12px and 13.6px, so a 1px stem lands
      on 0.91 / 1.09 / 1.24 device pixels. Antialiasing renders that
-     fraction as grey, which is why the pixel font looked thin — and why
+     fraction as gray, which is why the pixel font looked thin — and why
      it looked worse on non-retina, where there is no second device pixel
      to carry the difference.
 
      Turning smoothing off makes the rasteriser snap each stem to a whole
-     pixel: solid strokes, no grey. It is the fix for the thinness, and
+     pixel: solid strokes, no gray. It is the fix for the thinness, and
      it costs nothing. WebKit/Blink only — Firefox has no equivalent and
      simply keeps today's rendering, so this degrades quietly.
      Set to `antialiased` to go back. */
@@ -198,8 +198,8 @@
   /* Link hover — asymmetric, same principle as the lightbulb below and
      applied the same way (base rule governs leaving, :hover rule governs
      arriving).
-     --ease-out is wrong for a colour fade: cubic-bezier(0.16, 1, …)
-     dumps almost all its travel in the first few frames, so the colour
+     --ease-out is wrong for a color fade: cubic-bezier(0.16, 1, …)
+     dumps almost all its travel in the first few frames, so the color
      snaps and then creeps, which reads as a jump rather than a fade.
      These are gentler at both ends. Arriving is quick and confident;
      leaving takes roughly twice as long and trails off, so a pointer

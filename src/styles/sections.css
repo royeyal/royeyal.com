@@ -105,10 +105,10 @@
      `.hero__hint` ("scroll to continue") landed 73px BELOW the fold, so
      the one cue telling people to scroll was invisible on a phone.
      9vh brings the whole hero inside 100svh and the hint back on screen.
-     Note this is genuinely the padding, not the centring: `justify-
+     Note this is genuinely the padding, not the centering: `justify-
      content: center` has no slack to distribute once the content
      overflows. */
-  /* Asymmetric, and the SUM is what matters. `.hero__inner` is centred in
+  /* Asymmetric, and the SUM is what matters. `.hero__inner` is centered in
      a 100svh hero with only ~12px of slack, so adding bottom padding just
      overflows again and pushes the hint back off screen. Moving padding
      from the top to the bottom keeps the total height identical and lifts
@@ -343,7 +343,7 @@
   color: var(--text-muted);
 }
 
-/* Brand colours, tuned: each company's own hue kept, but lightness and
+/* Brand colors, tuned: each company's own hue kept, but lightness and
    chroma normalised so all three carry equal visual weight on a dark
    tile. Their hues happen to sit along the site's own cyan -> magenta
    arc, so they read as part of the palette rather than against it.
@@ -556,7 +556,7 @@
  * shot toward the dark card beneath it, so the light ones calm down
  * while the dark ones barely move — brightness() would have crushed
  * SatYield into mud. Slight desaturation stops the borrowed brand
- * colours competing with the magenta/cyan accents.
+ * colors competing with the magenta/cyan accents.
  *
  * Comes up fast and fades slowly, same asymmetry as the timeline
  * markers, so the page keeps one motion vocabulary.

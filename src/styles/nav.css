@@ -18,7 +18,7 @@
   --bar-height: 3.75em;
 }
 
-/* Centred with auto margins, NOT `left: 50%` + `translate(-50%)`.
+/* Centered with auto margins, NOT `left: 50%` + `translate(-50%)`.
 
    Two reasons, both real:
 
@@ -33,7 +33,7 @@
       getComputedStyle, which returns PIXELS. It then rewrites the
       transform with that frozen pixel offset, so the -50% stops tracking
       the element's width — and this element changes width, from
-      --closed-width to --open-width. Auto margins re-centre on every
+      --closed-width to --open-width. Auto margins re-center on every
       resize and every open/close, with nothing to bake. */
 .bottom-nav {
   z-index: 100;
@@ -86,7 +86,7 @@
    backdrop root correctly.
 
    z-index: -1 puts it below the in-flow bar and panel but above the
-   parent's own background — which is why the background colour moved
+   parent's own background — which is why the background color moved
    here too. `isolation: isolate` on the parent keeps that -1 from
    escaping into the page's stacking context. */
 .bottom-nav__inner::before {
@@ -132,7 +132,7 @@
   height: 1.75rem;
   /* ...which leaves it 20px WIDE, under the 24x24 CSS px floor in WCAG
      2.2 SC 2.5.8. min-width pads the hit area out to 24 without touching
-     the SVG, which stays 20px and centred by the justify-content above —
+     the SVG, which stays 20px and centered by the justify-content above —
      so the control gets bigger and the mark does not. */
   min-width: 1.5rem;
   flex: none;
