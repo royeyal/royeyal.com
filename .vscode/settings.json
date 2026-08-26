@@ -1,0 +1,25 @@
+{
+  // Branch protection is scoped to this repo on purpose.
+  //
+  // It lives here rather than in user settings because the risk it
+  // guards against is specific to how this repo is worked on: Claude
+  // Code checks branches out into .claude/worktrees/, so two or three
+  // VS Code windows can be open on the same repository at once. One of
+  // them has main checked out, and committing into the wrong window is
+  // a two-second mistake with a public repo on the other end.
+  //
+  // Set globally it fired on every unrelated project's main, which is
+  // friction with no matching risk. Both keys are `scope: resource`, so
+  // this file is the right home for them — and because it is committed,
+  // every worktree of this repo inherits it automatically.
+  //
+  // The prompt still offers "Commit Anyway". This is a speed bump, not
+  // a lock; deliberate commits to main (the deploy flow does them) are
+  // one extra click.
+  "git.branchProtection": ["main"],
+
+  // Redundant with the default today, but stated so a future global
+  // "alwaysCommit" — the obvious thing to reach for when the prompt is
+  // annoying elsewhere — cannot silently disarm it here.
+  "git.branchProtectionPrompt": "alwaysPrompt"
+}
