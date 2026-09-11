@@ -1,0 +1,10 @@
+# public/cv.html and the other standalone pages are hand-tuned single
+# files with inline CSS — no build step, no shared stylesheet. Prettier
+# reflows all ~1300 lines of cv.html, which turns any incidental
+# `npm run format` into a diff nobody can review. They are formatted the
+# way their authors left them; keep it that way.
+public/cv.html
+
+# Generated, or not ours.
+dist/
+public/fonts/

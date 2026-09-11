@@ -75,7 +75,12 @@ src/js/scroll.js       GSAP ScrollToPlugin anchor scrolling
 src/js/clipboard.js    copy-to-clipboard email fields
 src/js/signature.js    the ANSI wordmark + hello, in the console and (via
                        the build) in the HTML source. Single source of truth
+src/data/projects.js   the freelance grid, as data — reorder or add a
+                       project here; the markup is generated
+build/projects.js      Vite plugin — renders src/data/projects.js into the
+                       <!--#projects--> placeholder in index.html
 build/llms-txt.js      Vite plugin — emits dist/llms.txt from index.html
+                       (plus src/data/projects.js for the freelance list)
 build/strip-html-comments.js
                        Vite plugin — removes HTML comments from dist/ and
                        prepends the signature block
@@ -141,6 +146,51 @@ because Node evaluates the module during the build.
 `build/llms-txt.js` is unaffected by any of this: it reads `index.html`
 off disk rather than taking the transformed HTML.
 
+### The drift check
+
+`renderMarkdown` is exported so its guard rails can be exercised without
+a build. It asserts every selector it reads, so this is a cheap way to
+find out whether a markup change has quietly broken the extraction —
+run it after renaming a class on the page:
+
+```bash
+node --input-type=module -e "import {readFileSync} from 'node:fs'; import {renderMarkdown} from './build/llms-txt.js'; renderMarkdown(readFileSync('index.html','utf8')); console.log('llms.txt selectors ok')"
+```
+
+It throws naming the selector that stopped matching. `npm run build`
+runs the same code, so this only buys you a faster answer.
+
+## The freelance grid
+
+The four project cards are the only section of the page that is not
+written out in `index.html`. They are generated at build time by
+`build/projects.js` from the array in `src/data/projects.js`, into a
+`<!--#projects-->` placeholder inside `<ul class="project-grid">`.
+
+**To reorder, move an object in the array.** Display order is array
+order — no sort, no `featured` flag, no date field that could disagree
+with the order you can see. The grid is two columns, so the first two
+entries are what a visitor reads on arrival.
+
+**To add one, drop a 1000x595 WebP in `public/images/projects/` and
+append an object** with `name`, `href`, `meta`, `image` and `alt`. The
+capture spec and the reasoning behind it are in the header of the data
+file.
+
+It is generated rather than typed because every card is the same
+twenty-five lines of markup with five words changed, and the parts that
+are not the five words — `loading="lazy"`, `decoding="async"`, the
+intrinsic `width`/`height` that stop the grid reflowing,
+`rel="noreferrer"` — are the parts a hand-copied fifth card would get
+wrong. The output is still static HTML in the document, so the section
+survives a failed script, a crawler and the print stylesheet.
+
+The plugin **fails the build** on a missing placeholder, a missing
+field, or an entry whose screenshot is not on disk. All three otherwise
+ship a page that looks finished with the work missing. It runs `pre`, so
+`strip-html-comments` (which runs `post`) never sees the placeholder,
+and it carries no `apply`, so `npm run dev` renders the section too.
+
 ## Deploy
 
 Hosted on Cloudflare Workers using a static assets binding — Vite already
@@ -170,6 +220,22 @@ ln -sf "$(git rev-parse --path-format=absolute --git-common-dir)/../.env" .env
 ```
 
 A symlink rather than a copy, so it stays current if the token rotates.
+
+**The same trap, but silent — Satoshi.** `public/fonts/Satoshi-Variable.woff2`
+is gitignored too (the ITF licence forbids redistributing it; see
+`public/fonts/LICENSES.md`), so a fresh worktree or a fresh clone does not
+have it either. Unlike the missing `.env`, this one **does not fail**:
+Vite copies `public/` verbatim, the build succeeds, `wrangler deploy`
+succeeds, and the live site serves a `@font-face` that 404s — every word
+of body copy silently falls back to the system stack. Copy the file in
+before building anywhere that is not this working directory:
+
+```bash
+cp "$(git rev-parse --path-format=absolute --git-common-dir)/../public/fonts/Satoshi-Variable.woff2" public/fonts/
+```
+
+Verify with `ls dist/fonts/Satoshi-Variable.woff2` after a build. A copy
+rather than a symlink, because Vite resolves it into `dist/`.
 
 The apex is attached as a Workers **custom domain**, which created its
 own DNS record. It is not declared in `wrangler.jsonc` — see the note

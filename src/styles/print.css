@@ -244,7 +244,7 @@
   }
 
   /* ---- Images ---------------------------------------------------
-     The freelance grid is six full-bleed dark screenshots — the single
+     The freelance grid is full-bleed dark screenshots — the single
      biggest ink cost on the document, and nothing a hiring manager
      needs from a printout when the name and URL survive above them.
      To keep them, delete this block; the cards are already sized to
@@ -289,8 +289,8 @@
     widows: 3;
   }
 
-  /* Four work cards plus six projects overflow one sheet regardless, so
-     the breaks may as well fall somewhere deliberate. */
+  /* The work cards plus the freelance grid overflow one sheet
+     regardless, so the breaks may as well fall somewhere deliberate. */
   .work,
   .freelance,
   .footer {
