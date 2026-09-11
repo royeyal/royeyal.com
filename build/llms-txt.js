@@ -7,7 +7,9 @@
  * WHY THIS IS GENERATED, NOT WRITTEN BY HAND
  * A second copy of a CV that someone has to remember to update is a CV
  * that goes stale, and a stale one is worse than none. This derives
- * every line from index.html at build time, so the two cannot drift.
+ * every line from index.html at build time — except the freelance list,
+ * which comes from src/data/projects.js, the same array the page itself
+ * is rendered from. Either way there is one source and no drift.
  *
  * WHY IT THROWS
  * The extraction is regex over known class hooks (.work-card__company
@@ -21,6 +23,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { PROJECTS } from '../src/data/projects.js';
 
 const SITE = 'https://royeyal.com/';
 
@@ -155,25 +158,13 @@ export function renderMarkdown(html) {
   }));
   if (roles.length < 1) throw new Error('llms.txt: no .work-card blocks found');
 
-  const projects = blocks(html, '<li class="project-card"').map((b) => ({
-    name: one(
-      b,
-      /class="project-card__name">([\s\S]*?)<\/h3>/,
-      '.project-card__name'
-    ),
-    meta: one(
-      b,
-      /class="project-card__meta[^"]*">([\s\S]*?)<\/p>/,
-      '.project-card__meta'
-    ),
-    href: one(
-      b,
-      /class="project-card__link"[\s\S]*?href="([^"]+)"/,
-      '.project-card__link[href]'
-    ),
-  }));
-  if (projects.length < 1)
-    throw new Error('llms.txt: no .project-card blocks found');
+  /* The freelance grid is the one section not scraped out of the page:
+     index.html holds a placeholder, and build/projects.js renders the
+     cards from src/data/projects.js. Reading the same array here is
+     both simpler than the scrape it replaced and stricter — the data is
+     already validated by that plugin, so there is no selector to rot. */
+  if (PROJECTS.length < 1)
+    throw new Error('llms.txt: src/data/projects.js is empty');
 
   const email = one(html, /data-clip="([^"]+)"/, '[data-clip] (email)');
   const linkedin = one(
@@ -209,7 +200,7 @@ export function renderMarkdown(html) {
   }
 
   out.push('## Selected freelance work', '');
-  for (const p of projects) out.push(`- [${p.name}](${p.href}) — ${p.meta}`);
+  for (const p of PROJECTS) out.push(`- [${p.name}](${p.href}) — ${p.meta}`);
   out.push('');
 
   out.push('## Contact', '');
