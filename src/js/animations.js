@@ -88,10 +88,25 @@ export function initAnimations() {
      * never write the same property on the same element. Keep it that
      * way. Living inside this matchMedia block also means the nav is
      * simply always visible under reduced motion, which is correct.
+     *
+     * The slide is a tween on --nav-reveal-offset, NOT on yPercent, and
+     * that is not a style preference. A GSAP transform tween does not
+     * clean up after itself: when it finishes it leaves
+     * `transform: translate(0px, 0px)` on the element permanently, and
+     * an identity transform establishes a Backdrop Root just as a real
+     * one does. .bottom-nav__inner::before is backdrop-filtered, so in
+     * Safari that turned the frosted pill into a frosted viewport the
+     * moment you scrolled past the hero — see the long note at the top
+     * of src/styles/nav.css. Tweening a custom property writes that one
+     * property and nothing else, so the element keeps `transform: none`
+     * before, during and after.
+     *
+     * 8rem clears the bar (3.75em) plus its bottom inset with room to
+     * spare, so it starts fully off-screen at any root font size.
      */
     if (document.querySelector('.bottom-nav')) {
       gsap.from('.bottom-nav', {
-        yPercent: 200,
+        '--nav-reveal-offset': '8rem',
         autoAlpha: 0,
         duration: 0.6,
         ease: 'expo.out',
@@ -99,6 +114,14 @@ export function initAnimations() {
           trigger: '.hero',
           start: 'bottom 80%',
           toggleActions: 'play none none reverse',
+          /* Reload deep in the page and no boundary is ever crossed, so
+             no toggleAction fires and the nav stays parked off-screen
+             until you scroll back up through the hero and down again.
+             On refresh, anything already past the start is simply put
+             in its finished state. */
+          onRefresh: (self) => {
+            if (self.progress > 0) self.animation.progress(1);
+          },
         },
       });
     }

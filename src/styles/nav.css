@@ -18,27 +18,47 @@
   --bar-height: 3.75em;
 }
 
-/* Centered with auto margins, NOT `left: 50%` + `translate(-50%)`.
+/* NOTHING MAY PUT A TRANSFORM ON THIS ELEMENT. Not `translate(-50%)`,
+   not a GSAP tween, not a `will-change: transform`. It is the hard
+   constraint this whole file is built around, and it has now bitten
+   twice.
 
-   Two reasons, both real:
+   Why: `.bottom-nav__inner::before` carries a backdrop-filter, and a
+   transform on any ancestor makes that ancestor the Backdrop Root the
+   filter samples from. WebKit computes that root's coordinate space
+   wrong, so the frosted panel stops being the pill and becomes the
+   viewport — the whole page goes dark and blurred with the bar's own
+   contents still crisp on top of it. Chrome gets it right, which is why
+   this only ever shows up in Safari, and it is a compositing fault
+   rather than a layout one, so it is intermittent: it depends on what
+   else holds a layer at that moment (the hero's WebGL canvas, chiefly).
 
-   1. Safari. `.bottom-nav__inner` carries a backdrop-filter, and WebKit
-      computes the backdrop sampling region in the wrong coordinate space
-      when the filtered element sits inside a transformed ancestor — the
-      blur escapes the pill and floods the viewport from the nav's left
-      edge outward. Removing the transform removes the trigger.
+   Hence, in place of the two transforms that used to be here:
 
-   2. GSAP. animations.js runs `gsap.from('.bottom-nav', { yPercent })`,
-      and GSAP resolves the existing `translate(-50%)` through
-      getComputedStyle, which returns PIXELS. It then rewrites the
-      transform with that frozen pixel offset, so the -50% stops tracking
-      the element's width — and this element changes width, from
-      --closed-width to --open-width. Auto margins re-center on every
-      resize and every open/close, with nothing to bake. */
+   1. Centering is `left/right: 0` + `margin-inline: auto`, not
+      `left: 50%` + `translate(-50%)`. Auto margins also re-center on
+      every resize and every open/close with nothing to bake — and this
+      element changes width, from --closed-width to --open-width.
+
+   2. The reveal-after-hero tween in animations.js slides the bar with
+      --nav-reveal-offset below, not with `yPercent`. GSAP's transform
+      tweens leave `transform: translate(0px, 0px)` on the element
+      forever once they finish, and an identity transform establishes a
+      Backdrop Root exactly as a real one does. A tween on a custom
+      property writes only that property.
+
+   The offset is subtracted rather than added so the tween can count
+   down from a positive distance to 0, and it is folded into `bottom` so
+   the env() safe-area inset survives — animating `bottom` directly
+   would bake the resolved max() into a pixel value. */
 .bottom-nav {
+  --nav-reveal-offset: 0rem;
+
   z-index: 100;
   position: fixed;
-  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  bottom: calc(
+    max(1.5rem, env(safe-area-inset-bottom)) - var(--nav-reveal-offset)
+  );
   left: 0;
   right: 0;
   margin-inline: auto;
@@ -46,7 +66,14 @@
 }
 
 .bottom-nav__inner {
-  will-change: width, height;
+  /* No `will-change: width, height`. will-change only buys anything for
+     properties the compositor can animate by itself — transform,
+     opacity, filter. Width and height are layout, so the hint bought no
+     speed; all it did was force this element onto its own compositing
+     layer permanently, and this is the element whose `overflow: hidden`
+     is the only thing keeping the backdrop-filtered ::before inside the
+     pill. Handing WebKit an extra layer boundary to lose that clip
+     across was a cost with no matching benefit. */
   width: var(--closed-width);
   height: var(--bar-height);
   /* background AND backdrop-filter live on ::before — see below */
