@@ -10,7 +10,9 @@ say up front.
 A hand-written static site. One page (`index.html`), plain CSS in
 `src/styles/`, plain ES modules in `src/js/`, Vite for the build,
 Cloudflare Workers for hosting. No framework, no CMS, no TypeScript, no
-test runner. Three build plugins in `build/` do the generation.
+test runner. Three Vite plugins in `build/` do the generation;
+`build/favicon-ico.js` beside them is a one-off script, not part of the
+build.
 
 The code carries long comments explaining _why_ — the font weight range,
 why the email copies instead of opening a mail client, why the project
