@@ -52,7 +52,7 @@ built as plain HTML/CSS/JS with Vite, hosted on Cloudflare Workers.
 | `npm run preview`      | Serve the built `dist/` over HTTP so you can sanity-check the real production output before deploying. Opening `dist/index.html` directly (`file://`) will **not** work — ES modules are blocked under `file://`, so this is the only way to view a finished build locally. |
 | `npm run format`       | Format the whole repo with Prettier                                                                                                                                                                                                                                         |
 | `npm run format:check` | Check formatting without writing                                                                                                                                                                                                                                            |
-| `npm run deploy`       | Build fresh, then `wrangler deploy` to Cloudflare. Sources `CLOUDFLARE_API_TOKEN` from the gitignored `.env`. Never deploys a stale `dist/`.                                                                                                                                |
+| `npm run deploy`       | Build fresh, then `wrangler deploy` to Cloudflare, from your machine. Sources `CLOUDFLARE_API_TOKEN` from the gitignored `.env`. Never deploys a stale `dist/`. Pushing to `main` does the same thing in CI (see Deploy).                                                   |
 
 ## Structure
 
@@ -84,6 +84,10 @@ build/llms-txt.js      Vite plugin — emits dist/llms.txt from index.html
 build/strip-html-comments.js
                        Vite plugin — removes HTML comments from dist/ and
                        prepends the signature block
+build/require-fonts.js Vite plugin — fails the build if a font fonts.css
+                       references is missing or not a WOFF2
+.github/workflows/deploy.yml
+                       deploys every push to main
 public/                static assets, copied verbatim into dist/ on build
 public/og.png          1200x630 link-preview card (generated — see docs/)
 public/404.html        standalone 404 (inline CSS, no JS, no build step)
@@ -200,7 +204,20 @@ in `docs/cloudflare-workers.md`.
 
 **Live at [royeyal.com](https://royeyal.com)** since 2026-08-09.
 
-`npm run deploy` builds fresh and ships. Validate config changes with
+**Every push to `main` deploys**, via `.github/workflows/deploy.yml`:
+download Satoshi from the live site, `npm ci`, `format:check`, build,
+`wrangler deploy`. It needs one repository secret,
+`CLOUDFLARE_API_TOKEN` (Settings → Secrets and variables → Actions) —
+the same token as `.env`, so rotate both together. Re-run it by hand
+from the Actions tab.
+
+Downloading the font from the site it is deployed to is only safe
+because the build refuses to ship without it: if the download fails, or
+returns a challenge page instead of a font, `build/require-fonts.js`
+stops the run before `wrangler deploy`, and the live site keeps the
+font for next time.
+
+`npm run deploy` still builds fresh and ships from your machine. Validate config changes with
 `npx wrangler deploy --dry-run` first (local only — it does **not**
 check token scopes; the real deploy is the test for those).
 
@@ -221,14 +238,15 @@ ln -sf "$(git rev-parse --path-format=absolute --git-common-dir)/../.env" .env
 
 A symlink rather than a copy, so it stays current if the token rotates.
 
-**The same trap, but silent — Satoshi.** `public/fonts/Satoshi-Variable.woff2`
+**The same trap — Satoshi.** `public/fonts/Satoshi-Variable.woff2`
 is gitignored too (the ITF licence forbids redistributing it; see
 `public/fonts/LICENSES.md`), so a fresh worktree or a fresh clone does not
-have it either. Unlike the missing `.env`, this one **does not fail**:
-Vite copies `public/` verbatim, the build succeeds, `wrangler deploy`
-succeeds, and the live site serves a `@font-face` that 404s — every word
-of body copy silently falls back to the system stack. Copy the file in
-before building anywhere that is not this working directory:
+have it either. This one used to **not fail**: Vite copies `public/`
+verbatim, so the build succeeded, `wrangler deploy` succeeded, and the
+live site served a `@font-face` that 404'd — every word of body copy
+silently falling back to the system stack. `build/require-fonts.js` now
+fails the build instead. Copy the file in before building anywhere that
+is not this working directory:
 
 ```bash
 cp "$(git rev-parse --path-format=absolute --git-common-dir)/../public/fonts/Satoshi-Variable.woff2" public/fonts/

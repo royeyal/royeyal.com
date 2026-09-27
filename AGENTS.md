@@ -10,9 +10,12 @@ say up front.
 A hand-written static site. One page (`index.html`), plain CSS in
 `src/styles/`, plain ES modules in `src/js/`, Vite for the build,
 Cloudflare Workers for hosting. No framework, no CMS, no TypeScript, no
-test runner. Three Vite plugins in `build/` do the generation;
-`build/favicon-ico.js` beside them is a one-off script, not part of the
-build.
+test runner. Four Vite plugins in `build/`: three do the generation
+and `build/require-fonts.js` guards the build. `build/favicon-ico.js`
+beside them is a one-off script, not part of the build.
+
+**Pushing to `main` deploys.** `.github/workflows/deploy.yml` builds and
+ships every push, so a push is a release, not a backup.
 
 The code carries long comments explaining _why_ — the font weight range,
 why the email copies instead of opening a mail client, why the project
@@ -35,13 +38,17 @@ Everything else on the page is written where you see it.
 
 ## Traps
 
-- **Never build or deploy from a git worktree without copying
-  `public/fonts/Satoshi-Variable.woff2` in first.** It is gitignored
-  (licence), worktrees do not share gitignored files, and nothing fails
-  — the site just ships with no body font. `.env` has the same cause but
-  fails loudly. Both are in README → Deploy.
+- **`public/fonts/Satoshi-Variable.woff2` is gitignored** (licence), so
+  a worktree or fresh clone does not have it. `build/require-fonts.js`
+  fails the build when it is missing — copy it in (README → Deploy);
+  never work around the check. It used to fail silently and ship the
+  site with no body font. CI downloads it from the live site instead.
 - **`npm run deploy` builds fresh and needs `CLOUDFLARE_API_TOKEN` from
-  the gitignored `.env`.** Never hand-edit `dist/`.
+  the gitignored `.env`.** Normally unnecessary now — pushing to `main`
+  deploys. Never hand-edit `dist/`.
+- **Never add `actions/upload-artifact` to the deploy workflow.** The
+  repo is public and so are its artifacts; uploading `dist/` would
+  redistribute Satoshi.
 - **The repo is public.** Anything committed is published immediately.
 - **The bottom nav measures itself once, in pixels.** `measure()` in
   `src/js/nav.js` pins the pill's size inline. Measured before
@@ -56,7 +63,7 @@ Everything else on the page is written where you see it.
 
 ## Before you say it works
 
-`npm run build` is the test suite. All three plugins assert and fail the
+`npm run build` is the test suite. All four plugins assert and fail the
 build rather than shipping a damaged page, so a green build genuinely
 means something. Then check the rendered result in the browser — this is
 a site whose whole point is how it looks.

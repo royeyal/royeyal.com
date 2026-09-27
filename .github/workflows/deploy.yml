@@ -1,0 +1,76 @@
+# Deploy royeyal.com on every push to main.
+#
+# The same three steps as `npm run deploy` on Roy's machine — build fresh,
+# then `wrangler deploy` — with one extra step in front, because the
+# runner starts from a clean clone and a clean clone has no Satoshi.
+#
+# SATOSHI
+# The font is gitignored: its licence (ITF FFL, see
+# public/fonts/LICENSES.md) forbids putting it in a public repository,
+# but expressly permits self-hosting it on royeyal.com. So the one copy
+# CI can reach is the one the site already serves, and the workflow
+# downloads it from there. No storage bucket, no second copy anywhere.
+#
+# That makes the live site the source, which would be circular if a
+# deploy could ever ship WITHOUT the font — the next run would then have
+# nothing to download. It cannot: build/require-fonts.js fails the build
+# if the file is missing or is not a real WOFF2 (a challenge page served
+# with a 200 would pass curl -f), and a failed build never reaches
+# `wrangler deploy`. The live site, and so the font, stays as it was.
+#
+# NEVER add actions/upload-artifact here. This repo is public, and so are
+# its workflow artifacts: uploading dist/ would hand the font file to
+# anyone who asks, which is exactly the redistribution the licence
+# forbids.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Re-run by hand from the Actions tab, e.g. after rotating the token.
+  workflow_dispatch:
+
+# One deploy at a time, and never cancel one halfway: a newer push waits
+# for the running deploy to finish, then ships on top of it.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # Matches Roy's machine. package.json's allowScripts needs the
+          # npm that ships with a current Node.
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Fetch Satoshi from the live site
+        run: |
+          curl -fsSL --retry 3 --retry-delay 5 \
+            -o public/fonts/Satoshi-Variable.woff2 \
+            https://royeyal.com/fonts/Satoshi-Variable.woff2
+
+      # The repo's whole test suite (AGENTS.md → Before you say it works):
+      # every build plugin asserts, so a green build means something.
+      - run: npm run format:check
+      - run: npm run build
+
+      # Not `npm run deploy`: that script sources the token from the
+      # gitignored .env, which does not exist here. The token comes from
+      # the repository secret instead; account_id is in wrangler.jsonc.
+      - name: Deploy to Cloudflare
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
