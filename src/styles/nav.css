@@ -81,9 +81,20 @@
   height: var(--bar-height);
   /* background AND backdrop-filter live on ::before — see below */
   isolation: isolate;
-  border: var(--border-w) solid var(--line-strong);
+  /* No real border: the glass rim (glass.css) IS the edge. Every other
+     glass element keeps a transparent 1px border under its rim, but
+     this one has `overflow: hidden`, which clips at the padding box — a
+     rim laid over a border would be clipped away, and a rim laid inside
+     it would leave a 1px ring of unfrosted page around the pill. With
+     no border, the frost (::before) and the rim (::after) both sit at
+     inset: 0 and meet the pill's edge exactly. It also makes the closed
+     pill exactly --bar-height tall, where before the bar overflowed its
+     content box by the 2px of border. */
+  border: 0;
+  --rim-inset: 0;
+  --glass-tint: var(--magenta);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--glass-glow);
   flex-flow: column-reverse;
   justify-content: flex-start;
   align-items: center;
@@ -91,18 +102,15 @@
   position: relative;
   overflow: hidden;
 
-  /* ONLY border-color and box-shadow. width and height are driven by
-     GSAP, which writes them inline every frame — a CSS transition on
-     either would fight the timeline and make the open/close stutter.
-     Never widen this list to `all`.
+  /* ONLY the two glass numbers. width and height are driven by GSAP,
+     which writes them inline every frame — a CSS transition on either
+     would fight the timeline and make the open/close stutter. Never
+     widen this list to `all`.
 
-     The open-state glow is a light switching on, so it borrows the
-     lightbulb curves the tokens already define: this rule governs
-     switching OFF (slow, trailing away as a filament cools), the
+     Opening lights the pill: the rim warms from white to magenta and
+     the glow blooms out behind it. This rule governs switching OFF, the
      [data-bottom-nav-open='true'] rule governs switching ON. */
-  transition:
-    border-color var(--bulb-off) var(--ease-bulb-off),
-    box-shadow var(--bulb-off) var(--ease-bulb-off);
+  transition: var(--glass-off);
 }
 
 /* The frosted pill itself.
@@ -128,20 +136,26 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: rgba(11, 13, 21, 0.82);
-  backdrop-filter: blur(0.75rem);
+  /* Glass, not smoked plastic. At 82% the fill hid everything behind
+     it, and the pill read as a black slab; at 60% the page shows
+     through, and saturate() is what makes that read as GLASS — the
+     blurred magenta and cyan behind the pill come through richer than
+     they are, the way colored light does through a lens.
+
+     brightness() is the contrast guard. It darkens what is behind the
+     pill BEFORE the fill goes over it, so a bright project screenshot
+     scrolling under the bar cannot lift the background far enough to
+     wash out the 10px muted sound label. Dropping the fill alone would
+     have traded that contrast away. */
+  background: rgba(11, 13, 21, 0.6);
+  backdrop-filter: blur(1rem) saturate(180%) brightness(0.6);
   pointer-events: none;
 }
 
 [data-bottom-nav-open='true'] .bottom-nav__inner {
-  border-color: var(--magenta-dim);
-  box-shadow:
-    var(--shadow-card),
-    0 0 1.5rem -0.5rem var(--magenta),
-    0 0 4rem -0.75rem var(--magenta-dim);
-  transition:
-    border-color var(--bulb-on) var(--ease-bulb-on),
-    box-shadow var(--bulb-on) var(--ease-bulb-bloom);
+  --lit-core: 1;
+  --lit-halo: 1;
+  transition: var(--glass-on);
 }
 
 .bottom-nav__bar {
@@ -204,9 +218,13 @@
   gap: 0.25em;
   color: #fff;
   background: linear-gradient(135deg, var(--magenta), #a000f0);
-  border: var(--border-w) solid rgba(255, 255, 255, 0.35);
+  /* transparent: the glass rim is the edge now (glass.css) */
+  border: var(--border-w) solid transparent;
   border-radius: var(--radius-chip);
-  box-shadow: var(--shadow-btn);
+  --glass-tint: var(--magenta);
+  --glass-reach: 0.6;
+  box-shadow: var(--shadow-btn), var(--glass-glow);
+  transition: var(--glass-off);
   flex-flow: column;
   flex: none;
   justify-content: center;
@@ -216,6 +234,13 @@
   padding: 0;
   cursor: pointer;
   display: flex;
+}
+
+.bottom-nav__toggle:hover,
+.bottom-nav__toggle:focus-visible {
+  --lit-core: 1;
+  --lit-halo: 1;
+  transition: var(--glass-on);
 }
 
 .bottom-nav__toggle-bar {

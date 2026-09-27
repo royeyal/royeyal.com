@@ -1,0 +1,225 @@
+/* ------------------------------------------------------------------
+   Glass — the specular rim and the warm-up glow
+
+   Every raised thing on the page (the nav pill, buttons, chips, the
+   timeline markers, the logo tiles, the cards) used to be edged with
+   one flat 1px border of 9-16% white. On --ink that is close to
+   invisible: the nav pill in particular read as black on black, with
+   no edge at all.
+
+   Apple's Liquid Glass gets its definition from a SPECULAR RIM, not a
+   border: the edge is bright where the light falls on it (the top, and
+   hardest at the top-left corner), nearly gone along the sides, and
+   picks up a fainter bounce along the bottom, where light that entered
+   the glass exits again. This file draws that rim. It does not refract
+   — no displacement, no SVG filters — so it costs one gradient per
+   element and renders identically in Safari and Chrome.
+
+   The elements opt in here, by selector, rather than by a class in the
+   markup, because the rim is a property of what these things ARE. Each
+   element's own sheet then does three things:
+     1. puts var(--glass-glow) in its box-shadow,
+     2. sets --lit-core / --lit-halo to 1 in its lit state,
+     3. splices var(--glass-off) / var(--glass-on) into its transitions
+        (tokens.css) — the base rule governs cooling, the lit rule
+        governs warming, same as every other lightbulb on the page.
+   And may set --glass-tint (the glow's color), --glass-reach (how far
+   the glow throws) and --rim-rest (how visible the rim is unlit).
+   ------------------------------------------------------------------ */
+
+/* How lit an element is, 0 to 1, as two numbers: the tight core of
+   light and the wide halo around it, which ramp on separate curves.
+
+   REGISTERED so they interpolate. An unregistered custom property flips
+   discretely at the midpoint of a transition; a <number> tweens, and
+   everything computed from it — the rim colors, all five glow layers —
+   tweens with it, which is what makes the glow ramp rather than snap.
+
+   inherits: false so a lit card does not light every chip inside it:
+   the chips would otherwise inherit the card's 1 and glow along with
+   it. Anything that SHOULD light with a parent says so explicitly (see
+   the logo tiles in sections.css). */
+@property --lit-core {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --lit-halo {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* :where() keeps this rule at zero specificity, so every element's own
+   rule overrides the defaults below without an arms race — and so the
+   `position: relative` here never beats a real `position` elsewhere.
+
+   The rim colors and the glow are declared ON EACH ELEMENT, never on
+   :root. A custom property's var() is substituted where the property
+   is declared: on :root, --lit-core would resolve to its initial 0 and
+   --glass-tint to the default, freeze there, and inherit down as a
+   glow that never lights. Declared here, each element computes them
+   from its own values, every frame.
+
+   The rim colors are unregistered on purpose: they are computed on the
+   element and then INHERITED by its ::after, which is where the rim is
+   actually painted — --lit-core itself does not inherit, so the
+   pseudo-element could not read it directly. */
+:where(
+  .bottom-nav__inner,
+  .bottom-nav__toggle,
+  .sound-toggle,
+  .btn,
+  .chip,
+  .step-timeline__marker,
+  .work-card__logo:has(svg),
+  .work-card,
+  .project-card
+) {
+  --glass-tint: var(--cyan);
+  --glass-reach: 1;
+  /* 1 = the full rim at rest. The sound toggle sets 0: it is bare text
+     until you hover it, and a permanent rim would make it a button-
+     shaped thing competing with the menu button beside it. */
+  --rim-rest: 1;
+  /* Where the rim sits: laid exactly over the element's 1px border.
+     The nav pill sets 0 — see nav.css. */
+  --rim-inset: calc(var(--border-w) * -1);
+
+  /* Unlit: white light at three strengths — top, sides, bottom bounce.
+     Lit: the element's own tint, lightened toward white on the top edge
+     so the brightest line still reads as a highlight, not as paint. */
+  --rim-hi: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--glass-tint), #fff 35%)
+      calc(var(--lit-core) * 100%),
+    rgb(255 255 255 / calc(0.4 * var(--rim-rest)))
+  );
+  --rim-lo: color-mix(
+    in oklab,
+    var(--glass-tint) calc(var(--lit-core) * 45%),
+    rgb(255 255 255 / calc(0.07 * var(--rim-rest)))
+  );
+  --rim-bounce: color-mix(
+    in oklab,
+    var(--glass-tint) calc(var(--lit-core) * 75%),
+    rgb(255 255 255 / calc(0.2 * var(--rim-rest)))
+  );
+
+  /* Five layers, because light does not fall off in one step:
+       inset  — the glass itself filling with light from inside
+       core   — a tight, bright line hugging the rim
+       3 x halo — progressively wider and fainter, the bloom
+     Every layer has ZERO spread, so the light extends past the edge
+     instead of being pulled back inside it by a negative spread.
+     Blur and alpha both scale with the lit numbers, so the glow does
+     not just fade in, it GROWS — a halo at 0 is a 0-blur transparent
+     shadow, which paints nothing. */
+  --glass-glow:
+    inset 0 0 calc(var(--lit-core) * 1rem * var(--glass-reach)) 0
+      color-mix(
+        in oklab,
+        var(--glass-tint) calc(var(--lit-core) * 24%),
+        transparent
+      ),
+    0 0 calc(var(--lit-core) * 0.5rem * var(--glass-reach)) 0
+      color-mix(
+        in oklab,
+        var(--glass-tint) calc(var(--lit-core) * 75%),
+        transparent
+      ),
+    0 0 calc(var(--lit-halo) * 1.5rem * var(--glass-reach)) 0
+      color-mix(
+        in oklab,
+        var(--glass-tint) calc(var(--lit-halo) * 45%),
+        transparent
+      ),
+    0 0 calc(var(--lit-halo) * 3.5rem * var(--glass-reach)) 0
+      color-mix(
+        in oklab,
+        var(--glass-tint) calc(var(--lit-halo) * 24%),
+        transparent
+      ),
+    0 0 calc(var(--lit-halo) * 7rem * var(--glass-reach)) 0
+      color-mix(
+        in oklab,
+        var(--glass-tint) calc(var(--lit-halo) * 12%),
+        transparent
+      );
+
+  position: relative;
+}
+
+/* The rim. A gradient box the size of the element's border box, masked
+   down to a 1px ring: the mask keeps the whole box, then EXCLUDES the
+   content box, and padding: 1px is what makes the content box 1px
+   smaller all round. border-radius: inherit rounds it to the element's
+   own corners.
+
+   Three layers: a vertical gradient for the overall top-lit / dim-sides
+   / bottom-bounce falloff, and two radial glints on the opposite
+   corners, which are what make it read as a curved edge catching light
+   rather than a gradient border. The glints are sized in percent so a
+   36px chip and a 500px card catch the same share of their own edge.
+
+   Painted over the element's real border, which the elements now set
+   to transparent. The real border is kept, not removed: it holds the
+   layout the element always had, and in forced-colors mode (where this
+   rim is switched off, below) the system paints it in a real color. */
+:where(
+  .bottom-nav__inner,
+  .bottom-nav__toggle,
+  .sound-toggle,
+  .btn,
+  .chip,
+  .step-timeline__marker,
+  .work-card__logo:has(svg),
+  .work-card,
+  .project-card
+)::after {
+  content: '';
+  position: absolute;
+  inset: var(--rim-inset);
+  border-radius: inherit;
+  padding: var(--border-w);
+  background:
+    radial-gradient(60% 110% at 0% 0%, var(--rim-hi), transparent 70%),
+    radial-gradient(60% 110% at 100% 100%, var(--rim-bounce), transparent 70%),
+    linear-gradient(
+      180deg,
+      var(--rim-hi),
+      var(--rim-lo) 38%,
+      var(--rim-lo) 68%,
+      var(--rim-bounce)
+    );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* In forced colors the rim's hard-coded white and tint would ignore the
+   user's chosen palette, so it goes, and the real border — which the
+   system repaints in a palette color even though we set it transparent
+   — becomes the edge again. */
+@media (forced-colors: active) {
+  :where(
+    .bottom-nav__inner,
+    .bottom-nav__toggle,
+    .sound-toggle,
+    .btn,
+    .chip,
+    .step-timeline__marker,
+    .work-card__logo:has(svg),
+    .work-card,
+    .project-card
+  )::after {
+    display: none;
+  }
+}

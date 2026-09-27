@@ -57,7 +57,8 @@
   width: 2.75rem;
   height: 2.75rem;
   position: relative;
-  border: var(--border-w) solid var(--line-strong);
+  /* transparent: the glass rim is the edge now (glass.css) */
+  border: var(--border-w) solid transparent;
   border-radius: var(--radius-small);
   background: var(--surface);
   color: var(--text-muted);
@@ -66,41 +67,56 @@
   font-feature-settings: var(--font-features-mono);
   -webkit-font-smoothing: var(--smoothing-mono);
   font-size: var(--font-size-xs);
-  box-shadow: var(--shadow-chip);
+  --glass-tint: var(--magenta);
+  --glass-reach: 0.7;
+  /* The ring around the current step is the halo's job too: its spread
+     is driven by --lit-halo, so it swells in with the bloom instead of
+     needing a box-shadow transition of its own (which would restart
+     every frame — see --glass-on in tokens.css). Passed steps keep
+     --lit-halo at 0, so only the current step wears the ring. */
+  box-shadow:
+    var(--shadow-chip),
+    0 0 0 calc(var(--lit-halo) * 0.5rem)
+      color-mix(
+        in oklab,
+        var(--magenta) calc(var(--lit-halo) * 35%),
+        transparent
+      ),
+    var(--glass-glow);
   /* base = unlit. This transition governs turning OFF: a steep initial
      drop and a long cooling tail. */
   transition:
     background-color var(--bulb-off) var(--ease-bulb-off),
-    border-color var(--bulb-off) var(--ease-bulb-off),
     color var(--bulb-off) var(--ease-bulb-off),
-    box-shadow var(--bulb-off) var(--ease-bulb-off),
+    var(--glass-off),
     transform var(--bulb-off) var(--ease-bulb-off);
 }
 
-/* every step the fill has passed — lit.
-   This transition governs turning ON: a fast surge, with the glow and
-   scale allowed to overshoot slightly so the filament visibly blooms
-   before settling. Colors use the non-overshooting curve to avoid
+/* every step the fill has passed — lit, but only the core: a steady
+   glow with no bloom, so the passed steps read as a lit trail and the
+   current one still stands out.
+   This transition governs turning ON. The fill and the scale keep the
+   fast surge — they are the scroll position ticking past, and should
+   keep pace with it — while the glow warms up like every other light
+   on the page. Colors use the non-overshooting curve to avoid
    interpolating out of gamut. */
 [data-step-timeline-item][data-status='active'] [data-step-timeline-marker] {
+  --lit-core: 0.7;
   background: var(--magenta);
-  border-color: var(--magenta);
   color: #fff;
   transition:
     background-color var(--bulb-on) var(--ease-bulb-on),
-    border-color var(--bulb-on) var(--ease-bulb-on),
     color var(--bulb-on) var(--ease-bulb-on),
-    box-shadow var(--bulb-on) var(--ease-bulb-bloom),
+    var(--glass-on),
     transform var(--bulb-on) var(--ease-bulb-bloom);
 }
 
-/* the single leading step — brightest, and physically swells a touch */
+/* the single leading step — brightest, blooms, and physically swells a
+   touch */
 [data-step-timeline-item][data-current] [data-step-timeline-marker] {
+  --lit-core: 1;
+  --lit-halo: 1;
   transform: scale(1.06);
-  box-shadow:
-    var(--shadow-chip),
-    0 0 0 0.5rem var(--magenta-dim),
-    0 0 2rem -0.25rem var(--magenta);
 }
 
 .step-timeline__content {

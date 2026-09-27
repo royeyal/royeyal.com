@@ -143,12 +143,12 @@
     0 0.125rem 0.25rem rgba(0, 0, 0, 0.65),
     0 0.75rem 1.5rem -0.5rem rgba(0, 0, 0, 0.85),
     0 3rem 6.875rem -1.25rem rgba(0, 0, 0, 1);
-  /* NOTE: the lit-card hover shadow (--shadow-card-lit) is deliberately
-     NOT here. It references --accent, which only exists on the cards,
-     and a custom property's var() is substituted where the property is
-     DECLARED — so on :root it would resolve against a non-existent
-     --accent, compute to guaranteed-invalid, and inherit down as
-     nothing. It lives on the card selectors in sections.css instead. */
+  /* NOTE: the lit glow (--glass-glow) is deliberately NOT here. It
+     references --lit-core and --glass-tint, which each element sets
+     for itself, and a custom property's var() is substituted where the
+     property is DECLARED — so on :root it would freeze at the initial
+     values and inherit down as a glow that never lights. It is
+     declared on the glass elements themselves, in glass.css. */
 
   --shadow-btn:
     inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.3),
@@ -221,6 +221,37 @@
   --ease-bulb-off: cubic-bezier(0.25, 0.75, 0.35, 1);
   --bulb-on: 260ms;
   --bulb-off: 780ms;
+
+  /* Filament warm-up — the glass glow (see glass.css). The curves above
+     make a light SURGE on, which suits a timeline marker ticking past
+     but made every hover feel like a switch being flicked. A real bulb
+     does not do that: the filament takes a moment to heat, then swells,
+     then settles. So this curve starts SLOW (the flat foot of the
+     bezier is the heating), then climbs steeply and eases into full.
+
+     The halo is a separate, longer, slightly delayed ramp: the tight
+     core of light comes up first and the wide bloom follows it out
+     into the dark, instead of the whole glow arriving as one flat
+     disc. Switching off reuses --ease-bulb-off, with the halo lingering
+     past the core the way an afterglow does. */
+  --ease-warm: cubic-bezier(0.55, 0, 0.25, 1);
+  --warm-core: 480ms;
+  --warm-halo: 760ms;
+  --warm-halo-delay: 90ms;
+  --cool-halo: 1100ms;
+
+  /* The two glass transitions, as lists, so every glass element can
+     splice them into its own `transition` beside whatever else it
+     animates. They transition the REGISTERED numbers --lit-core and
+     --lit-halo (glass.css), never box-shadow: box-shadow is computed
+     from those numbers, so it follows them frame by frame, and a
+     box-shadow transition on top would restart itself every frame. */
+  --glass-on:
+    --lit-core var(--warm-core) var(--ease-warm),
+    --lit-halo var(--warm-halo) var(--ease-warm) var(--warm-halo-delay);
+  --glass-off:
+    --lit-core var(--bulb-off) var(--ease-bulb-off),
+    --lit-halo var(--cool-halo) var(--ease-bulb-off);
 
   /* Slow cinematic drift on project screenshots — long enough to read as
      a camera move rather than a UI effect. */

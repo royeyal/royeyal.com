@@ -239,24 +239,29 @@ a {
   font-weight: var(--weight-mono);
   letter-spacing: 0.04em;
   padding: 0.4375rem 0.875rem;
-  border: var(--border-w) solid var(--line-strong);
+  /* transparent: the glass rim is the edge now (glass.css) */
+  border: var(--border-w) solid transparent;
   /* tight, even radius reads terminal-chip, not pill */
   border-radius: var(--radius-chip);
   background: var(--surface);
   color: var(--text-muted);
-  box-shadow: var(--shadow-chip);
+  /* a chip is small; a card-sized bloom around it would swamp the row */
+  --glass-reach: 0.6;
+  box-shadow: var(--shadow-chip), var(--glass-glow);
+  /* The label warms with the glass, on the same curve, so text and
+     light arrive together rather than the text snapping ahead. */
   transition:
-    color var(--fast) var(--ease-out),
-    border-color var(--fast) var(--ease-out),
-    box-shadow var(--fast) var(--ease-out);
+    color var(--bulb-off) var(--ease-bulb-off),
+    var(--glass-off);
 }
 
 .chip:hover {
+  --lit-core: 1;
+  --lit-halo: 1;
   color: var(--cyan);
-  border-color: var(--cyan-dim);
-  box-shadow:
-    var(--shadow-chip),
-    0 0 1.5rem -0.25rem var(--cyan-dim);
+  transition:
+    color var(--warm-core) var(--ease-warm),
+    var(--glass-on);
 }
 
 /* The one linked chip (the Accessibility tag on the Wix card).
@@ -288,8 +293,12 @@ a {
 /* :focus-within, not just :hover — the chip's lit state is on the li,
    and a keyboard user lands on the anchor inside it. */
 .chip--link:focus-within {
+  --lit-core: 1;
+  --lit-halo: 1;
   color: var(--cyan);
-  border-color: var(--cyan-dim);
+  transition:
+    color var(--warm-core) var(--ease-warm),
+    var(--glass-on);
 }
 
 .chip__out {
@@ -320,39 +329,42 @@ a {
   padding: 0.875rem 1.625rem;
   /* squared-off cyberpunk corners instead of a pill */
   border-radius: var(--radius-btn);
-  /* transform and box-shadow keep their own feel — the lift is a
-     physical move, not a fade. Only the color pair takes the
-     asymmetric link easing, so the hero's ghost buttons tint in and out
-     like every other link on the page. */
+  --glass-reach: 0.9;
+  /* Three motion languages, each for its own kind of change:
+     the lift is a physical move and keeps its springy snap; the glow is
+     a light and warms up like a filament (the glass pair, see
+     tokens.css); and the text color takes the asymmetric link easing,
+     so the hero's ghost buttons tint in and out like every other link
+     on the page. */
   transition:
     transform var(--fast) var(--ease-snap),
-    box-shadow var(--slow) var(--ease-out),
-    border-color var(--link-out) var(--ease-link-out),
+    var(--glass-off),
     color var(--link-out) var(--ease-link-out);
 }
 
-.btn:hover {
+/* :focus-visible as well as :hover: a keyboard user should see the
+   same light come on that a pointer user does. */
+.btn:hover,
+.btn:focus-visible {
+  --lit-core: 1;
+  --lit-halo: 1;
   transition:
     transform var(--fast) var(--ease-snap),
-    box-shadow var(--slow) var(--ease-out),
-    border-color var(--link-in) var(--ease-link-in),
+    var(--glass-on),
     color var(--link-in) var(--ease-link-in);
 }
 
 .btn--primary {
+  --glass-tint: var(--magenta);
   color: #fff;
   background: linear-gradient(135deg, var(--magenta), #a000f0);
-  border: var(--border-w) solid rgba(255, 255, 255, 0.35);
-  box-shadow: var(--shadow-btn);
+  /* transparent: the glass rim is the edge now (glass.css) */
+  border: var(--border-w) solid transparent;
+  box-shadow: var(--shadow-btn), var(--glass-glow);
 }
 
 .btn--primary:hover {
   transform: translateY(-0.125rem);
-  box-shadow:
-    inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.35),
-    0 0.25rem 0.625rem rgba(0, 0, 0, 0.6),
-    0 1rem 3rem -0.5rem var(--magenta-dim),
-    0 0 2.5rem -0.25rem var(--magenta-dim);
 }
 
 .btn__arrow {
@@ -378,22 +390,21 @@ a {
 
 .btn--ghost {
   color: var(--text-muted);
-  border: var(--border-w) solid var(--line-strong);
+  /* transparent: the glass rim is the edge now (glass.css) */
+  border: var(--border-w) solid transparent;
   background: rgba(11, 13, 21, 0.6);
-  backdrop-filter: blur(0.75rem);
+  /* saturate() for the same reason as the nav pill: it is what makes
+     the strands behind the button read through it as glass */
+  backdrop-filter: blur(0.75rem) saturate(160%);
   box-shadow:
     inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.06),
-    0 0.5rem 1.5rem -0.5rem rgba(0, 0, 0, 0.9);
+    0 0.5rem 1.5rem -0.5rem rgba(0, 0, 0, 0.9),
+    var(--glass-glow);
 }
 
 .btn--ghost:hover {
   color: var(--cyan);
-  border-color: var(--cyan-dim);
   transform: translateY(-0.125rem);
-  box-shadow:
-    inset 0 var(--border-w) 0 rgba(255, 255, 255, 0.06),
-    0 0.5rem 1.5rem -0.5rem rgba(0, 0, 0, 0.9),
-    0 0 2rem -0.375rem var(--cyan-dim);
 }
 
 @media (max-width: 40rem) {
@@ -419,6 +430,11 @@ a {
   background: none;
   border: var(--border-w) solid transparent;
   border-radius: var(--radius-chip);
+  /* No rim at rest: this is bare text until it is hovered. It only
+     becomes a glass chip while lit. See --rim-rest in glass.css. */
+  --rim-rest: 0;
+  --glass-reach: 0.5;
+  box-shadow: var(--glass-glow);
   padding: 0.375rem 0.625rem;
   /* The padding above lands this at 23px tall — one pixel under the
      24x24 floor in WCAG 2.2 SC 2.5.8, which is a silly way to fail it.
@@ -431,23 +447,43 @@ a {
   -webkit-appearance: none;
   appearance: none;
   transition:
-    color var(--fast) var(--ease-out),
-    border-color var(--fast) var(--ease-out),
-    text-shadow var(--fast) var(--ease-out);
+    color var(--bulb-off) var(--ease-bulb-off),
+    text-shadow var(--bulb-off) var(--ease-bulb-off),
+    var(--glass-off);
 }
 
-.sound-toggle:hover {
+.sound-toggle:hover,
+.sound-toggle:focus-visible {
+  --lit-core: 1;
+  --lit-halo: 1;
   color: var(--cyan);
-  border-color: var(--cyan-dim);
+  transition:
+    color var(--warm-core) var(--ease-warm),
+    text-shadow var(--warm-core) var(--ease-warm),
+    var(--glass-on);
 }
 
+/* Sound on is a PILOT LIGHT: the toggle keeps a low magenta glow and a
+   faint tinted rim while it is on, so the state is visible at a glance
+   without the chip competing with the menu button. Hovering turns it
+   up to full. The fractional values work because the rim tint and
+   every glow layer are proportional to --lit-core / --lit-halo. */
 .sound-toggle[aria-pressed='true'] {
+  --glass-tint: var(--magenta);
+  --lit-core: 0.4;
+  --lit-halo: 0.25;
   color: var(--magenta);
   text-shadow: 0 0 1rem var(--magenta-dim);
+  transition:
+    color var(--warm-core) var(--ease-warm),
+    text-shadow var(--warm-core) var(--ease-warm),
+    var(--glass-on);
 }
 
-.sound-toggle[aria-pressed='true']:hover {
-  border-color: var(--magenta-dim);
+.sound-toggle[aria-pressed='true']:hover,
+.sound-toggle[aria-pressed='true']:focus-visible {
+  --lit-core: 1;
+  --lit-halo: 1;
 }
 
 .sound-toggle[disabled] {
