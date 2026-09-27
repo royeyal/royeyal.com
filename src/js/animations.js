@@ -89,17 +89,16 @@ export function initAnimations() {
      * way. Living inside this matchMedia block also means the nav is
      * simply always visible under reduced motion, which is correct.
      *
-     * The slide is a tween on --nav-reveal-offset, NOT on yPercent, and
-     * that is not a style preference. A GSAP transform tween does not
-     * clean up after itself: when it finishes it leaves
-     * `transform: translate(0px, 0px)` on the element permanently, and
-     * an identity transform establishes a Backdrop Root just as a real
-     * one does. .bottom-nav__inner::before is backdrop-filtered, so in
-     * Safari that turned the frosted pill into a frosted viewport the
-     * moment you scrolled past the hero — see the long note at the top
-     * of src/styles/nav.css. Tweening a custom property writes that one
-     * property and nothing else, so the element keeps `transform: none`
-     * before, during and after.
+     * The slide is a tween on --nav-reveal-offset, which nav.css folds
+     * into `bottom` so the env() safe-area inset survives. This tween
+     * was once blamed for Safari frosting the whole viewport when the
+     * nav appeared; it was not the cause — see the note on .bottom-nav
+     * at the top of src/styles/nav.css.
+     *
+     * Everything it writes — opacity, visibility and that offset — is
+     * on the OUTER element and leaves the pill's box alone, so it does
+     * not matter whether it attaches before or after nav.js measures.
+     * src/main.js relies on that.
      *
      * 8rem clears the bar (3.75em) plus its bottom inset with room to
      * spare, so it starts fully off-screen at any root font size.

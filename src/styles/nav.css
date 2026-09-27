@@ -18,39 +18,35 @@
   --bar-height: 3.75em;
 }
 
-/* NOTHING MAY PUT A TRANSFORM ON THIS ELEMENT. Not `translate(-50%)`,
-   not a GSAP tween, not a `will-change: transform`. It is the hard
-   constraint this whole file is built around, and it has now bitten
-   twice.
+/* Centered with auto margins, NOT `left: 50%` + `translate(-50%)`.
+   animations.js tweens this element, and GSAP resolves an existing
+   translate(-50%) through getComputedStyle, which returns PIXELS. It
+   then rewrites the transform with that frozen offset, so the -50%
+   stops tracking the element's width — and this element changes width,
+   from --closed-width to --open-width. Auto margins re-center on every
+   resize and every open/close, with nothing to bake.
 
-   Why: `.bottom-nav__inner::before` carries a backdrop-filter, and a
-   transform on any ancestor makes that ancestor the Backdrop Root the
-   filter samples from. WebKit computes that root's coordinate space
-   wrong, so the frosted panel stops being the pill and becomes the
-   viewport — the whole page goes dark and blurred with the bar's own
-   contents still crisp on top of it. Chrome gets it right, which is why
-   this only ever shows up in Safari, and it is a compositing fault
-   rather than a layout one, so it is intermittent: it depends on what
-   else holds a layer at that moment (the hero's WebGL canvas, chiefly).
-
-   Hence, in place of the two transforms that used to be here:
-
-   1. Centering is `left/right: 0` + `margin-inline: auto`, not
-      `left: 50%` + `translate(-50%)`. Auto margins also re-center on
-      every resize and every open/close with nothing to bake — and this
-      element changes width, from --closed-width to --open-width.
-
-   2. The reveal-after-hero tween in animations.js slides the bar with
-      --nav-reveal-offset below, not with `yPercent`. GSAP's transform
-      tweens leave `transform: translate(0px, 0px)` on the element
-      forever once they finish, and an identity transform establishes a
-      Backdrop Root exactly as a real one does. A tween on a custom
-      property writes only that property.
-
+   The reveal-after-hero tween slides the bar with --nav-reveal-offset,
+   folded into `bottom` so the env() safe-area inset survives — animating
+   `bottom` directly would bake the resolved max() into a pixel value.
    The offset is subtracted rather than added so the tween can count
-   down from a positive distance to 0, and it is folded into `bottom` so
-   the env() safe-area inset survives — animating `bottom` directly
-   would bake the resolved max() into a pixel value. */
+   down from a positive distance to 0.
+
+   THE SAFARI "FROSTED VIEWPORT" WAS NOT A COMPOSITING BUG. In Safari the
+   whole page would go dark and blurred once the nav appeared, with the
+   bar's own contents crisp in the corners of the window. That was
+   blamed on this element twice — first on its translate(-50%), then on
+   the identity transform a GSAP yPercent tween leaves behind — on the
+   theory that WebKit misplaces a backdrop-filter under a transformed
+   ancestor. Both fixes shipped and the bug stayed. The pill really was
+   the size of the viewport: nav.js had measured it before this
+   stylesheet applied, and pinned those sizes inline. See
+   whenNavStyled() in src/js/nav.js.
+
+   The tell was in every screenshot: the logo and the menu button sat in
+   the corners of the window. A blur leaking past the pill would not
+   have moved them. Check the pill's inline width before reaching for a
+   compositor theory. */
 .bottom-nav {
   --nav-reveal-offset: 0rem;
 
@@ -69,12 +65,19 @@
   /* No `will-change: width, height`. will-change only buys anything for
      properties the compositor can animate by itself — transform,
      opacity, filter. Width and height are layout, so the hint bought no
-     speed; all it did was force this element onto its own compositing
-     layer permanently, and this is the element whose `overflow: hidden`
-     is the only thing keeping the backdrop-filtered ::before inside the
-     pill. Handing WebKit an extra layer boundary to lose that clip
-     across was a cost with no matching benefit. */
+     speed and only cost a permanent compositing layer. */
   width: var(--closed-width);
+  /* A backstop, not the fix. nav.js pins this width inline in pixels,
+     and if it ever measures wrongly again (see whenNavStyled() in
+     src/js/nav.js), this stops the pill spreading across the viewport.
+     --open-width is the widest the pill legitimately gets, and
+     box-sizing is border-box, so in normal use this never bites.
+
+     Height gets no matching cap. The open height is whatever the
+     panel's content measures, so there is no honest number to clamp it
+     to — a bad measurement can still make the pill too tall, just no
+     longer full-width. */
+  max-width: var(--open-width);
   height: var(--bar-height);
   /* background AND backdrop-filter live on ::before — see below */
   isolation: isolate;
@@ -104,13 +107,16 @@
 
 /* The frosted pill itself.
 
-   This is a child rather than a property of .bottom-nav__inner because a
-   backdrop-filter is NOT clipped by the filtered element's own
-   `overflow: hidden` — an element cannot clip its own backdrop. Safari
-   was therefore free to sample and paint the blur far outside the pill.
-   As a descendant it IS clipped by the parent's overflow, so the blurred
-   region is bounded by geometry rather than by WebKit computing the
-   backdrop root correctly.
+   A backdrop-filter paints within its own element's border box, so
+   inset: 0 makes the frosted area exactly the pill, and border-radius:
+   inherit rounds it to the pill's corners. That is also why a wrongly
+   measured pill frosts the whole page: the blur is faithfully filling a
+   box that has become viewport-sized.
+
+   It lives on a pseudo-element rather than on .bottom-nav__inner
+   because of the Safari misdiagnosis described on .bottom-nav above —
+   it was moved here to stop a leak that never existed. It stays because
+   it is correct either way and costs nothing.
 
    z-index: -1 puts it below the in-flow bar and panel but above the
    parent's own background — which is why the background color moved

@@ -14,7 +14,11 @@ import { initStepTimeline } from './js/timeline.js';
 import { initSound } from './js/sound.js';
 import { initSmoothScroll } from './js/scroll.js';
 import { initClipboard } from './js/clipboard.js';
-import { initExpandingBottomNav, initNavEnhancements } from './js/nav.js';
+import {
+  initExpandingBottomNav,
+  initNavEnhancements,
+  whenNavStyled,
+} from './js/nav.js';
 import { initSignature } from './js/signature.js';
 
 document.querySelector('[data-year]').textContent = new Date().getFullYear();
@@ -34,10 +38,21 @@ initStrands(document.querySelector('[data-strands]'), {
   scale: 1.35,
 });
 
-/* The nav must be measured before anything animates it: measure() reads
-   offsetWidth off a temporarily-restyled element, so it has to run
-   before initAnimations() attaches the reveal tween to .bottom-nav. */
-initExpandingBottomNav();
+/* The nav measures itself once, in pixels, so it must not start until
+   its stylesheet has applied — measured unstyled, the pill comes out
+   viewport-sized and frosts the whole page. See whenNavStyled() in
+   src/js/nav.js.
+
+   That makes it asynchronous, so it may now start after
+   initAnimations() has attached the reveal tween to .bottom-nav. That
+   is safe: the tween writes only opacity, visibility and
+   --nav-reveal-offset on the outer element, none of which change the
+   inner box measure() reads. Nothing is visibly late either — the nav
+   is hidden until you scroll past the hero.
+
+   initNavEnhancements() does not measure anything, so it runs now: the
+   closed panel's links should leave the tab order from the start. */
+whenNavStyled().then(initExpandingBottomNav);
 initNavEnhancements();
 
 initAnimations();
