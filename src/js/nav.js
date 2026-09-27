@@ -243,11 +243,17 @@ export function initExpandingBottomNav() {
  * and menu button crisp in the corners of the window. Resizing cleared
  * it, because the resize handler above measures again.
  *
- * Safari 27 lost this race on a first, uncached load: the module ran
- * before the stylesheet had applied. The built index.html puts Vite's
- * module <script> ahead of the stylesheet <link>, which is probably why
- * Safari is the one that loses, but the gate below does not depend on
- * that being the reason.
+ * Safari 27 lost this race on a first, uncached load. Verified through
+ * Safari's own MCP server (safaridriver --mcp): with the stylesheet
+ * held back 2s but still render-blocking, Safari ran the module before
+ * it applied on 3 loads out of 3, and the old build pinned a 1264x1763
+ * pill in a 1280px window. Chromium waited under the same conditions. A
+ * cached stylesheet arrives in time, which is why only a cold load
+ * showed it.
+ *
+ * The built index.html puts Vite's module <script> ahead of the
+ * stylesheet <link>. That order was never tested as the reason, and the
+ * gate below does not depend on it.
  *
  * Twice before, this was misread as a WebKit backdrop-filter bug and
  * "fixed" in nav.css — see the note on .bottom-nav there.
