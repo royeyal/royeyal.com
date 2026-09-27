@@ -1,7 +1,13 @@
 @import './styles/fonts.css';
 @import './styles/tokens.css';
-@import './styles/glass.css';
 @import './styles/base.css';
+/* After base.css, not beside tokens.css. Its rim is a ::after whose 1px
+   padding IS the ring (see glass.css), and base.css's reset sets
+   `*::after { padding: 0 }` at the same specificity — loaded first, the
+   reset won on source order and silently erased every rim, leaving only
+   the glow. Nothing else here depends on the position: every other rule
+   in glass.css is inside :where() and meant to lose. */
+@import './styles/glass.css';
 @import './styles/clipboard.css';
 @import './styles/sections.css';
 @import './styles/timeline.css';
