@@ -298,13 +298,16 @@
     transform var(--bulb-off) var(--ease-bulb-off);
 }
 
-.work-card:hover {
-  --lit-core: 1;
-  --lit-halo: 1;
-  transform: translateY(-0.1875rem);
-  transition:
-    var(--glass-on),
-    transform var(--bulb-on) var(--ease-bulb-bloom);
+/* hover only where there is a real pointer — see glass.css */
+@media (hover: hover) {
+  .work-card:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+    transform: translateY(-0.1875rem);
+    transition:
+      var(--glass-on),
+      transform var(--bulb-on) var(--ease-bulb-bloom);
+  }
 }
 
 .work-card__head {
@@ -354,10 +357,13 @@
   transition: var(--glass-off);
 }
 
-.work-card:hover .work-card__logo:has(svg) {
-  --lit-core: 1;
-  --lit-halo: 1;
-  transition: var(--glass-on);
+/* hover only where there is a real pointer — see glass.css */
+@media (hover: hover) {
+  .work-card:hover .work-card__logo:has(svg) {
+    --lit-core: 1;
+    --lit-halo: 1;
+    transition: var(--glass-on);
+  }
 }
 
 .work-card__logo {
@@ -527,7 +533,6 @@
     transform var(--bulb-off) var(--ease-bulb-off);
 }
 
-.project-card:hover,
 .project-card:has(.project-card__link:focus-visible) {
   --lit-core: 1;
   --lit-halo: 1;
@@ -535,6 +540,17 @@
   transition:
     var(--glass-on),
     transform var(--bulb-on) var(--ease-bulb-bloom);
+}
+
+@media (hover: hover) {
+  .project-card:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+    transform: translateY(-0.25rem);
+    transition:
+      var(--glass-on),
+      transform var(--bulb-on) var(--ease-bulb-bloom);
+  }
 }
 
 .project-card__media {
@@ -578,7 +594,6 @@
    why the zoom gets its own longer duration rather than --bulb-on. The
    4% scale is comfortably inside the resolution headroom (a 1000px
    capture in a 474px slot), so nothing goes soft. */
-.project-card:hover .project-card__shot,
 .project-card:has(.project-card__link:focus-visible) .project-card__shot {
   opacity: 1;
   filter: saturate(1);
@@ -587,6 +602,18 @@
     opacity var(--bulb-on) var(--ease-bulb-on),
     filter var(--bulb-on) var(--ease-bulb-on),
     transform var(--zoom-in) var(--ease-bulb-on);
+}
+
+@media (hover: hover) {
+  .project-card:hover .project-card__shot {
+    opacity: 1;
+    filter: saturate(1);
+    transform: scale(1.04);
+    transition:
+      opacity var(--bulb-on) var(--ease-bulb-on),
+      filter var(--bulb-on) var(--ease-bulb-on),
+      transform var(--zoom-in) var(--ease-bulb-on);
+  }
 }
 
 .project-card__link {
@@ -598,9 +625,10 @@
     border-color var(--fast) var(--ease-out);
 }
 
-/* Keyboard focus lights the card exactly like a hover — the selector is
-   folded into the .project-card:hover rule above so the two states can
-   never drift apart. */
+/* Keyboard focus lights the card exactly like a hover. The two used to
+   share one selector list so they could never drift apart; they are
+   twin rules now, because the hover half is gated on (hover: hover) —
+   see glass.css. Change one, change both. */
 
 .project-card__name {
   font-family: var(--font-display);

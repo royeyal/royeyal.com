@@ -255,13 +255,16 @@ a {
     var(--glass-off);
 }
 
-.chip:hover {
-  --lit-core: 1;
-  --lit-halo: 1;
-  color: var(--cyan);
-  transition:
-    color var(--warm-core) var(--ease-warm),
-    var(--glass-on);
+/* hover only where there is a real pointer — see glass.css */
+@media (hover: hover) {
+  .chip:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+    color: var(--cyan);
+    transition:
+      color var(--warm-core) var(--ease-warm),
+      var(--glass-on);
+  }
 }
 
 /* The one linked chip (the Accessibility tag on the Wix card).
@@ -343,8 +346,8 @@ a {
 }
 
 /* :focus-visible as well as :hover: a keyboard user should see the
-   same light come on that a pointer user does. */
-.btn:hover,
+   same light come on that a pointer user does. Two rules rather than
+   one selector list because the hover half is gated — see glass.css. */
 .btn:focus-visible {
   --lit-core: 1;
   --lit-halo: 1;
@@ -352,6 +355,17 @@ a {
     transform var(--fast) var(--ease-snap),
     var(--glass-on),
     color var(--link-in) var(--ease-link-in);
+}
+
+@media (hover: hover) {
+  .btn:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+    transition:
+      transform var(--fast) var(--ease-snap),
+      var(--glass-on),
+      color var(--link-in) var(--ease-link-in);
+  }
 }
 
 .btn--primary {
@@ -363,8 +377,11 @@ a {
   box-shadow: var(--shadow-btn), var(--glass-glow);
 }
 
-.btn--primary:hover {
-  transform: translateY(-0.125rem);
+/* hover only where there is a real pointer — see glass.css */
+@media (hover: hover) {
+  .btn--primary:hover {
+    transform: translateY(-0.125rem);
+  }
 }
 
 .btn__arrow {
@@ -383,9 +400,12 @@ a {
   fill: currentColor;
 }
 
-/* Down, not across — the primary button scrolls to the next section now. */
-.btn--primary:hover .btn__arrow {
-  transform: translateY(0.25rem);
+/* Down, not across — the primary button scrolls to the next section now.
+   Hover only where there is a real pointer — see glass.css. */
+@media (hover: hover) {
+  .btn--primary:hover .btn__arrow {
+    transform: translateY(0.25rem);
+  }
 }
 
 .btn--ghost {
@@ -402,9 +422,12 @@ a {
     var(--glass-glow);
 }
 
-.btn--ghost:hover {
-  color: var(--cyan);
-  transform: translateY(-0.125rem);
+/* hover only where there is a real pointer — see glass.css */
+@media (hover: hover) {
+  .btn--ghost:hover {
+    color: var(--cyan);
+    transform: translateY(-0.125rem);
+  }
 }
 
 @media (max-width: 40rem) {
@@ -452,7 +475,9 @@ a {
     var(--glass-off);
 }
 
-.sound-toggle:hover,
+/* Focus and hover as twins, the hover half gated — see glass.css. Both
+   come before the pressed rule below, so a pressed toggle keeps its
+   magenta over this cyan on source order. */
 .sound-toggle:focus-visible {
   --lit-core: 1;
   --lit-halo: 1;
@@ -461,6 +486,18 @@ a {
     color var(--warm-core) var(--ease-warm),
     text-shadow var(--warm-core) var(--ease-warm),
     var(--glass-on);
+}
+
+@media (hover: hover) {
+  .sound-toggle:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+    color: var(--cyan);
+    transition:
+      color var(--warm-core) var(--ease-warm),
+      text-shadow var(--warm-core) var(--ease-warm),
+      var(--glass-on);
+  }
 }
 
 /* Sound on is a PILOT LIGHT: the toggle keeps a low magenta glow and a
@@ -480,10 +517,16 @@ a {
     var(--glass-on);
 }
 
-.sound-toggle[aria-pressed='true']:hover,
 .sound-toggle[aria-pressed='true']:focus-visible {
   --lit-core: 1;
   --lit-halo: 1;
+}
+
+@media (hover: hover) {
+  .sound-toggle[aria-pressed='true']:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+  }
 }
 
 .sound-toggle[disabled] {

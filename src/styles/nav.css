@@ -236,11 +236,21 @@
   display: flex;
 }
 
-.bottom-nav__toggle:hover,
+/* Focus and hover as twins, the hover half gated — see glass.css. On a
+   phone this button is tapped every time the menu opens, so an ungated
+   hover would leave it glowing after every close. */
 .bottom-nav__toggle:focus-visible {
   --lit-core: 1;
   --lit-halo: 1;
   transition: var(--glass-on);
+}
+
+@media (hover: hover) {
+  .bottom-nav__toggle:hover {
+    --lit-core: 1;
+    --lit-halo: 1;
+    transition: var(--glass-on);
+  }
 }
 
 .bottom-nav__toggle-bar {

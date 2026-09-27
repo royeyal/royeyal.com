@@ -23,6 +23,20 @@
      3. splices var(--glass-off) / var(--glass-on) into its transitions
         (tokens.css) — the base rule governs cooling, the lit rule
         governs warming, same as every other lightbulb on the page.
+
+   HOVER IS GATED ON @media (hover: hover). On a touchscreen a tap is
+   also a :hover, and it STICKS: the tapped chip or card stays hovered
+   until the next tap lands somewhere else. The old hover tints stuck
+   the same way, but a five-layer bloom stuck on one chip is far louder
+   than a tinted border was. So every rule that lights on :hover sits
+   inside that media query, and its :focus-visible twin sits outside it
+   — keyboard focus, the open nav, the timeline and the sound-on pilot
+   light are states, not hovers, and light up on every device. The twins
+   are deliberate duplicates; change one, change both.
+
+   The lift and the text tint that go with a hover are gated with it:
+   they are the same state, and a button left raised after a tap is the
+   same bug as one left glowing.
    And may set --glass-tint (the glow's color), --glass-reach (how far
    the glow throws) and --rim-rest (how visible the rim is unlit).
    ------------------------------------------------------------------ */
