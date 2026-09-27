@@ -251,9 +251,14 @@ export function initExpandingBottomNav() {
  * cached stylesheet arrives in time, which is why only a cold load
  * showed it.
  *
- * The built index.html puts Vite's module <script> ahead of the
- * stylesheet <link>. That order was never tested as the reason, and the
- * gate below does not depend on it.
+ * It is not the tag order. The built index.html puts Vite's module
+ * <script> ahead of the stylesheet <link>, which looked like the cause,
+ * but the same test with the <link> moved above the <script> pinned the
+ * same 1264x1763 pill, 3 loads out of 3: Safari 27 does not hold a
+ * module back for a pending stylesheet in either order. (Vite also
+ * re-emits the tags in its own order however index.html authors them,
+ * so reordering would have taken a build plugin to do nothing.) This
+ * gate is the fix.
  *
  * Twice before, this was misread as a WebKit backdrop-filter bug and
  * "fixed" in nav.css — see the note on .bottom-nav there.
