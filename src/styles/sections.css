@@ -35,9 +35,14 @@
   height: 100%;
   /* The strands load after the hero intro and fade in over the
      gradient above — see src/main.js. strands.js sets data-ready once
-     a frame has been drawn. */
+     a frame has been drawn.
+
+     0.6s, down from 1.6s: Speed Index counts the page as unfinished
+     until the fade ends. Deferring the strands already raised it by
+     ~1.4s in Lighthouse; every second of fade on top was more of the
+     same, for a difference nobody reading the page would notice. */
   opacity: 0;
-  transition: opacity 1.6s ease-out;
+  transition: opacity 0.6s ease-out;
 }
 
 .hero__bg canvas[data-ready] {
