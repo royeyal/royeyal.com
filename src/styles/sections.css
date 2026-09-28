@@ -33,6 +33,21 @@
   display: block;
   width: 100%;
   height: 100%;
+  /* The strands load after the hero intro and fade in over the
+     gradient above — see src/main.js. strands.js sets data-ready once
+     a frame has been drawn. */
+  opacity: 0;
+  transition: opacity 1.6s ease-out;
+}
+
+.hero__bg canvas[data-ready] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__bg canvas {
+    transition: none;
+  }
 }
 
 /* scrim — keeps hero copy readable over the bright strand core */

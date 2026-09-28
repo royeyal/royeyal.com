@@ -16,8 +16,16 @@ if (import.meta.env.DEV) {
   window.ScrollTrigger = ScrollTrigger;
 }
 
+/**
+ * Returns a promise that resolves once the hero intro's copy has landed
+ * — or at once, when there is no intro to wait for. src/main.js holds
+ * the WebGL strands back until then; see the note there.
+ */
 export function initAnimations() {
   const mm = gsap.matchMedia();
+
+  let introLanded;
+  const intro = new Promise((resolve) => (introLanded = resolve));
 
   mm.add('(prefers-reduced-motion: no-preference)', () => {
     // --- Hero intro -------------------------------------------------
@@ -46,6 +54,13 @@ export function initAnimations() {
         { opacity: 0, y: 20, duration: 0.7, stagger: 0.09 },
         '-=0.6'
       )
+      /* The copy has landed; only the scroll hint's slow fade is left.
+         That is the cue for the strands — compiling their shader any
+         earlier would stall frames of the logo's blur-in, the one
+         moment on the page that must not stutter. A zero-length call
+         does not move the timeline's end, so the hint's '-=0.3' below
+         still overlaps exactly what it did before. */
+      .call(introLanded)
       .from('[data-hero="hint"]', { opacity: 0, duration: 1 }, '-=0.3');
 
     // --- Scroll reveals --------------------------------------------
@@ -126,6 +141,13 @@ export function initAnimations() {
     }
   });
 
+  /* Under reduced motion the block above never ran, so there is no
+     intro to wait for. (matchMedia runs a matching block synchronously,
+     so by this line the answer is settled.) */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    introLanded();
+  }
+
   /* --- Current section, shown in the closed nav pill ---------------
    * Outside the matchMedia block on purpose: this is information, not
    * motion, so it must work with reduced motion enabled too.
@@ -188,4 +210,6 @@ export function initAnimations() {
       });
     });
   }
+
+  return intro;
 }

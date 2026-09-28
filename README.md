@@ -66,7 +66,8 @@ src/styles/            fonts / tokens / base / clipboard / sections /
 src/styles/fonts.css   self-hosted @font-face declarations
 public/fonts/         the woff2 files themselves (public/ so the URLs stay
                        stable enough for index.html to preload them)
-src/js/strands.js      WebGL hero background (ogl)
+src/js/strands.js      WebGL hero background (ogl) — lazy-loaded after the
+                       hero intro, fades in (see src/main.js)
 src/js/animations.js   GSAP hero intro, reveals, nav reveal + section indicator
 src/js/timeline.js     GSAP scroll-highlighted "four disciplines" timeline
 src/js/sound.js        cuelume interaction sounds (opt-in)

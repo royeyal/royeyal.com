@@ -296,6 +296,17 @@ export function initStrands(container, options = {}) {
   resizeObserver.observe(container);
   resize();
 
+  /* ---- Fade in -------------------------------------------------------
+   * The canvas starts at opacity 0 (sections.css) and is revealed only
+   * now, with a frame already drawn by resize() above, so the fade can
+   * never show an empty or wrong-sized canvas. A frame later rather
+   * than right here: the transition needs opacity 0 to have been
+   * computed first, or the strands simply pop in. resize()'s
+   * offsetWidth read happens to force that today, but that is an
+   * accident of the sizing code, not something to lean on.
+   */
+  requestAnimationFrame(() => gl.canvas.setAttribute('data-ready', ''));
+
   let animateId = 0;
   let visibilityObserver = null;
 
