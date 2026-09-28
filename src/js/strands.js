@@ -7,7 +7,8 @@
  *
  * Requires WebGL2. Falls back silently (the hero keeps its CSS gradient
  * atmosphere) when unavailable. Honors prefers-reduced-motion by rendering
- * a single static frame instead of animating.
+ * a single static frame instead of animating, and does the same when the
+ * GPU turns out to be software (see isSoftwareRenderer()).
  */
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
 
@@ -137,6 +138,42 @@ function buildPalette(colors) {
     padded.push([c.r, c.g, c.b]);
   }
   return padded;
+}
+
+/* ---- Software WebGL -------------------------------------------------
+ * A machine with no usable GPU can still hand out a WebGL2 context:
+ * Chrome falls back to SwiftShader, Linux to Mesa's llvmpipe, Windows
+ * to its Basic Render Driver. Each one runs the fragment shader on the
+ * CPU. Our dpr cap does not save it — a desktop hero at dpr 1 is still
+ * about five times the pixels of the phone hero — so every frame is a
+ * large slab of CPU work competing with the page.
+ *
+ * PageSpeed's desktop run appears to be one of these machines: after
+ * the strands were deferred it still scored 67 on desktop against 98
+ * on mobile, while every local desktop run on a real GPU scored 100.
+ * Forcing SwiftShader locally tripled Speed Index. The real audience
+ * is the same shape — VMs, remote desktops, old laptops whose GPU
+ * Chrome has blocklisted — so this is not just for the test.
+ *
+ * Such a machine gets the reduced-motion treatment: one static frame,
+ * which still looks like the hero, and no loop.
+ *
+ * gl.RENDERER is masked to "WebKit WebGL" in Chrome and Safari; the
+ * real name is behind WEBGL_debug_renderer_info. Firefox deprecated
+ * that extension (and warns when it is requested) but already returns
+ * the real name from RENDERER, so the extension is asked for only when
+ * RENDERER is that masked placeholder.
+ */
+const SOFTWARE_RENDERER =
+  /swiftshader|llvmpipe|softpipe|basic render driver|software/i;
+
+function isSoftwareRenderer(gl) {
+  let name = gl.getParameter(gl.RENDERER) || '';
+  if (/^webkit webgl$/i.test(name)) {
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    if (info) name = gl.getParameter(info.UNMASKED_RENDERER_WEBGL) || '';
+  }
+  return SOFTWARE_RENDERER.test(name);
 }
 
 export function initStrands(container, options = {}) {
@@ -310,7 +347,7 @@ export function initStrands(container, options = {}) {
   let animateId = 0;
   let visibilityObserver = null;
 
-  if (reducedMotion) {
+  if (reducedMotion || isSoftwareRenderer(gl)) {
     // one static, pretty frame — no animation loop
     program.uniforms.uTime.value = 12;
     renderer.render({ scene: mesh });
