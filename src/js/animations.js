@@ -43,12 +43,17 @@ export function initAnimations() {
         { opacity: 0, x: -20, duration: 0.7 },
         '-=0.7'
       )
-      .from(
-        '[data-hero="title"]',
-        { opacity: 0, y: 40, duration: 1.1 },
-        '-=0.5'
-      )
-      .from('[data-hero="sub"]', { opacity: 0, y: 24, duration: 0.9 }, '-=0.75')
+      /* The headline starts at 0, alongside the logo, not 0.7s in. It
+         is the page's LCP element, and Chrome does not count an element
+         as painted while it sits at opacity 0 — so LCP waited on this
+         tween's start, a delay chosen for choreography, not content.
+
+         Everything after it keeps its old timing. The sub used to be
+         placed relative to the headline's end ('-=0.75' of 1.8s), which
+         would now drag it and the buttons 0.6s earlier; 1.05 is where
+         it has always started. */
+      .from('[data-hero="title"]', { opacity: 0, y: 40, duration: 1.1 }, 0)
+      .from('[data-hero="sub"]', { opacity: 0, y: 24, duration: 0.9 }, 1.05)
       .from(
         '[data-hero="actions"] .btn',
         { opacity: 0, y: 20, duration: 0.7, stagger: 0.09 },
