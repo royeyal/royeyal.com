@@ -8,7 +8,10 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+/* ScrollTrigger is registered in initScrollAnimations(), not here.
+   Registering it measures the page (it reads the body's bounds), and at
+   import time that dragged the page's first full style and layout into
+   the one long startup task — see the note in src/main.js. */
 
 if (import.meta.env.DEV) {
   // console access for debugging during development only
@@ -68,8 +71,47 @@ export function initAnimations() {
       .call(introLanded)
       .from('[data-hero="hint"]', { opacity: 0, duration: 1 }, '-=0.3');
 
+    /* The bottom nav stays hidden over the hero (see the reveal in
+       initScrollAnimations()). That reveal is set up after the first
+       paint, so hide the bar now, or it would sit on the hero for the
+       first frame. Opacity, visibility and a custom property only —
+       nothing here reads layout. The matchMedia context reverts this
+       set, so reduced motion gets the nav back. */
+    if (document.querySelector('.bottom-nav')) {
+      gsap.set('.bottom-nav', { '--nav-reveal-offset': '8rem', autoAlpha: 0 });
+    }
+  });
+
+  /* Under reduced motion the block above never ran, so there is no
+     intro to wait for. (matchMedia runs a matching block synchronously,
+     so by this line the answer is settled.) */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    introLanded();
+  }
+
+  return intro;
+}
+
+/**
+ * Everything scroll-driven: reveals, the giant footer, the nav's
+ * arrival and the section indicator. None of it is on screen at load,
+ * so src/main.js runs this in its own task after the first paint.
+ */
+export function initScrollAnimations() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  const mm = gsap.matchMedia();
+
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
     // --- Scroll reveals --------------------------------------------
+    /* This runs after the first paint now, so anything already on
+       screen — a deep link, a restored scroll position — has been seen
+       at full opacity. Hiding it to fade it back in would read as a
+       flicker; it is left as it is. The check mirrors the 'top 85%'
+       start below. */
+    const revealLine = window.innerHeight * 0.85;
     gsap.utils.toArray('[data-reveal]').forEach((el) => {
+      if (el.getBoundingClientRect().top < revealLine) return;
       gsap.from(el, {
         opacity: 0,
         y: 44,
@@ -106,8 +148,9 @@ export function initAnimations() {
      * This targets the OUTER .bottom-nav; the Osmo timeline in
      * src/js/nav.js only ever animates .bottom-nav__inner, so the two
      * never write the same property on the same element. Keep it that
-     * way. Living inside this matchMedia block also means the nav is
-     * simply always visible under reduced motion, which is correct.
+     * way. Living inside a no-preference matchMedia block (here, and
+     * where initAnimations() pre-hides it) means the nav is simply
+     * always visible under reduced motion, which is correct.
      *
      * The slide is a tween on --nav-reveal-offset, which nav.css folds
      * into `bottom` so the env() safe-area inset survives. This tween
@@ -118,40 +161,39 @@ export function initAnimations() {
      * Everything it writes — opacity, visibility and that offset — is
      * on the OUTER element and leaves the pill's box alone, so it does
      * not matter whether it attaches before or after nav.js measures.
-     * src/main.js relies on that.
      *
      * 8rem clears the bar (3.75em) plus its bottom inset with room to
      * spare, so it starts fully off-screen at any root font size.
+     *
+     * A fromTo rather than a from: initAnimations() has already set the
+     * hidden state, and a from() would read that back as its end state.
      */
     if (document.querySelector('.bottom-nav')) {
-      gsap.from('.bottom-nav', {
-        '--nav-reveal-offset': '8rem',
-        autoAlpha: 0,
-        duration: 0.6,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: '.hero',
-          start: 'bottom 80%',
-          toggleActions: 'play none none reverse',
-          /* Reload deep in the page and no boundary is ever crossed, so
-             no toggleAction fires and the nav stays parked off-screen
-             until you scroll back up through the hero and down again.
-             On refresh, anything already past the start is simply put
-             in its finished state. */
-          onRefresh: (self) => {
-            if (self.progress > 0) self.animation.progress(1);
+      gsap.fromTo(
+        '.bottom-nav',
+        { '--nav-reveal-offset': '8rem', autoAlpha: 0 },
+        {
+          '--nav-reveal-offset': '0rem',
+          autoAlpha: 1,
+          duration: 0.6,
+          ease: 'expo.out',
+          scrollTrigger: {
+            trigger: '.hero',
+            start: 'bottom 80%',
+            toggleActions: 'play none none reverse',
+            /* Reload deep in the page and no boundary is ever crossed,
+               so no toggleAction fires and the nav stays parked
+               off-screen until you scroll back up through the hero and
+               down again. On refresh, anything already past the start
+               is simply put in its finished state. */
+            onRefresh: (self) => {
+              if (self.progress > 0) self.animation.progress(1);
+            },
           },
-        },
-      });
+        }
+      );
     }
   });
-
-  /* Under reduced motion the block above never ran, so there is no
-     intro to wait for. (matchMedia runs a matching block synchronously,
-     so by this line the answer is settled.) */
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    introLanded();
-  }
 
   /* --- Current section, shown in the closed nav pill ---------------
    * Outside the matchMedia block on purpose: this is information, not
@@ -215,6 +257,4 @@ export function initAnimations() {
       });
     });
   }
-
-  return intro;
 }

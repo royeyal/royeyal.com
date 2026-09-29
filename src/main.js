@@ -8,7 +8,7 @@
  */
 import './main.css'; /* includes all @font-face declarations */
 
-import { initAnimations } from './js/animations.js';
+import { initAnimations, initScrollAnimations } from './js/animations.js';
 import { initStepTimeline } from './js/timeline.js';
 import { initSound } from './js/sound.js';
 import { initSmoothScroll } from './js/scroll.js';
@@ -22,21 +22,10 @@ import { initSignature } from './js/signature.js';
 
 document.querySelector('[data-year]').textContent = new Date().getFullYear();
 
-/* The nav measures itself once, in pixels, so it must not start until
-   its stylesheet has applied — measured unstyled, the pill comes out
-   viewport-sized and frosts the whole page. See whenNavStyled() in
-   src/js/nav.js.
-
-   That makes it asynchronous, so it may now start after
-   initAnimations() has attached the reveal tween to .bottom-nav. That
-   is safe: the tween writes only opacity, visibility and
-   --nav-reveal-offset on the outer element, none of which change the
-   inner box measure() reads. Nothing is visibly late either — the nav
-   is hidden until you scroll past the hero.
-
-   initNavEnhancements() does not measure anything, so it runs now: the
-   closed panel's links should leave the tab order from the start. */
-whenNavStyled().then(initExpandingBottomNav);
+/* initNavEnhancements() does not measure anything, so it runs now: the
+   closed panel's links should leave the tab order from the start. The
+   rest of the nav is set up after the first paint — see "Everything
+   else" at the bottom of this file. */
 initNavEnhancements();
 
 const intro = initAnimations();
@@ -102,12 +91,57 @@ Promise.race([Promise.all([intro, pageLoaded]), cap])
      fallback anyway — nothing worth surfacing to the reader. */
   .catch(() => {});
 
-initStepTimeline();
+/* Listeners only, and cheap: they run now so a click in the first
+   frame already scrolls smoothly and copies. */
 initSmoothScroll();
 initClipboard();
-initSound(document.querySelector('[data-sound-toggle]'));
 
-/* Last, so the greeting is the final thing in the console rather than
-   something the init logs scroll away. Its twin lives in the HTML
-   comment at the top of View Source — see build/strip-html-comments.js. */
-initSignature();
+/* ---- Everything else, after the first paint -------------------------
+ * Startup used to be one long task. Profiled at 6x CPU throttling on a
+ * desktop viewport it was ~210ms, and PageSpeed's desktop run measured
+ * the same task at ~400ms — nearly all of its 363ms Total Blocking
+ * Time. Inside it: ~95ms of the page's first style and layout, forced
+ * early by registering ScrollTrigger at import time, then ~80ms of
+ * setup for things nobody can see yet.
+ *
+ * Only the hero intro has to run before the first paint: it hides the
+ * hero copy so it can animate it in, and a frame painted before that
+ * would flash the copy. Everything below it is below the fold, hidden
+ * (the nav), or not visual at all (the console signature), so it waits
+ * for a painted frame and then runs one step per task. Each step is
+ * short, and a task under 50ms costs Total Blocking Time nothing.
+ *
+ * afterPaint: requestAnimationFrame fires just before a frame is
+ * painted, and a timeout queued from inside it runs just after.
+ * nextTask: scheduler.yield() where it exists (it keeps our place in
+ * the queue ahead of other work), a timeout elsewhere. A background
+ * tab paints nothing, so there this waits until the tab is shown —
+ * which is exactly when any of it starts to matter.
+ *
+ * The order keeps two old promises. The nav still starts only once
+ * its stylesheet has applied — measured unstyled, the pill comes out
+ * viewport-sized and frosts the whole page (whenNavStyled() in
+ * src/js/nav.js). And the signature still runs last, so the greeting
+ * is the final thing in the console; its twin lives in the HTML
+ * comment at the top of View Source (build/strip-html-comments.js).
+ */
+const afterPaint = () =>
+  new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+const nextTask = () =>
+  globalThis.scheduler?.yield
+    ? globalThis.scheduler.yield()
+    : new Promise((resolve) => setTimeout(resolve, 0));
+
+afterPaint().then(async () => {
+  const steps = [
+    initScrollAnimations,
+    initStepTimeline,
+    () => whenNavStyled().then(initExpandingBottomNav),
+    () => initSound(document.querySelector('[data-sound-toggle]')),
+    initSignature,
+  ];
+  for (const step of steps) {
+    await step();
+    await nextTask();
+  }
+});

@@ -24,9 +24,11 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function initStepTimeline() {
+  /* Registered here rather than at import time, which would measure
+     the page inside the startup task — see src/js/animations.js. */
+  gsap.registerPlugin(ScrollTrigger);
+
   const root = document.querySelector('[data-step-timeline-init]');
   if (!root) return;
 
