@@ -31,8 +31,15 @@ built as plain HTML/CSS/JS with Vite, hosted on Cloudflare Workers.
     `@font-face` is load-bearing: Satoshi's default instance is wght 900,
     so without it body copy can render Black. **Not in this repo** — the
     ITF Free Font License forbids redistributing the file, so it is
-    gitignored; grab it from Fontshare after cloning. The page still
-    builds and renders without it, on `system-ui`.
+    gitignored; grab it from Fontshare after cloning. The dev server
+    still renders without it, on the size-matched Arial fallback;
+    `npm run build` refuses to (`build/require-fonts.js`).
+  - **Fallbacks** — each face has a `… Fallback` `@font-face` in
+    `src/styles/fonts.css`: local Arial / Courier New (or their Linux
+    clones) resized to take the same room, so the `font-display: swap`
+    swap does not re-wrap the hero and shift it. Change a face or a
+    weight token and those numbers need re-measuring — the note above
+    them says how.
   - **Departure Mono** — terminal accents (single weight, never fake-bold
     it). MIT.
 - **Typography tokens** — every weight and line-height is a token in

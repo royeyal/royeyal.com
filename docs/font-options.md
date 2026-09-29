@@ -112,3 +112,10 @@ display face is four steps:
    for example) has no range, so both tokens must be set to the one
    weight it ships, and the footer loses that contrast. This is the step
    that actually costs something, and it is why the swap was declined.
+5. **Re-measure the fallback.** `'Tektur Fallback'` in `fonts.css` is
+   Arial resized to Tektur's widths; left as it is, the new face would
+   swap in over the wrong-sized fallback and shift the hero. Rename it
+   for the new face and redo its `size-adjust` and overrides (the note
+   above the fallback faces says how). The hero headline's
+   `max-width: 11.7em` is also 18 of Tektur's "0" — recompute it from
+   the new face's "0", or the headline box changes width.

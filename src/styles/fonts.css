@@ -62,6 +62,98 @@
   font-display: swap;
 }
 
+/* ------------------------------------------------------------------
+   Size-matched fallbacks
+
+   All three faces use font-display: swap, so the page first paints in
+   a fallback and swaps when the file lands. That used to be system-ui,
+   a different font on every OS — and one whose widths have nothing to
+   do with ours. When the swap re-wrapped the hero, its vertically
+   centred block jumped: on a 412px phone the headline went from 2
+   lines to 3 and pushed the lede down 41px, and PageSpeed's desktop
+   run (Linux) scored a 0.227 layout shift on .hero__inner.
+
+   These faces are Arial and Courier New — or their metric-identical
+   clones on Linux, Liberation and Arimo/Cousine — resized so they take
+   the same room as the real face. size-adjust matches the average
+   advance width, measured on the hero's own text (headline for Tektur,
+   lede for Satoshi, eyebrow for Departure Mono) at the weight each
+   role uses; that is what decides where lines wrap. The ascent,
+   descent and line-gap overrides are the real face's hhea metrics
+   divided by that size-adjust, so glyphs sit on the same baseline.
+
+   Two faces per variable family, split at 600, because the browser
+   picks Arial Bold for bold text and Bold is wider: each half is
+   matched against the weight actually used in that range (display
+   666 and 400; body 550 and body-strong 780, from tokens.css).
+
+   If a weight token or a face changes, re-measure — the numbers are
+   only as good as the instance they were taken from. The script that
+   produced them used fontTools' instancer on the woff2 files against
+   macOS's Arial/Courier New; Arial's clones share its advances, so the
+   numbers hold for them too. A machine with none of these fonts skips
+   the fallback and lands on system-ui, exactly as before.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Tektur Fallback';
+  src:
+    local('Arial'), local('ArialMT'), local('Liberation Sans'),
+    local('LiberationSans'), local('Arimo');
+  font-weight: 400 599;
+  size-adjust: 111.06%;
+  ascent-override: 90.04%;
+  descent-override: 27.01%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Tektur Fallback';
+  src:
+    local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'),
+    local('LiberationSans-Bold'), local('Arimo Bold');
+  font-weight: 600 900;
+  size-adjust: 103.53%;
+  ascent-override: 96.59%;
+  descent-override: 28.98%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Satoshi Fallback';
+  src:
+    local('Arial'), local('ArialMT'), local('Liberation Sans'),
+    local('LiberationSans'), local('Arimo');
+  font-weight: 300 599;
+  size-adjust: 102.32%;
+  ascent-override: 98.71%;
+  descent-override: 23.46%;
+  line-gap-override: 9.77%;
+}
+
+@font-face {
+  font-family: 'Satoshi Fallback';
+  src:
+    local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'),
+    local('LiberationSans-Bold'), local('Arimo Bold');
+  font-weight: 600 900;
+  size-adjust: 98.81%;
+  ascent-override: 102.22%;
+  descent-override: 24.29%;
+  line-gap-override: 10.12%;
+}
+
+@font-face {
+  font-family: 'Departure Mono Fallback';
+  src:
+    local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'),
+    local('LiberationMono'), local('Cousine');
+  font-weight: 400;
+  size-adjust: 106.04%;
+  ascent-override: 94.3%;
+  descent-override: 25.72%;
+  line-gap-override: 0%;
+}
+
 /* The three faces above are the final set — the display face is settled.
    A commented-out Neue Machina @font-face used to sit here as a pending
    swap; that upgrade was considered and declined, so the dead rule is

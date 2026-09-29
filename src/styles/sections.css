@@ -176,13 +176,21 @@
   line-height: var(--leading-flush);
   letter-spacing: -0.025em;
   text-wrap: balance;
-  max-width: 18ch;
+  /* 18ch, frozen in em. A ch is the width of "0" in whichever font is
+     rendering right now — so before Tektur arrives it was the
+     fallback's "0", the box was a different width, and the headline
+     wrapped differently until the swap (see "Size-matched fallbacks"
+     in fonts.css). Tektur's "0" at weight 666 is 0.65em, so this is
+     the same box, pixel for pixel, once the font is in. */
+  max-width: 11.7em;
   margin-bottom: 1.75rem;
   text-shadow: 0 0.375rem 3.75rem rgba(0, 0, 0, 0.9);
 }
 
 .hero__sub {
-  max-width: 52ch;
+  /* 52ch in Satoshi at weight 550, frozen in em for the same reason
+     as .hero__title above. */
+  max-width: 36.2em;
   font-size: var(--font-size-lede);
   color: var(--text-lede);
   margin-bottom: 2.75rem;

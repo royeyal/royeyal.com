@@ -37,13 +37,21 @@
   /* typography — the display face is settled (Tektur). Alternatives
      that were considered live in docs/font-options.md. */
   /* Tektur (self-hosted, see fonts.css) — variable wght 400-900. */
-  --font-display: 'Tektur Variable', system-ui, sans-serif;
+  --font-display: 'Tektur Variable', 'Tektur Fallback', system-ui, sans-serif;
   /* Body: Satoshi, and that is settled — the Switzer it was on trial
      against has been removed. system-ui is a real fallback here, not
      boilerplate: Satoshi is gitignored (its license forbids
-     redistribution), so a fresh clone renders in it. */
-  --font-body: 'Satoshi Variable', system-ui, sans-serif;
-  --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', monospace;
+     redistribution), so a fresh clone's dev server renders in it.
+
+     Each 'X Fallback' is a local Arial / Courier New resized to take
+     the same room as the real face, so the swap does not re-wrap the
+     hero — see "Size-matched fallbacks" in fonts.css. It sits ahead of
+     system-ui, which only answers now on a machine without Arial or
+     one of its clones. */
+  --font-body: 'Satoshi Variable', 'Satoshi Fallback', system-ui, sans-serif;
+  --font-mono:
+    'Departure Mono', 'Departure Mono Fallback', ui-monospace, 'SF Mono',
+    monospace;
 
   /* weights — one value per role, never a bare number in a component.
 
