@@ -39,10 +39,10 @@
   /* ---- GSAP inline styles ---------------------------------------
      NOT cosmetic — without this the print is mostly BLANK.
 
-     animations.js reveals every [data-reveal] with gsap.from({opacity:0})
-     driven by ScrollTrigger. `.from()` renders its start state
-     immediately, so everything the reader has not scrolled past yet is
-     carrying an inline `opacity: 0` when they hit print. Measured on a
+     animations.js hides every [data-reveal] still below the fold with
+     gsap.set({opacity:0}) and has ScrollTrigger fade it back in, so
+     everything the reader has not scrolled past yet is carrying an
+     inline `opacity: 0` when they hit print. Measured on a
      cold load: 8 of 22 reveal elements, including the whole freelance
      grid. Inline styles beat any stylesheet rule, so !important is the
      only thing that reaches them, and printing fires no ScrollTrigger

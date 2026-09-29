@@ -110,18 +110,32 @@ export function initScrollAnimations() {
        flicker; it is left as it is. The check mirrors the 'top 85%'
        start below. */
     const revealLine = window.innerHeight * 0.85;
-    gsap.utils.toArray('[data-reveal]').forEach((el) => {
-      if (el.getBoundingClientRect().top < revealLine) return;
-      gsap.from(el, {
-        opacity: 0,
-        y: 44,
-        duration: 1.1,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          once: true,
-        },
+    const toReveal = gsap.utils
+      .toArray('[data-reveal]')
+      .filter((el) => el.getBoundingClientRect().top >= revealLine);
+
+    /* One set for every element, not a gsap.from() per element. A
+       from() renders its start state the moment it is created, so the
+       loop alternated: write one element's opacity and transform, then
+       read the next one's computed style — which forces a fresh style
+       recalc of the whole page. 22 of them in a row made this the
+       longest task after startup: 155ms at 6x CPU, ~360ms on
+       PageSpeed's desktop run. A single tween reads every target
+       first and writes them all after, so the page is restyled once.
+
+       The ScrollTriggers below are callbacks only; they write nothing
+       when created, so measuring 22 of them costs one layout, not 22.
+       The end state, opacity 1 and y 0, is exactly what the from()
+       returned to: no reveal target has a resting opacity or transform
+       of its own. */
+    gsap.set(toReveal, { opacity: 0, y: 44 });
+    toReveal.forEach((el) => {
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 85%',
+        once: true,
+        onEnter: () =>
+          gsap.to(el, { opacity: 1, y: 0, duration: 1.1, ease: 'expo.out' }),
       });
     });
 
