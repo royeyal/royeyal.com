@@ -13,11 +13,11 @@
     "deploy": "export $(grep -v '^#' .env | xargs) && npm run build && wrangler deploy"
   },
   "dependencies": {
-    "cuelume": "0.2.2",
     "gsap": "^3.13.0",
     "ogl": "^1.0.11"
   },
   "devDependencies": {
+    "cuelume": "^0.2.4",
     "prettier": "^3.6.2",
     "vite": "^8.1.5",
     "wrangler": "^4.118.0"
@@ -25,6 +25,6 @@
   "allowScripts": {
     "esbuild@0.28.1": true,
     "fsevents@2.3.3": true,
-    "workerd@1.20260923.1": true
+    "workerd@1.20260926.1": true
   }
 }
