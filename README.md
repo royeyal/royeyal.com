@@ -299,24 +299,29 @@ drop one in the markup and the feature stops, usually with no error.
 - `src/js/animations.js` — `data-hero`, `data-reveal`, `data-giant`, and
   `data-nav-current` (the section label in the closed nav pill)
 - `src/js/timeline.js` — `data-step-timeline-*`
-- cuelume itself — `data-cuelume-tap` (its value names the cue: `tap`,
-  `navigate`, `ready`). Not `data-cuelume-press`, which cuelume deprecated;
-  `src/js/sound.js` explains why the swap changed timing, not just a name.
+- cuelume itself — `data-cuelume-tap` (its value names the cue), plus
+  `data-cuelume-theme="press"` on every link that opens a new tab, and
+  `data-cuelume-select` on the menu links. Not `data-cuelume-press`, which
+  cuelume deprecated; `src/js/sound.js` explains why the swap changed
+  timing, not just a name.
 - `src/js/sound.js` — `data-sound-state`, plus `data-sound-on` /
-  `data-sound-off` in **two** places. The easiest to miss and the only
+  `data-sound-off` in **three** places. The easiest to miss and the only
   ones that fail **silently**: drop them and the page still works
   perfectly, just mute.
   - on the timeline steps, driving the per-step scroll cues through a
     MutationObserver watching `data-status`
-  - on the `<nav>`, driving the menu's open/close cues (`navigate` /
-    `select`) through a second observer watching `data-bottom-nav-open`.
+  - on the `<nav>`, driving the menu's open/close cues (`bubble:ready` /
+    `bubble:attention` — `theme:cue`, split in `sound.js`) through an
+    observer watching `data-bottom-nav-open`.
     Keeping the cue here rather than in `nav.js` is what lets the Osmo
     script stay untouched.
+  - on the two copy buttons, `data-sound-on="press:success"`, played when
+    `clipboard.js` sets `data-copied` — so only after a write that worked.
 - `src/styles/sections.css` — `data-brand`, the only CSS-only one
   (picks the logo tile color)
 - `src/js/clipboard.js` — `data-clip` (holds the value **and** is the
-  hook), plus `data-copied`, which the module writes and
-  `clipboard.css` animates off
+  hook), plus `data-copied`, which the module writes, `clipboard.css`
+  animates off and `sound.js` plays its success cue from
 - `src/js/scroll.js` — none of its own; it delegates off `href="#…"`
 - `src/js/nav.js` — **`data-bottom-nav-*`: seven vendor-owned hooks**
   (`-init`, `-open`, `-inner`, `-bar`, `-toggle`, `-panel`, `-reveal`,

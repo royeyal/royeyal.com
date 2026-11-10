@@ -375,6 +375,7 @@
             target="_blank"
             rel="noreferrer"
             data-cuelume-tap="tap"
+            data-cuelume-theme="press"
             >Lusha</a
           >.
         </p>
@@ -394,6 +395,7 @@
           <a
             class="btn btn--ghost"
             data-cuelume-tap="tap"
+            data-cuelume-theme="press"
             href="https://www.linkedin.com/in/royeyalcom/"
             target="_blank"
             rel="noreferrer"
@@ -414,6 +416,7 @@
           <a
             class="btn btn--ghost"
             data-cuelume-tap="tap"
+            data-cuelume-theme="press"
             href="https://github.com/royeyal"
             target="_blank"
             rel="noreferrer"
@@ -975,7 +978,8 @@
           class="clip footer__mail"
           data-clip="hello@royeyal.com"
           data-reveal
-          data-cuelume-tap="ready"
+          data-cuelume-tap="tap"
+          data-sound-on="press:success"
           aria-label="Copy email address hello@royeyal.com"
         >
           <span class="clip__track">
@@ -1022,6 +1026,7 @@
             target="_blank"
             rel="noreferrer"
             data-cuelume-tap="tap"
+            data-cuelume-theme="press"
           >
             <svg
               class="social-icon"
@@ -1041,6 +1046,7 @@
             target="_blank"
             rel="noreferrer"
             data-cuelume-tap="tap"
+            data-cuelume-theme="press"
           >
             <svg
               class="social-icon"
@@ -1098,16 +1104,16 @@
          ============================================================ -->
     <!-- data-sound-on/off are OURS, not Osmo's — src/js/sound.js watches
          data-bottom-nav-open and plays these, so the cue stays out of the
-         vendored script. `navigate` is a soft whoosh whose air rises,
-         `select` a crisp detent over a small wooden knock, the cue cuelume
-         documents for menus. They were `arrival` / `scan` until cuelume
-         0.2.4 renamed its palette; the old names are aliases that 1.0
-         removes, and they already played these two. -->
+         vendored script. Both play in cuelume's `bubble` theme, written
+         `theme:cue` (sound.js splits it): opening is `ready`, a drop into
+         water; closing is `attention`, one note that bends up a fourth
+         like a question. Until November 2026 these were default-theme
+         `navigate` / `select`. -->
     <nav
       data-bottom-nav-open="false"
       data-bottom-nav-init
-      data-sound-on="navigate"
-      data-sound-off="select"
+      data-sound-on="bubble:ready"
+      data-sound-off="bubble:attention"
       class="bottom-nav"
       aria-label="Primary"
     >
@@ -1172,22 +1178,22 @@
         <div aria-hidden="true" data-bottom-nav-panel class="bottom-nav__panel">
           <ul class="bottom-nav__list">
             <li data-bottom-nav-reveal class="bottom-nav__list-item">
-              <a href="#top" class="bottom-nav__link" data-cuelume-tap="tap"
+              <a href="#top" class="bottom-nav__link" data-cuelume-select
                 >Top</a
               >
             </li>
             <li data-bottom-nav-reveal class="bottom-nav__list-item">
-              <a href="#about" class="bottom-nav__link" data-cuelume-tap="tap"
+              <a href="#about" class="bottom-nav__link" data-cuelume-select
                 >About</a
               >
             </li>
             <li data-bottom-nav-reveal class="bottom-nav__list-item">
-              <a href="#career" class="bottom-nav__link" data-cuelume-tap="tap"
+              <a href="#career" class="bottom-nav__link" data-cuelume-select
                 >Career</a
               >
             </li>
             <li data-bottom-nav-reveal class="bottom-nav__list-item">
-              <a href="#work" class="bottom-nav__link" data-cuelume-tap="tap"
+              <a href="#work" class="bottom-nav__link" data-cuelume-select
                 >Work</a
               >
             </li>
@@ -1195,7 +1201,7 @@
               <a
                 href="#contact"
                 class="bottom-nav__link is--cta"
-                data-cuelume-tap="tap"
+                data-cuelume-select
                 >Contact ↓</a
               >
             </li>
@@ -1216,6 +1222,7 @@
                     rel="noreferrer"
                     class="bottom-nav__sublink"
                     data-cuelume-tap="tap"
+                    data-cuelume-theme="press"
                   >
                     <svg
                       class="social-icon"
@@ -1238,6 +1245,7 @@
                     rel="noreferrer"
                     class="bottom-nav__sublink"
                     data-cuelume-tap="tap"
+                    data-cuelume-theme="press"
                   >
                     <svg
                       class="social-icon"
@@ -1304,7 +1312,8 @@
                   type="button"
                   class="clip"
                   data-clip="hello@royeyal.com"
-                  data-cuelume-tap="ready"
+                  data-cuelume-tap="tap"
+                  data-sound-on="press:success"
                   aria-label="Copy email address hello@royeyal.com"
                 >
                   <span class="clip__track">

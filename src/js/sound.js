@@ -5,12 +5,29 @@
  * index.html). This module owns only load / enable / volume. The state
  * is never persisted — every page load starts off.
  *
- * Two kinds of cue, both answering a deliberate act. Keep in sync with
- * index.html:
+ * Every cue answers a deliberate act. Keep in sync with index.html and
+ * build/projects.js:
  *
- *   click   data-cuelume-tap on links/buttons    tap / ready / navigate
+ *   click   data-cuelume-tap, most links         tap
+ *           … + data-cuelume-theme="press"       press:tap — every link
+ *                                                that opens a new tab,
+ *                                                project cards included
+ *           data-cuelume-select, menu links      select
+ *           data-cuelume-tap, copy buttons       tap
+ *   copied  data-sound-on on the copy buttons    press:success
  *   scroll  data-sound-on / -off on the steps    toggle / error
- *   menu    data-sound-on / -off on the nav      navigate / select
+ *   menu    data-sound-on / -off on the nav      bubble:ready / bubble:attention
+ *
+ * Themes are per cue, never global: setTheme() is not called, so anything
+ * unmarked plays `default`. cuelume's bindings read data-cuelume-theme
+ * from the element or an ancestor. The data-sound-* values are ours, so
+ * they carry the theme inline as `theme:cue` and cueFrom() below splits
+ * it; a bare name means `default`.
+ *
+ * Copying sounds twice: tap as the button goes down, success once the
+ * clipboard write has actually landed (clipboard.js sets data-copied only
+ * then). A refused write gets the tap and nothing else — the same honesty
+ * as the button never claiming "Copied" for a copy that did not happen.
  *
  * These are cuelume's canonical names. Until November 2026 the markup
  * used the v0.2 palette (press, page, arrival, scan), which cuelume 0.2.4
@@ -22,9 +39,11 @@
  * it changes when and how a cue sounds (bind.js, 0.2.8):
  *
  *   mouse     plays on pointerdown, as before, then lets go on the click.
- *             The default theme has no release for tap / navigate / ready,
- *             so the click is silent. The release only matters if the
- *             site ever moves to the `press` theme.
+ *             `default` has no release for tap or select, so most clicks
+ *             are silent. `press` tap does have one, a lighter click, so
+ *             the new-tab links sound twice with a mouse: down, then as
+ *             the click opens the tab. Nothing mutes a hidden tab any
+ *             more (see "hidden tab" below), so that release rings out.
  *   touch     plays whole on the click, not on touch-down, so a scroll
  *             that starts on a link — the project cards, the nav — stays
  *             silent. The old attribute sounded on every one of those.
@@ -72,7 +91,29 @@ const STORAGE_KEY = 'royeyal:sound';
 
 // Dev-only guard: cuelume is pre-1.0, so catch a renamed sound at
 // `npm run dev` rather than by ear in production.
-const USED_SOUNDS = ['tap', 'ready', 'navigate', 'toggle', 'error', 'select'];
+const USED_SOUNDS = [
+  'tap',
+  'select',
+  'success',
+  'toggle',
+  'error',
+  'ready',
+  'attention',
+];
+const USED_THEMES = ['press', 'bubble'];
+
+/* `bubble:ready` → play('ready', { theme: 'bubble' }); `toggle` → plain
+   play('toggle'). An unknown theme is not an error: cuelume ignores it
+   and plays `default`, which is the safe way to be wrong. */
+function cueFrom(value) {
+  if (!value) return null;
+  const at = value.indexOf(':');
+  if (at === -1) return { name: value, options: undefined };
+  return {
+    name: value.slice(at + 1),
+    options: { theme: value.slice(0, at) },
+  };
+}
 
 /*
  * The preference is deliberately NOT persisted. Every page load starts
@@ -123,6 +164,19 @@ export function initSound(toggle, options = {}) {
     }
   }
 
+  // Plays a data-sound-* value (`cue` or `theme:cue`) for the observers.
+  function playCue(value) {
+    const cue = cueFrom(value);
+    if (!cue) return;
+    if (import.meta.env.DEV) {
+      // cuelume's play() is a no-op until the document has real user
+      // activation, so this is the only way to confirm cues fire
+      // without a human at the keyboard.
+      window.__soundCues = (window.__soundCues || []).concat(value);
+    }
+    safe(() => api.play(cue.name, cue.options));
+  }
+
   function render() {
     toggle.setAttribute('aria-pressed', String(enabled));
     if (state) state.textContent = enabled ? 'on' : 'off';
@@ -154,6 +208,12 @@ export function initSound(toggle, options = {}) {
           const missing = USED_SOUNDS.filter((n) => !mod.sounds.includes(n));
           if (missing.length) {
             console.warn('[sound] unknown cuelume sounds:', missing);
+          }
+        }
+        if (import.meta.env.DEV && Array.isArray(mod.themes)) {
+          const missing = USED_THEMES.filter((t) => !mod.themes.includes(t));
+          if (missing.length) {
+            console.warn('[sound] unknown cuelume themes:', missing);
           }
         }
         api = mod;
@@ -259,11 +319,11 @@ export function initSound(toggle, options = {}) {
    * mapping stays with the element and ports to Webflow like the
    * data-cuelume-* attributes do.
    */
-  /* The nav carries data-sound-on/off too, but it signals through
-     data-bottom-nav-open rather than data-status, so it gets its own
-     observer below and is excluded here. */
+  /* The nav and the copy buttons carry data-sound-on/off too, but they
+     signal through other attributes, so they get the flag watcher below.
+     Selecting the steps by their own hook keeps them out of this one. */
   const stateNodes = document.querySelectorAll(
-    '[data-sound-on]:not([data-bottom-nav-init]), [data-sound-off]:not([data-bottom-nav-init])'
+    '[data-step-timeline-item][data-sound-on], [data-step-timeline-item][data-sound-off]'
   );
 
   // ScrollTrigger sets statuses during init and on every refresh; if the
@@ -295,13 +355,7 @@ export function initSound(toggle, options = {}) {
           // from stacking into a chord.
           if (now - lastCue < 70) continue;
           lastCue = now;
-          if (import.meta.env.DEV) {
-            // cuelume's play() is a no-op until the document has real
-            // user activation, so this is the only way to confirm cues
-            // fire without a human at the keyboard.
-            window.__soundCues = (window.__soundCues || []).concat(name);
-          }
-          safe(() => api.play(name));
+          playCue(name);
         }
       })
     : null;
@@ -319,37 +373,51 @@ export function initSound(toggle, options = {}) {
     }, 700);
   }
 
-  /* ---- bottom nav open / close -----------------------------------
-   * Same declarative idea as the timeline steps, different attribute:
-   * the vendored Osmo script writes data-bottom-nav-open, so watching
-   * that keeps the cue out of nav.js entirely.
+  /* ---- flag cues: bottom nav, copy buttons -----------------------
+   * Same declarative idea as the timeline steps, different attribute.
+   * Another script owns the flag and this module only listens, so the
+   * cue stays out of nav.js and clipboard.js entirely:
    *
-   * No arming delay is needed here, unlike the timeline: the attribute
-   * only ever changes from a real click on the toggle, so there is no
-   * init/refresh burst to suppress.
+   *   nav    data-bottom-nav-open, written by the vendored Osmo script.
+   *          "true" plays data-sound-on, anything else data-sound-off.
+   *   copy   data-copied, written by clipboard.js after a successful
+   *          write and removed 2s later. Only "true" plays.
+   *
+   * `everyWrite` is for the copy buttons. Copying again inside those 2s
+   * sets "true" over "true"; a MutationObserver still records that, and
+   * it is a second real copy, so it gets its own success. The nav keeps
+   * the old === new skip in case Osmo ever rewrites the same state.
+   *
+   * No arming delay is needed here, unlike the timeline: both flags only
+   * ever change from a real click, so there is no init/refresh burst.
    */
-  const navNode = document.querySelector('[data-bottom-nav-init]');
-  const navObserver =
-    navNode && (navNode.dataset.soundOn || navNode.dataset.soundOff)
-      ? new MutationObserver((records) => {
-          if (!enabled || !api || document.hidden) return;
-          for (const record of records) {
-            const is = navNode.getAttribute('data-bottom-nav-open');
-            if (record.oldValue === is) continue;
-            const name =
-              is === 'true'
-                ? navNode.dataset.soundOn
-                : navNode.dataset.soundOff;
-            if (name) safe(() => api.play(name));
-          }
-        })
-      : null;
+  function watchFlag(node, attr, everyWrite = false) {
+    const mo = new MutationObserver((records) => {
+      if (!enabled || !api || document.hidden) return;
+      for (const record of records) {
+        const is = node.getAttribute(attr);
+        if (!everyWrite && record.oldValue === is) continue;
+        playCue(is === 'true' ? node.dataset.soundOn : node.dataset.soundOff);
+      }
+    });
+    mo.observe(node, {
+      attributes: true,
+      attributeFilter: [attr],
+      attributeOldValue: true,
+    });
+    return mo;
+  }
 
-  navObserver?.observe(navNode, {
-    attributes: true,
-    attributeFilter: ['data-bottom-nav-open'],
-    attributeOldValue: true,
-  });
+  const flagObservers = [];
+  const navNode = document.querySelector('[data-bottom-nav-init]');
+  if (navNode && (navNode.dataset.soundOn || navNode.dataset.soundOff)) {
+    flagObservers.push(watchFlag(navNode, 'data-bottom-nav-open'));
+  }
+  document
+    .querySelectorAll('[data-clip][data-sound-on]')
+    .forEach((node) =>
+      flagObservers.push(watchFlag(node, 'data-copied', true))
+    );
 
   /* ---- hidden tab ------------------------------------------------
    * Nothing new may start while the tab is hidden: both observers above
@@ -372,7 +440,7 @@ export function initSound(toggle, options = {}) {
     document.removeEventListener('pointerdown', onUnlockGesture, true);
     clearTimeout(armTimer);
     observer?.disconnect();
-    navObserver?.disconnect();
+    flagObservers.forEach((mo) => mo.disconnect());
     // Mute first: since 0.2.6 setEnabled(false) also fades anything
     // still ringing within a few ms, so nothing outlives the teardown.
     if (api) safe(() => api.setEnabled(false));
