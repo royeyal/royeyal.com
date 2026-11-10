@@ -299,7 +299,9 @@ drop one in the markup and the feature stops, usually with no error.
 - `src/js/animations.js` — `data-hero`, `data-reveal`, `data-giant`, and
   `data-nav-current` (the section label in the closed nav pill)
 - `src/js/timeline.js` — `data-step-timeline-*`
-- cuelume itself — `data-cuelume-press`
+- cuelume itself — `data-cuelume-tap` (its value names the cue: `tap`,
+  `navigate`, `ready`). Not `data-cuelume-press`, which cuelume deprecated;
+  `src/js/sound.js` explains why the swap changed timing, not just a name.
 - `src/js/sound.js` — `data-sound-state`, plus `data-sound-on` /
   `data-sound-off` in **two** places. The easiest to miss and the only
   ones that fail **silently**: drop them and the page still works

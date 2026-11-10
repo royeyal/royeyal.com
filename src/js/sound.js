@@ -8,7 +8,7 @@
  * Two kinds of cue, both answering a deliberate act. Keep in sync with
  * index.html:
  *
- *   click   data-cuelume-press on links/buttons  tap / ready / navigate
+ *   click   data-cuelume-tap on links/buttons    tap / ready / navigate
  *   scroll  data-sound-on / -off on the steps    toggle / error
  *   menu    data-sound-on / -off on the nav      navigate / select
  *
@@ -17,13 +17,25 @@
  * turned into aliases for exactly these cues — so the rename changed no
  * sound, only removed names that 1.0 drops.
  *
- * data-cuelume-press is itself deprecated (kept through v0.3, gone in
- * 1.0). Its replacements — data-cuelume-tap, -navigate and so on — are
- * not a rename: they press on pointerdown and let go on the click, and
- * handle keyboard activation themselves, which would double up with the
- * keyboard bridge below and add a release sound into the tab a link has
- * just backgrounded. That is a design change for the 0.3 upgrade, not a
- * find-and-replace.
+ * The click cues used data-cuelume-press until November 2026. cuelume
+ * deprecated it (gone in 1.0), and data-cuelume-tap is not a rename —
+ * it changes when and how a cue sounds (bind.js, 0.2.8):
+ *
+ *   mouse     plays on pointerdown, as before, then lets go on the click.
+ *             The default theme has no release for tap / navigate / ready,
+ *             so the click is silent. The release only matters if the
+ *             site ever moves to the `press` theme.
+ *   touch     plays whole on the click, not on touch-down, so a scroll
+ *             that starts on a link — the project cards, the nav — stays
+ *             silent. The old attribute sounded on every one of those.
+ *   keyboard  Enter / Space dispatch a click (detail 0), which plays the
+ *             cue, so this module no longer bridges keydown. Keeping a
+ *             bridge would sound every keyboard activation twice.
+ *
+ * `tap` also changes timbre with the input. The old attribute fired on
+ * pointerdown, which reports detail 0, so cuelume heard every mouse tap
+ * as a keyboard one (lower, shorter, duller) and the bridge's play() as
+ * neither. Now each input gets its own.
  *
  * No hover cues, by choice. cuelume throttles pointerenter with a single
  * module-level timestamp shared across every element, so moving between
@@ -31,8 +43,9 @@
  * as lag rather than restraint. Bluetooth output latency compounds it.
  * Sound now only ever answers a click or a step lighting up.
  *
- * No data-cuelume-release either: every target opens a new tab or the
- * mail client, so a pointerup sound would fire into a backgrounding tab.
+ * No data-cuelume-release either: most targets open a new tab or leave
+ * the page, so a separate pointerup sound would fire into a tab that is
+ * already going away.
  *
  * WCAG 1.4.2 (Audio Control) is satisfied by construction — nothing plays
  * without an explicit opt-in gesture, every clip is far under 3s, and the
@@ -238,23 +251,6 @@ export function initSound(toggle, options = {}) {
   });
   document.addEventListener('pointerdown', onUnlockGesture, true);
 
-  /* ---- keyboard bridge -------------------------------------------
-   * cuelume binds pointerdown/pointerenter, and NEITHER fires when a
-   * link or button is activated from the keyboard — browsers dispatch
-   * only a click. Without this, sound would be a mouse-only feature.
-   */
-  function onKeydown(event) {
-    if (!enabled || !api || event.repeat) return;
-    const el = event.target.closest?.('[data-cuelume-press]');
-    if (!el || el === toggle) return;
-    // Space activates buttons but only scrolls when a link is focused.
-    const isLink = el.tagName === 'A';
-    if (event.key !== 'Enter' && !(event.key === ' ' && !isLink)) return;
-    safe(() => api.play(el.dataset.cuelumePress || 'tap'));
-  }
-
-  document.addEventListener('keydown', onKeydown);
-
   /* ---- state-change cues -----------------------------------------
    * cuelume's bind() only covers pointer and click events. The timeline
    * steps light up from scroll position, not from a pointer, so their
@@ -279,7 +275,7 @@ export function initSound(toggle, options = {}) {
 
   const observer = stateNodes.length
     ? new MutationObserver((records) => {
-        if (!armed || !enabled || !api) return;
+        if (!armed || !enabled || !api || document.hidden) return;
         const now = performance.now();
         for (const record of records) {
           const el = record.target;
@@ -336,7 +332,7 @@ export function initSound(toggle, options = {}) {
   const navObserver =
     navNode && (navNode.dataset.soundOn || navNode.dataset.soundOff)
       ? new MutationObserver((records) => {
-          if (!enabled || !api) return;
+          if (!enabled || !api || document.hidden) return;
           for (const record of records) {
             const is = navNode.getAttribute('data-bottom-nav-open');
             if (record.oldValue === is) continue;
@@ -355,21 +351,25 @@ export function initSound(toggle, options = {}) {
     attributeOldValue: true,
   });
 
-  // Clicking a _blank link backgrounds the tab; don't play into it.
-  function onVisibility() {
-    if (!api) return;
-    safe(() => api.setEnabled(enabled && !document.hidden));
-  }
-  document.addEventListener('visibilitychange', onVisibility);
+  /* ---- hidden tab ------------------------------------------------
+   * Nothing new may start while the tab is hidden: both observers above
+   * bail on document.hidden, which keeps a ScrollTrigger re-measure on
+   * the way back from firing a burst of step cues.
+   *
+   * This used to mute cuelume on visibilitychange instead. Since 0.2.6,
+   * setEnabled(false) also fades whatever is still ringing within a few
+   * milliseconds, and data-cuelume-tap plays a touch cue on the click —
+   * the same instant a _blank link hides the tab. Muting there would cut
+   * the tap on every external link on a phone. Letting a cue that
+   * already started finish is not "playing into" the hidden tab.
+   */
 
   // Always renders the off state; nothing is loaded until a real click.
   render();
 
   return function destroy() {
     toggle.removeEventListener('click', onClick);
-    document.removeEventListener('keydown', onKeydown);
     document.removeEventListener('pointerdown', onUnlockGesture, true);
-    document.removeEventListener('visibilitychange', onVisibility);
     clearTimeout(armTimer);
     observer?.disconnect();
     navObserver?.disconnect();
