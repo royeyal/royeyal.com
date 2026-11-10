@@ -333,7 +333,7 @@ export function initNavEnhancements() {
    *
    * Driving it through toggle.click() rather than reaching into the
    * vendored timeline means the close animation, the aria state and the
-   * `scan` sound cue all run exactly as they do for a real dismissal.
+   * `select` sound cue all run exactly as they do for a real dismissal.
    */
   panel.addEventListener('click', (event) => {
     if (event.target.closest('a[href^="#"]') && isOpen()) toggle.click();

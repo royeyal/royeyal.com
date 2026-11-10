@@ -17,7 +17,7 @@
     "ogl": "^1.0.11"
   },
   "devDependencies": {
-    "cuelume": "^0.2.4",
+    "cuelume": "^0.2.8",
     "prettier": "^3.6.2",
     "vite": "^8.1.5",
     "wrangler": "^4.118.0"

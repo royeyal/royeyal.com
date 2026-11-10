@@ -8,9 +8,22 @@
  * Two kinds of cue, both answering a deliberate act. Keep in sync with
  * index.html:
  *
- *   click   data-cuelume-press on the 19 targets press / ready / page
+ *   click   data-cuelume-press on links/buttons  tap / ready / navigate
  *   scroll  data-sound-on / -off on the steps    toggle / error
- *   menu    data-sound-on / -off on the nav      arrival / scan
+ *   menu    data-sound-on / -off on the nav      navigate / select
+ *
+ * These are cuelume's canonical names. Until November 2026 the markup
+ * used the v0.2 palette (press, page, arrival, scan), which cuelume 0.2.4
+ * turned into aliases for exactly these cues — so the rename changed no
+ * sound, only removed names that 1.0 drops.
+ *
+ * data-cuelume-press is itself deprecated (kept through v0.3, gone in
+ * 1.0). Its replacements — data-cuelume-tap, -navigate and so on — are
+ * not a rename: they press on pointerdown and let go on the click, and
+ * handle keyboard activation themselves, which would double up with the
+ * keyboard bridge below and add a release sound into the tab a link has
+ * just backgrounded. That is a design change for the 0.3 upgrade, not a
+ * find-and-replace.
  *
  * No hover cues, by choice. cuelume throttles pointerenter with a single
  * module-level timestamp shared across every element, so moving between
@@ -29,8 +42,10 @@
  * it on has given an unambiguous instruction. Don't "fix" this.
  *
  * cuelume handles more than its README documents (verified in
- * node_modules/cuelume/dist/interactions/bind.js): bind() is idempotent
- * and unknown sound names fall back safely rather than throwing. Note
+ * node_modules/cuelume/dist/interactions/bind.js, 0.2.8): bind() counts
+ * its callers per root, so binding twice is harmless, and returns an
+ * unbind that only lets go once every caller has. Unknown sound names
+ * never throw — a binding falls back to `tap`, play() stays silent. Note
  * play() is also a hard no-op until navigator.userActivation reports
  * real interaction, so audio genuinely cannot fire on load.
  *
@@ -44,15 +59,7 @@ const STORAGE_KEY = 'royeyal:sound';
 
 // Dev-only guard: cuelume is pre-1.0, so catch a renamed sound at
 // `npm run dev` rather than by ear in production.
-const USED_SOUNDS = [
-  'press',
-  'ready',
-  'page',
-  'toggle',
-  'error',
-  'arrival',
-  'scan',
-];
+const USED_SOUNDS = ['tap', 'ready', 'navigate', 'toggle', 'error', 'select'];
 
 /*
  * The preference is deliberately NOT persisted. Every page load starts
@@ -89,6 +96,7 @@ export function initSound(toggle, options = {}) {
   let api = null; // resolved cuelume module namespace
   let loading = null; // in-flight import promise (singleton)
   let broken = false; // import or API validation failed
+  let unbind = null; // what bind() hands back; destroy() calls it
 
   // The button is inert without JS, so it ships hidden and we reveal it.
   toggle.hidden = false;
@@ -150,7 +158,10 @@ export function initSound(toggle, options = {}) {
            still in flight. */
         api.setEnabled(enabled);
 
-        api.bind(root); // idempotent — guarded by a WeakSet upstream
+        /* Since 0.2.6 bind() returns its undo. Older versions returned
+           nothing, hence the typeof guard in destroy() rather than
+           trusting the return value. */
+        unbind = api.bind(root);
         return api;
       })
       .catch((err) => {
@@ -239,7 +250,7 @@ export function initSound(toggle, options = {}) {
     // Space activates buttons but only scrolls when a link is focused.
     const isLink = el.tagName === 'A';
     if (event.key !== 'Enter' && !(event.key === ' ' && !isLink)) return;
-    safe(() => api.play(el.dataset.cuelumePress || 'press'));
+    safe(() => api.play(el.dataset.cuelumePress || 'tap'));
   }
 
   document.addEventListener('keydown', onKeydown);
@@ -362,7 +373,10 @@ export function initSound(toggle, options = {}) {
     clearTimeout(armTimer);
     observer?.disconnect();
     navObserver?.disconnect();
-    // cuelume 0.2.2 exposes no unbind(); muting is the best we can do.
+    // Mute first: since 0.2.6 setEnabled(false) also fades anything
+    // still ringing within a few ms, so nothing outlives the teardown.
     if (api) safe(() => api.setEnabled(false));
+    if (typeof unbind === 'function') safe(unbind);
+    unbind = null;
   };
 }

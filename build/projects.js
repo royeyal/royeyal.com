@@ -58,7 +58,7 @@ function card(p, indent) {
     i(0, '<li class="project-card" data-reveal>'),
     i(2, '<a'),
     i(4, 'class="project-card__link"'),
-    i(4, 'data-cuelume-press="page"'),
+    i(4, 'data-cuelume-press="navigate"'),
     i(4, `href="${attr(p.href)}"`),
     i(4, 'target="_blank"'),
     i(4, 'rel="noreferrer"'),

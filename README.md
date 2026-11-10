@@ -306,8 +306,8 @@ drop one in the markup and the feature stops, usually with no error.
   perfectly, just mute.
   - on the timeline steps, driving the per-step scroll cues through a
     MutationObserver watching `data-status`
-  - on the `<nav>`, driving the menu's open/close cues (`arrival` /
-    `scan`) through a second observer watching `data-bottom-nav-open`.
+  - on the `<nav>`, driving the menu's open/close cues (`navigate` /
+    `select`) through a second observer watching `data-bottom-nav-open`.
     Keeping the cue here rather than in `nav.js` is what lets the Osmo
     script stay untouched.
 - `src/styles/sections.css` — `data-brand`, the only CSS-only one
